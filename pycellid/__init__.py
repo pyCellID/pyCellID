@@ -8,8 +8,8 @@
 
 
 #Modulo de importación de tablas PyCell
-import pycell.load_data as ld
-from pycell.load_data import read_cellidtable
+import pycellid.load_data as ld
+from pycellid.load_data import read_cellidtable
 
 class PyCell(object):
     """Base class for PyCell objects."""

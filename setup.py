@@ -53,21 +53,21 @@ with open("README.md") as fp:
 # =============================================================================
 
 setup(
-    name="PyCell",
+    name="PyCellID",
     version=VERSION,
     description="An extension that analyze Cell-ID single-cell cytometry data using Python language.",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     author="",
     author_email="",
-    url="https://github.com/darksideoftheshmoo/pycell",
+    url="https://github.com/pyCellID/pyCellID",
     py_modules=["ez_setup"],
     packages=["pycellid"],
     license="The MIT License",
     install_requires=REQUIREMENTS,
     keywords=["pycell", "key2", "key3"],
     classifiers=[
-        "Development Status :: 1 - Beta",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Education",
         "Intended Audience :: Science/Research",
         'Intended Audience :: Developers',

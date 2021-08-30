@@ -31,37 +31,53 @@ Salida: único DataFrame con los valores de cada tabla. Agregará las series:
   la cantidad de variables morfológicas ``df['f_tot_x1fp','f_tot_x2fp',..., 'f_tot_xnfp']``
 """    
 
+#%%
 import os
 import pandas as pd
 import re
 
+#%%
+# Tables Proccesing
+def create_df(file):
+    """Delete the delimitations by space of headers.
 
-#Procesamiento de tablas
-def get_dataframe(file):
-    """Elimina las delimitaciones por espacio de headers.
-
-    :param file: ruta al texto plano (formato tabla).
+    :param file: path to the plain text given by *out_all* file (table formater).
     :return: A dataframe.
     """
-    df = pd.read_table(file)
-    #Elimino los espacios en los nombres de las columnas ' x.pos '. 
-    df.columns = df.columns.str.strip()
-    #Cambio (. por _) las separaciones x.pos por x_pos
-    df.columns = df.columns.str.replace('.', '_')
-    return df
+    try:
+        df = pd.read_table(file)
+        #Elimino los espacios en los nombres de las columnas ' x.pos '.
+        df.columns = df.columns.str.strip()
+        #Cambio (. por _) las separaciones x.pos por x_pos
+        df.columns = df.columns.str.replace('.', '_')
+        return df
+    except FileNotFoundError:
+        return f'No such file or directory: {file}'
 
-def get_ucid(df, pos):
+#%%
+def create_ucid_column(df_table, position):
     """Crea una columna en el dataframe ``(df)`` con número de tracking
-    ``df[ucid].loc[0] = 100000000000`` ``para ``cellID = 0``, ``Position = 1``.
+    ``df[ucid].loc[0] = 100000000000`` para ``cellID = 0``, ``Position = 1``.
 
     :param ucid: ``int(numberPosition + cellID)``.
 
-    :param df: dataframe creado por ``cellID`` contiene la serie ``df['cellID']``.
+    :param df_table: dataframe creado por ``cellID`` contiene la serie ``df['cellID']``.
     """
-    df['ucid'] = [pos * 100000000000 + cellID for cellID in df['cellID']]
-    return df
- 
-def get_chanel(df_mapping, flag):
+    #? Preguntar cómo podemos gestionar los errores en este caso.
+    #? Por ejemplo si el df no existe o si el rango no es válido.
+    #? falta validar que el número ingresado sea un entero.
+    try:
+        if pos > 0:
+            df_table['ucid'] = [position * 100000000000 +\
+                                cellID for cellID in df_table['cellID']]
+            return df
+        else:
+            return f'ingrese una posición válida'
+    except:
+        f'Input a valid ucid or datafame.'
+
+#%% 
+def get_channel(df_mapping, flag):
     """
     :param df_mapping: recibe un DataFrame de mapeo, ``df_mapping``,
                        con series ``['flag']=int()`` y
@@ -69,34 +85,32 @@ def get_chanel(df_mapping, flag):
     :return: ``str(chanel)`` correspondiente al ``int(flag)``.
     """
     #La escritura del cellID tiene la siguiente expresión regular
-     #De 2 a tres caractes xFP luego  _Position
+    #De 2 a tres caractes xFP luego  _Position
     chanel = re.compile(r'\w{2,3}_Position')
-    #cellID codifica en la columna 'fluor'(ruta_archivo contiene str('chanel'))
-     #Filtro el DataFrame  para la coincidencia falg == fluor
+    # cellID codifica en la columna 'fluor'(ruta_archivo contiene str('chanel'))
+    # Filtro el DataFrame  para la coincidencia falg == fluor
     path = df_mapping[df_mapping['flag'] == flag]['fluor'].values[0]
     return chanel.findall(path)[0].split('_')[0].lower()
 
-def get_col_chan(df, df_map):
+def create_morphological_series_by_channel(df, df_mapping):
     """Modifica la entrada df proviniente del pipeline ``pyCell``. 
     Separa las series (columnas) morfológicas por canal de fluorecsencia.
     Elimina los valores redundandes de ``cellID`` y la serie ``'flag'``.
 
     :param df: Tabla ``cellID`` contiendo ``df['ucid']``.
-    :param df_map: Tabla mapping ``cellID`` (``out_bf_fl_mapping``).
+    :param df_mapping: Tabla mapping ``cellID`` (``out_bf_fl_mapping``).
     :return: Crea serias morfologicas por canal ``df['f_tot_yfp',...,'f_nuc_bfp',...]``.
     """
-    #Mensaje
-    print('Agragando columnas chanles ...')
-    
     #Variables de fluorescencia
     fluor  = [f_var for f_var in df.columns if f_var.startswith('f_')]
+    idx = ['ucid', 't_frame']
     #Creo un df con columnas variable_fluor por ucid y t_frame
     #idx = ['ucid', 't_frame'] if 't_frame' in df else idx = ['ucid']
-    df_flag = df.pivot(index = ['ucid', 't_frame'] ,columns = 'flag', values= fluor)
+    df_flag = df.pivot(index = idx,columns = 'flag', values= fluor)
     
     #Renombro columnas 
     #Obtengo todos los flag:chanel en mapping
-    chanels = {flag:get_chanel(df_map, flag) for flag in df_map['flag'].unique()}
+    chanels = {flag:get_channel(df_mapping, flag) for flag in df_mapping['flag'].unique()}
     #Col_name
     df_flag.columns = [n[0] + '_' + chanels[n[1]] for n in df_flag.columns]
     
@@ -106,15 +120,16 @@ def get_col_chan(df, df_map):
     #Creo un df con las variables morfologicas
     #Elimino las redundancias creadas por cellID, registo un solo flag. 
     df_morf = df[df.flag == 0 ][morf]
-    df_morf.set_index(['ucid', 't_frame'], inplace=True)
+    df_morf.set_index(idx, inplace=True)
     #Junto los df_flag y df_morf
-    df = pd.merge(df_morf, df_flag, on=['ucid', 't_frame'], how='outer')
+    df = pd.merge(df_morf, df_flag, on = idx, how='outer')
     del df['flag']
     #Por congruencia con RCell
     #Indices numéricos. ucid, t_frama pasan a columnas
     df = df.reset_index()
     #Ordeno columnas compatible con marco de datos RCell
     col = ['pos', 't_frame', 'ucid', 'cellID']
+    # * col = ['pos'] + idx + ['cellID'] -- Preguntar si sirve!!!
     df = pd.concat([df[col],df.drop(col,axis=1)], axis=1)
     return df
 
@@ -131,20 +146,20 @@ def make_df(path_file):
     pos = int(re.findall("\d+", path_file)[0])
     print('leyendo position: ', pos)
     #Leo la tabla de texto plano.
-    df = get_dataframe(path_file)
+    df = create_df(path_file)
     #Asigno ucid
-    df = get_ucid(df, pos)
+    df = create_ucid_column(df, pos)
     df['pos'] = [pos for _ in range(len(df))]
     return df
 
-#%% #Navego direcctorios para obtener tablas
 
-def get_outall_files(path):
+#%% #Navego direcctorios para obtener tablas
+def get_outall_or_mapp_file(path):
     """Change the working directory.
 
     :param path: carpeta que contiene las salidas cellID.
-    
-    :return: una lista generadora con ``path`` de acceso a tablas ``'out'`` de ``cellID``.
+    :return: una lista generadora con ``path`` de acceso
+             a tablas ``'out'`` de ``cellID``.
     """
     #Rutas a los archivos out_all, out_bf_fl_mapping de cellID
     for r, d, f in os.walk ( "." ):
@@ -154,16 +169,6 @@ def get_outall_files(path):
                 p = os.path. join (r, name)
                 print(p)
                 yield p
-
-def get_mapp_files(path):
-    """
-    :param path: Carpeta que contiene las salidas cellID. Change the working directory.
-    :return: una lista generadora con path de acceso a tablas 'out' de cellID.
-    """
-    #Rutas a los archivos out_all, out_bf_fl_mapping de cellID
-    for r, d, f in os. walk ( "." ):
-        d.sort()
-        for name in f:
             if 'mapping' in name:
                 yield os.path.join(r, name)
                 
@@ -183,25 +188,30 @@ def read_cellidtable(path): #cambio load_df
         #Proceso las tablas de a una
         df_i = make_df(f)
         #Creo el DataFrame para mapear canales
-        df_i =  get_col_chan(df_i, get_dataframe(get_mapp_files(path).__next__()))
+        df_i = create_morphological_series_by_channel(df_i,\
+            create_df(get_outall_or_mapp_file(path).__next__())) #esto se llamaba get_mapp_files
         df = pd.concat([df, df_i], ignore_index=True)
     return df
 
 #%% #Opcional, crear directrio pydata y de guardar tabla
 
-def save_df (df):
+def save_df(df, dir_name = 'pydata'):
     """Crea una carpeda ``/pydata``
-    guarda el parámetro ``df`` DataFrame"""
-    #Mensaje de entrada
+    guarda el parámetro ``df`` DataFrame
+    
+    :param df: A dataframe.
+    :param dir_name: A directory. The defauld value is ``pydata``.
+    """
+    # Mensaje de entrada
     print('\nguardando archivo...')
-    dir_name = 'pydata'
-    #Me fijo si no existe el directorio
+    # Me fijo si no existe el directorio
     if not os.path.exists(dir_name):
-        os.mkdir(dir_name)# si no existe lo creo
+        os.mkdir(dir_name) # si no existe lo creo
     os.chdir(dir_name)
-    #gruado csv
-    df.to_csv('df.csv', index= False)
-    return print('se guardó el archivo df')
+    # Guardo csv.
+    csv = 'df.csv'
+    df.to_csv(index= False)
+    return f'se guardó el archivo {csv} en el diretorio {dir_name}'
 
 #%% #Programa principal y consola
 
@@ -229,3 +239,4 @@ def main(argv):
 if __name__ == '__main__':
     import sys
     main(sys.argv)
+

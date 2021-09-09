@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 #Modulo de importación de tablas PyCell
-import pycell.load_data as ld
-from pycell.load_data import read_cellidtable
+import load_data as ld
+from load_data import read_cellidtable
 #import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,7 +11,7 @@ import os
 
 #%%
 
-def get_img_name(ucid, t_frame, chanel):
+def img_name(ucid, t_frame, chanel):
     """This function have a initial ucid ``ucid_in = 100000000000``
     such that try a positional string given by ``pos = str(ucid //ucid_in).zfill(2)``.
     For example: ``ucid = int(300000000020)`` numero de traking unico.
@@ -101,7 +101,7 @@ def array_img(data, path, chanel='BF', n=25, shape=(5,5),\
     select = data[['ucid','t_frame','xpos', 'ypos']].sample(n)
     #Registra el nombre de cada imagen en la serie 'name'
     select['name'] = select.apply(
-        lambda row : get_img_name(row['ucid'], row['t_frame'], chanel),\
+        lambda row : img_name(row['ucid'], row['t_frame'], chanel),\
         axis=1
         )
     

@@ -43,9 +43,10 @@ def get_dataframe(file):
     :param file: ruta al texto plano (formato tabla).
     :return: A dataframe.
     """
-    df = pd.read_table(file)
+    #Elimino los espacios en los nombres de las columnas ' x.pos '
+    df = pd.read_table(file, delim_whitespace = True)
     #Elimino los espacios en los nombres de las columnas ' x.pos '. 
-    df.columns = df.columns.str.strip()
+    # df.columns = df.columns.str.strip()
     #Cambio (. por _) las separaciones x.pos por x_pos
     df.columns = df.columns.str.replace('.', '_')
     return df
@@ -72,7 +73,7 @@ def get_chanel(df_mapping, flag):
      #De 2 a tres caractes xFP luego  _Position
     chanel = re.compile(r'\w{2,3}_Position')
     #cellID codifica en la columna 'fluor'(ruta_archivo contiene str('chanel'))
-     #Filtro el DataFrame  para la coincidencia falg == fluor
+     #Filtro el DataFrame  para la coincidencia flag == fluor
     path = df_mapping[df_mapping['flag'] == flag]['fluor'].values[0]
     return chanel.findall(path)[0].split('_')[0].lower()
 
@@ -83,10 +84,10 @@ def get_col_chan(df, df_map):
 
     :param df: Tabla ``cellID`` contiendo ``df['ucid']``.
     :param df_map: Tabla mapping ``cellID`` (``out_bf_fl_mapping``).
-    :return: Crea serias morfologicas por canal ``df['f_tot_yfp',...,'f_nuc_bfp',...]``.
+    :return: Crea series morfologicas por canal ``df['f_tot_yfp',...,'f_nuc_bfp',...]``.
     """
     #Mensaje
-    print('Agragando columnas chanles ...')
+    print('Agregando columnas chanles ...')
     
     #Variables de fluorescencia
     fluor  = [f_var for f_var in df.columns if f_var.startswith('f_')]

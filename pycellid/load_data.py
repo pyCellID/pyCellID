@@ -209,21 +209,21 @@ def save_df (df):
 def main(argv):
     try:
         if len(argv) != 2:
-            raise SystemExit (f'\nUso adecuado: {sys.argv[0]}'
+            raise ValueError (f'\nUso adecuado: {sys.argv[0]}' #conviene usar SystemExit???
                                 ' ' 'path salida de cellID')
         df = read_cellidtable(argv[1])
         
-        guardar = input('¿Decea guardar DataFrame? S/N ')
+        guardar = input('¿Desea guardar DataFrame? S/N ')
         if 's' in guardar.lower():
             save_df(df)
         
-    except SystemExit as e:
+    except ValueError as e:
         print(e)
-        path = input('\ningrege path de acceso a salida cellID\n')
+        path = input('\nIngrese path de acceso a salida cellID\n')
         
         df = read_cellidtable(path)
         
-        guardar = input('¿Decea crear la carpeta pydata y guardar DataFrame? S/N ')
+        guardar = input('¿Desea crear la carpeta pydata y guardar DataFrame? S/N ')
         if 's' in guardar.lower():
             save_df(df)
 

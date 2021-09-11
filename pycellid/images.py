@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 #Modulo de importación de tablas PyCell
-import load_data as ld
-from load_data import read_cellidtable
+# import load_data as ld
+# from load_data import read_cellidtable
 #import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import pandas as pd
+import glob
 
 
 #%%
@@ -56,6 +58,8 @@ def box_img(path, im_name, x_pos, y_pos, dx=(15, 15), dy=(15, 15)):
     # load image
     im = plt.imread(path_n, format= 'tif') # [Y_min : Y_max, X_min : X_max]
     
+    im_size = im.shape
+    
     im = im.copy()
     centro = np.zeros((2,2))
     im[y_pos-1:y_pos+1, x_pos-1:x_pos+1] = centro
@@ -96,9 +100,33 @@ def array_img(data, path, chanel='BF', n=25, shape=(5,5),\
     """
     #Selecciono ucid al azar para las n celulas
     #select = np.random.choice(data['ucid'], 91 ,replace = False)
-        
+    
+    # Calculo las dimensiones de la imagen unitaria en base al area de la
+    # célula, suponiéndola esférica (con una proyección circular cuyo area es 
+    # df['a_tot'])
+    
+    radio = int(np.round(np.sqrt(data['a_tot'].max()/np.pi)))
+    
+    # Leo las dimensiones de una imagen típica
+    
+    image_name = glob.glob("*.tif.out.tif")[0]
+    filename = os.path.join(path, image_name)
+    im = plt.imread(filename, format= 'tif') # [Y_min : Y_max, X_min : X_max]
+    
+    im_size = im.shape
+    
+    del image_name, filename
+    
+    # im_size = im.shape
+    
     #seleccion de n filas al azar y sin repo
-    select = data[['ucid','t_frame','xpos', 'ypos']].sample(n)
+    data_copy = data.copy()
+    data_copy = data_copy[(data_copy['ypos'] > 2*radio) & 
+                          (data_copy['ypos'] < im_size[0] - (2*radio+3)) & 
+                          (data_copy['xpos'] > 2*radio) & 
+                          (data_copy['xpos'] < im_size[1] - (2*radio+3))]
+    
+    select = data_copy[['ucid','t_frame','xpos', 'ypos']].sample(n)
     #Registra el nombre de cada imagen en la serie 'name'
     select['name'] = select.apply(
         lambda row : img_name(row['ucid'], row['t_frame'], chanel),\
@@ -107,29 +135,31 @@ def array_img(data, path, chanel='BF', n=25, shape=(5,5),\
     
     #Registra un array para cada imagen en la serie 'box_img'
       #Cada imagen tiene dimenciones de 48*53 valores
-    Y_m = cent_cel[0][0]
-    Y_M = cent_cel[0][1]
-    X_m = cent_cel[1][0]
-    X_M = cent_cel[0][1]
+    Y_m = 2*radio#cent_cel[0][0]
+    Y_M = 2*radio#cent_cel[0][1]
+    X_m = 2*radio#cent_cel[1][0]
+    X_M = 2*radio#cent_cel[0][1]
     
     select['box_img'] =select.apply(
         lambda row : box_img(path, row['name'], row['xpos'], row['ypos'],\
-        [(Y_m, Y_M),(X_m, X_M)]), axis = 1
+        (Y_m, Y_M),(X_m, X_M)), axis = 1
         )
     
+        
+    s = (4*radio+3, 4*radio+3) #Shape of unitary image    
+    
     #iarray np.ones, con dimencion para contenr todas las imgs
-    iarray = np.ones((48*shape[0], 53*shape[1]), dtype=float)
+    iarray = np.ones((s[0]*shape[0], s[1]*shape[1]), dtype=float)
      
     #Para las filas i y columnas j de iarray
      #se remplazan las img de c/celula seleccionada
         
-    s = (48, 53) #Shape of unitary image
+    
     iloc = 0 #img index
     for i in range(0,shape[0]):
         for j in range (0,shape[1]):
             try:
-                iarray[s[0]*i:s[0]*(i+1), s[1]*j:s[1]*(j+1)] =\
-                    select['box_img'].iloc[iloc]
+                iarray[s[0]*i:s[0]*(i+1), s[1]*j:s[1]*(j+1)] = select['box_img'].iloc[iloc]
             except:
                 print(select.iloc[iloc], select['box_img'].iloc[iloc].shape)
                 pass
@@ -137,3 +167,6 @@ def array_img(data, path, chanel='BF', n=25, shape=(5,5),\
     
     plt.imshow(iarray, cmap="gist_gray")
     return iarray
+
+df = pd.read_csv('.//pydata//df.csv')
+array_img(df, "D://Documents//Universidad//Cursos//Curso FAMAF Diseño de software para cómputo científico//proyecto//pyCellID//muestras_cellid")

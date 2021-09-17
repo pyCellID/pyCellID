@@ -4,7 +4,7 @@
 
 # Created on Sun Nov 15 12:03:09 2020
 
-# @author: jose
+# @author: Clemente Jose Antonio
 
 """
 Script complemento para cellID.
@@ -32,8 +32,9 @@ Salida: único DataFrame con los valores de cada tabla. Agregará las series:
 """    
 
 import os
-import pandas as pd
 import re
+
+import pandas as pd
 
 
 #Procesamiento de tablas

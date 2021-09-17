@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 #Modulo de importación de tablas PyCell
-import pycell.load_data as ld
-from pycell.load_data import read_cellidtable
+#import io.load_data as ld
+#from io.load_data import read_cellidtable
 #import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
@@ -112,12 +112,13 @@ def array_img(data, path, chanel='BF', n=25, shape=(5,5),\
     X_m = cent_cel[1][0]
     X_M = cent_cel[0][1]
     
+    #box_img(path, im_name, x_pos, y_pos, dx=(15, 15), dy=(15, 15))
     select['box_img'] =select.apply(
         lambda row : box_img(path, row['name'], row['xpos'], row['ypos'],\
-        [(Y_m, Y_M),(X_m, X_M)]), axis = 1
+        dx=(Y_m, Y_M),dy=(X_m, X_M)), axis = 1
         )
     
-    #iarray np.ones, con dimencion para contenr todas las imgs
+    #iarray np.ones, con dimencion para contener todas las imgs
     iarray = np.ones((48*shape[0], 53*shape[1]), dtype=float)
      
     #Para las filas i y columnas j de iarray

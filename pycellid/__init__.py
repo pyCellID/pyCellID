@@ -3,13 +3,13 @@
 
 # Created on Thursday Aug 26 10:24:27 2021
 
-# @author: jose
+# @author: Jose Antonio Clemente
 # @author: Juan David Ferreira
 
 
 #Modulo de importación de tablas PyCell
-import pycellid.load_data as ld
-from pycellid.load_data import read_cellidtable
+import pycellid.io as ld
+from pycellid.io import read_cellidtable
 
 class PyCell(object):
     """Base class for PyCell objects."""

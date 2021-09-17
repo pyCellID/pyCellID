@@ -7,6 +7,7 @@ __pycache__/
 Documento sin título 1
 pycell_respaldo_1.py
 pycell.py
+dev_test.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -106,6 +107,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+my_env/
 
 # Spyder project settings
 .spyderproject

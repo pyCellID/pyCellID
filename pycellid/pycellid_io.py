@@ -37,24 +37,26 @@ import re
 import pandas as pd
 
 
-#Procesamiento de tablas
-def get_dataframe(file):
-    """Elimina las delimitaciones por espacio de headers.
+#%%Procesamiento de tablas
+def _read_df(path_file):
+    """Crea una dataframe para el path.
+    Elimina las delimitaciones por espacio de headers.
 
-    :param file: ruta al texto plano (formato tabla).
+    :param path_file: ruta al texto plano (formato tabla).
     :return: A dataframe.
     """
-    df = pd.read_table(file)
+    df = pd.read_table(path_file)
     #Elimino los espacios en los nombres de las columnas ' x.pos '. 
     df.columns = df.columns.str.strip()
     #Cambio (. por _) las separaciones x.pos por x_pos
-    df.columns = df.columns.str.replace('.', '_')
+    df.columns = df.columns.str.replace('.', '_', regex=True)
     return df
 
-def get_ucid(df, pos):
-    """Crea una columna en el dataframe ``(df)`` con número de tracking
+def _create_ucid(df, pos):
+    """ucid = unique cell identifier
+    Crea una columna en el dataframe ``(df)`` con número de tracking
     ``df[ucid].loc[0] = 100000000000`` ``para ``cellID = 0``, ``Position = 1``.
-
+    
     :param ucid: ``int(numberPosition + cellID)``.
 
     :param df: dataframe creado por ``cellID`` contiene la serie ``df['cellID']``.
@@ -62,8 +64,10 @@ def get_ucid(df, pos):
     df['ucid'] = [pos * 100000000000 + cellID for cellID in df['cellID']]
     return df
  
-def get_chanel(df_mapping, flag):
-    """
+def _decod_chanel(df_mapping, flag):
+    """Decodifica el flag, alojado en df_mapping. convirtiendolo
+    en un nombre adecuado para su lectura.
+
     :param df_mapping: recibe un DataFrame de mapeo, ``df_mapping``,
                        con series ``['flag']=int()`` y
                        ``['fluor']=str(path_file) ``(ver ``cellID doc``). 
@@ -77,7 +81,7 @@ def get_chanel(df_mapping, flag):
     path = df_mapping[df_mapping['flag'] == flag]['fluor'].values[0]
     return chanel.findall(path)[0].split('_')[0].lower()
 
-def get_col_chan(df, df_map):
+def _make_cols_chan(df, df_map, v=False):
     """Modifica la entrada df proviniente del pipeline ``pyCell``. 
     Separa las series (columnas) morfológicas por canal de fluorecsencia.
     Elimina los valores redundandes de ``cellID`` y la serie ``'flag'``.
@@ -87,7 +91,7 @@ def get_col_chan(df, df_map):
     :return: Crea serias morfologicas por canal ``df['f_tot_yfp',...,'f_nuc_bfp',...]``.
     """
     #Mensaje
-    print('Agragando columnas chanles ...')
+    if v : print('Agragando columnas chanles ...')
     
     #Variables de fluorescencia
     fluor  = [f_var for f_var in df.columns if f_var.startswith('f_')]
@@ -97,7 +101,7 @@ def get_col_chan(df, df_map):
     
     #Renombro columnas 
     #Obtengo todos los flag:chanel en mapping
-    chanels = {flag:get_chanel(df_map, flag) for flag in df_map['flag'].unique()}
+    chanels = {flag:_decod_chanel(df_map, flag) for flag in df_map['flag'].unique()}
     #Col_name
     df_flag.columns = [n[0] + '_' + chanels[n[1]] for n in df_flag.columns]
     
@@ -119,47 +123,43 @@ def get_col_chan(df, df_map):
     df = pd.concat([df[col],df.drop(col,axis=1)], axis=1)
     return df
 
-# def get_serie_chanels(df, df_map): funcion eliminada, crea elemento por linea
-
-def make_df(path_file):
+def make_df(path_file, v=False):
     """Crea un dataframe con numero de tracking ``ucid`` y ``position``.
 
     :param path_file: nombre del archivo de salida ``cellID`` ``out_all``
-    
     :return: un dataframe del archivo pasado conteniendo ``df['ucid']``.
     """
     #Position está codificada en el nombre del path al archivo.
     pos = int(re.findall("\d+", path_file)[0])
-    print('leyendo position: ', pos)
+    if v : print('leyendo position: ', pos)
     #Leo la tabla de texto plano.
-    df = get_dataframe(path_file)
+    df = _read_df(path_file)
     #Asigno ucid
-    df = get_ucid(df, pos)
+    df = _create_ucid(df, pos)
     df['pos'] = [pos for _ in range(len(df))]
     return df
 
-#%% #Navego direcctorios para obtener tablas
-
-def get_outall_files(path):
-    """Change the working directory.
+#%% Navego direcctorios para obtener tablas
+def _outall_path(path):
+    """Parsea la ruta pasada y devuele de a una las
+    ubicaciones a los archivos de mappig
 
     :param path: carpeta que contiene las salidas cellID.
-    
-    :return: una lista generadora con ``path`` de acceso a tablas ``'out'`` de ``cellID``.
+    :return: srt(acceso a tablas 'out' de cellID) 
     """
     #Rutas a los archivos out_all, out_bf_fl_mapping de cellID
     for r, d, f in os.walk ( "." ):
         d.sort()
         for name in f:
             if 'out_all' in name:
-                p = os.path. join (r, name)
-                print(p)
-                yield p
+                yield os.path. join (r, name)
 
-def get_mapp_files(path):
-    """
-    :param path: Carpeta que contiene las salidas cellID. Change the working directory.
-    :return: una lista generadora con path de acceso a tablas 'out' de cellID.
+def _mapping_path(path):
+    """Parsea la ruta pasada y devuele de a una las
+    ubicaciones a los archivos de mappig
+
+    :param path: ruta con registros cellID.
+    :return: srt(acceso a tablas 'out' de cellID)
     """
     #Rutas a los archivos out_all, out_bf_fl_mapping de cellID
     for r, d, f in os. walk ( "." ):
@@ -168,9 +168,8 @@ def get_mapp_files(path):
             if 'mapping' in name:
                 yield os.path.join(r, name)
                 
-#%%
-#Junto el pipeline compact_df
-def read_cellidtable(path): #cambio load_df
+#%% Junto el pipeline compact_df
+def read_cellidtable(path, verbose=False): #cambio load_df
     """
     :param path: ruta de acceso a las salida ``cellID``.
     :return: único dataframe para las tablas out ``cellID``.
@@ -180,16 +179,15 @@ def read_cellidtable(path): #cambio load_df
     #creo un DataFrame vacío.
     df = pd.DataFrame()
     #Itero sobre la lista de archivos out.
-    for f in get_outall_files(path):
+    for f in _outall_path(path):
         #Proceso las tablas de a una
-        df_i = make_df(f)
+        df_i = make_df(f, v=verbose)
         #Creo el DataFrame para mapear canales
-        df_i =  get_col_chan(df_i, get_dataframe(get_mapp_files(path).__next__()))
+        df_i =  _make_cols_chan(df_i, _read_df(_mapping_path(path).__next__()),v=verbose)
         df = pd.concat([df, df_i], ignore_index=True)
     return df
 
 #%% #Opcional, crear directrio pydata y de guardar tabla
-
 def save_df (df):
     """Crea una carpeda ``/pydata``
     guarda el parámetro ``df`` DataFrame"""
@@ -214,8 +212,7 @@ def main(argv):
         df = read_cellidtable(argv[1])
         
         guardar = input('¿Decea guardar DataFrame? S/N ')
-        if 's' in guardar.lower():
-            save_df(df)
+        if 's' in guardar.lower(): save_df(df)
         
     except SystemExit as e:
         print(e)

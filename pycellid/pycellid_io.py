@@ -7,14 +7,36 @@
 # @author: Clemente Jose Antonio
 
 """
-Script complemento para cellID.
+Espe pipeline está diseñado para navegar un path y rastrear tablas con
+data y metadata(mapping) para retornar un único objeto Dataframe.
 
-Requiere librerias python standard `pandas <https://pandas.pydata.org/docs/>`_,
+padre/
+    hijo01/
+        data.ext
+        mapping.ext
+    hijo03/
+        data.ext
+        mapping.ext
+    hijo03/
+        data.ext
+        mapping.ext
+    
+Requiere librerias python standard:
 `os <https://docs.python.org/3/library/os.html>`_,
 `re <https://docs.python.org/3/library/re.html?highlight=re#module-re>`_
-y también `matplotlib <https://matplotlib.org/stable/index.html>`_.
+`pandas <https://pandas.pydata.org/docs/>`_,
+`matplotlib <https://matplotlib.org/stable/index.html>`_.
 
-Debe pasarse como parámetro la ruta generada por ``cellID``. 
+Este proyecto comienza como soporte al software Cell-ID 
+Gordon, Colman‐Lerner et al. 2007 
+publicación original DOI: 10.1038/nmeth1008
+'software <https://sourceforge.net/projects/cell-id/>' 
+
+Orientado, pero no limitando, a las salidas prodcidas por cell-ID
+: input: la ruta generada por ``cellID``.
+
+En el futuro se integrará el código en C de Cell-ID para dar una 
+rutina acabada y completa.
 
 El programa recorrerá las subcarpetas. Toma de las tablas de salida ``cellID``
 (``out_all``, ``out_bf_fl_mapping``) por position. Creará una subcarpeta
@@ -140,50 +162,55 @@ def make_df(path_file, v=False):
     return df
 
 #%% Navego direcctorios para obtener tablas
-def _outall_path(path):
+def _parse_path(find_f, path=False):
     """Parsea la ruta pasada y devuele de a una las
-    ubicaciones a los archivos de mappig
+    ubicaciones a los archivos find_f, si path=False
+    la búsqueda se realiza en el path actual.
 
-    :param path: carpeta que contiene las salidas cellID.
-    :return: srt(acceso a tablas 'out' de cellID) 
+    :param path: str(path_to_parse).
+    :param find_f: str(searched_file).
+    :return: srt(path_to_find_f) 
     """
+    if path: os.chdir(path)
     #Rutas a los archivos out_all, out_bf_fl_mapping de cellID
     for r, d, f in os.walk ( "." ):
         d.sort()
         for name in f:
-            if 'out_all' in name:
-                yield os.path. join (r, name)
-
-def _mapping_path(path):
-    """Parsea la ruta pasada y devuele de a una las
-    ubicaciones a los archivos de mappig
-
-    :param path: ruta con registros cellID.
-    :return: srt(acceso a tablas 'out' de cellID)
-    """
-    #Rutas a los archivos out_all, out_bf_fl_mapping de cellID
-    for r, d, f in os. walk ( "." ):
-        d.sort()
-        for name in f:
-            if 'mapping' in name:
+            if find_f in name:
                 yield os.path.join(r, name)
                 
 #%% Junto el pipeline compact_df
-def read_cellidtable(path, verbose=False): #cambio load_df
-    """
-    :param path: ruta de acceso a las salida ``cellID``.
-    :return: único dataframe para las tablas out ``cellID``.
+def cellidtable(path, n_data='out_all', n_mdata='mapping', v=False):
+    """Concatenate the tables in the path with the pandas method.
+    Transforms the identifying index of each cell from each data 
+    table into a temporal index UCID (Unique Cell Identifier)
+    Disaggregate the columns of morphological measurements into 
+    columns by fluorescence channel. It uses the mapping present 
+    in the metadata file (mapping).
+    
+    :param path: global path from output ``cellID`` tables.
+    :param n_data: srt() name to finde each table data
+    :param n_mdata: srt() name to finde tables metadata/mapping_tags
+    :param verbose: bool, True to print in realtime pipeline
+    :return: dataframe ``cellID``.
+    ---------------------------------------------------------------
+    
+    to use:
+    import pycellid_io as ld
+
+    df = ld.cellidtable(path, n_data='out_all', n_mdata='mapping', v=False)
+
     """
     #Me posiciono en el directorio a buscar.
     os.chdir(path)
     #creo un DataFrame vacío.
     df = pd.DataFrame()
-    #Itero sobre la lista de archivos out.
-    for f in _outall_path(path):
+    #Itero sobre la lista tablas (data).
+    for data_table in _parse_path(find_f=n_data): 
         #Proceso las tablas de a una
-        df_i = make_df(f, v=verbose)
-        #Creo el DataFrame para mapear canales
-        df_i =  _make_cols_chan(df_i, _read_df(_mapping_path(path).__next__()),v=verbose)
+        df_i = make_df(data_table, v=v)
+        #Modifica el iesimo_df, crea columnas por fluorescencia
+        df_i =  _make_cols_chan(df_i, _read_df(_parse_path(find_f=n_mdata).__next__()), v=v)
         df = pd.concat([df, df_i], ignore_index=True)
     return df
 
@@ -209,7 +236,7 @@ def main(argv):
         if len(argv) != 2:
             raise SystemExit (f'\nUso adecuado: {sys.argv[0]}'
                                 ' ' 'path salida de cellID')
-        df = read_cellidtable(argv[1])
+        df = cellidtable(argv[1])
         
         guardar = input('¿Decea guardar DataFrame? S/N ')
         if 's' in guardar.lower(): save_df(df)
@@ -218,7 +245,7 @@ def main(argv):
         print(e)
         path = input('\ningrege path de acceso a salida cellID\n')
         
-        df = read_cellidtable(path)
+        df = cellidtable(path)
         
         guardar = input('¿Decea crear la carpeta pydata y guardar DataFrame? S/N ')
         if 's' in guardar.lower():

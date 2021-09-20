@@ -12,10 +12,10 @@ pycell.images module
    :undoc-members:
    :show-inheritance:
 
-pycell.load\_data module
+pycell.pycellid\_io module
 ------------------------
 
-.. automodule:: pycell.load_data
+.. automodule:: pycell.pycellid_io
    :members:
    :undoc-members:
    :show-inheritance:

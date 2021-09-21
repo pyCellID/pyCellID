@@ -80,7 +80,6 @@ def _create_ucid(df, pos):
     ``df[ucid].loc[0] = 100000000000`` ``para ``cellID = 0``, ``Position = 1``.
     
     :param ucid: ``int(numberPosition + cellID)``.
-
     :param df: dataframe creado por ``cellID`` contiene la serie ``df['cellID']``.
     """
     df['ucid'] = [pos * 100000000000 + cellID for cellID in df['cellID']]
@@ -162,7 +161,7 @@ def make_df(path_file, v=False):
     return df
 
 #%% Navego direcctorios para obtener tablas
-def _parse_path(find_f, path=False):
+def _parse_path(find_f, path=None):
     """Parsea la ruta pasada y devuele de a una las
     ubicaciones a los archivos find_f, si path=False
     la búsqueda se realiza en el path actual.
@@ -180,7 +179,8 @@ def _parse_path(find_f, path=False):
                 yield os.path.join(r, name)
                 
 #%% Junto el pipeline compact_df
-def cellidtable(path, n_data='out_all', n_mdata='mapping', v=False):
+def cellid_table(path, n_data='out_all', n_mdata='mapping', v=False):
+
     """Concatenate the tables in the path with the pandas method.
     Transforms the identifying index of each cell from each data 
     table into a temporal index UCID (Unique Cell Identifier)
@@ -189,7 +189,7 @@ def cellidtable(path, n_data='out_all', n_mdata='mapping', v=False):
     in the metadata file (mapping).
     
     :param path: global path from output ``cellID`` tables.
-    :param n_data: srt() name to finde each table data
+    :param n_data: srt() name to finde each table data.
     :param n_mdata: srt() name to finde tables metadata/mapping_tags
     :param verbose: bool, True to print in realtime pipeline
     :return: dataframe ``cellID``.
@@ -214,6 +214,36 @@ def cellidtable(path, n_data='out_all', n_mdata='mapping', v=False):
         df = pd.concat([df, df_i], ignore_index=True)
     return df
 
+#%%
+
+def merge_data(df, data_path, col_merge='pos', sep=',', *args):
+    '''Add the content in the data_path table to the DataFrame.
+    There must be a matching of values and header of the 
+    col_merge in both frames. Use the pandas merge method.
+
+    :param df: DataFrame to be modified
+    :param data_path: str() path to csv table to be added
+    :param col_merge: str() name of header must be coincidence
+    :param sep: separator or tab
+    :param *args:see pandas.read_csv() for extend function
+    :return: new DataFrame containing aggregate series.
+    '''
+    add_d=pd.read_csv(data_path ,*args)
+    return pd.merge(df, right=add_d, how='left', left_on=col_merge ,right_on=col_merge)
+
+
+#%%
+def concatenate(**kwargs):
+    result = ""
+    # Iterating over the keys of the Python kwargs dictionary
+    for arg in kwargs:
+        result += arg
+    return result
+
+print(concatenate(a="Real", b="Python", c="Is", d="Great", e="!"))
+
+#%%
+
 #%% #Opcional, crear directrio pydata y de guardar tabla
 def save_df (df):
     """Crea una carpeda ``/pydata``
@@ -236,7 +266,7 @@ def main(argv):
         if len(argv) != 2:
             raise SystemExit (f'\nUso adecuado: {sys.argv[0]}'
                                 ' ' 'path salida de cellID')
-        df = cellidtable(argv[1])
+        df = cellid_table(argv[1])
         
         guardar = input('¿Decea guardar DataFrame? S/N ')
         if 's' in guardar.lower(): save_df(df)
@@ -245,7 +275,7 @@ def main(argv):
         print(e)
         path = input('\ningrege path de acceso a salida cellID\n')
         
-        df = cellidtable(path)
+        df = cellid_table(path)
         
         guardar = input('¿Decea crear la carpeta pydata y guardar DataFrame? S/N ')
         if 's' in guardar.lower():

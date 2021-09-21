@@ -1,65 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
 # Created on Sun Nov 15 12:03:09 2020
 
 # @author: Clemente Jose Antonio
-
-"""
-Este pipeline está diseñado para navegar un path y rastrear tablas con
-data y metadata(mapping) para retornar un único objeto Dataframe.::
-
-    padre/
-        hijo01/
-            data.ext
-            mapping.ext
-        hijo03/
-            data.ext
-            mapping.ext
-        hijo03/
-            data.ext
-            mapping.ext
-
-Requiere librerias python standard:
-`os <https://docs.python.org/3/library/os.html>`_,
-`re <https://docs.python.org/3/library/re.html?highlight=re#module-re>`_
-`pandas <https://pandas.pydata.org/docs/>`_,
-`matplotlib <https://matplotlib.org/stable/index.html>`_.
-
-Este proyecto comienza como soporte al software Cell-ID
-Gordon, Colman‐Lerner et al. 2007
-publicación original DOI: 10.1038/nmeth1008
-`software <https://sourceforge.net/projects/cell-id/>`_.
-Orientado, pero no limitando, a las salidas prodcidas por cell-ID:
-
-- ``input``: la ruta generada por ``cellID``.
-
-En el futuro se integrará el código en C de Cell-ID para dar una
-rutina acabada y completa.
-
-El programa recorrerá las subcarpetas. Toma de las tablas de salida ``cellID``
-(``out_all``, ``out_bf_fl_mapping``) por position. Creará una subcarpeta
-``pydata/df`` (opcional).
-
-Salida: único DataFrame con los valores de cada tabla. Agregará las series:
-
-* ``df['ucid']`` identificador de célula por posición. ``int()``.
-    ``Unic Cell ID = ucid``
-
-* ``df['pos']`` identificador de posición de adquisición. ``int()``
-
-* Para los valores de fluorescencia mapeados en ``out_bf_fl_mapping(df_mapp)``
-  se crearran tantas series como ``flags`` en ``df_mapp`` multiplicado por la
-  cantidad de variables morfológicas
-  ``df['f_tot_x1fp','f_tot_x2fp',..., 'f_tot_xnfp']``
-"""
 
 import os
 import re
 
 import pandas as pd
-
 
 def _read_df(path_file):
     """Crea una dataframe para el path.
@@ -95,11 +44,11 @@ def _create_ucid(df, pos):
             df["ucid"] = [calc + cellid for cellid in df["cellID"]]
             return df
         else:
-            return f"ingrese nueva una posición. '{pos}'' no es válida"
+            return f"ingrese nueva una posición. '{pos}' no es válida"
     except ValueError:
         # * No sé si es ValueError. Lo puse para que deje de joder
         # * flake8 después lo cambio
-        return f"ingrese nueva una posición. '{pos}'' no es válida"
+        return f"ingrese nueva una posición. '{pos}' no es válida"
 
 
 def _decod_chanel(df_mapping, flag):
@@ -118,7 +67,8 @@ def _decod_chanel(df_mapping, flag):
     # str('chanel'))
     # Filtro el DataFrame  para la coincidencia falg == fluor
     path = df_mapping[df_mapping["flag"] == flag]["fluor"].values[0]
-    return chanel.findall(path)[0].split("_")[0].lower()
+    name = chanel.findall(path)[0].split("_")[0].lower()
+    return name
 
 
 def _make_cols_chan(df, df_map, v=False):
@@ -146,7 +96,7 @@ def _make_cols_chan(df, df_map, v=False):
     df_m = df_map["flag"]
     chanels = {flag: _decod_chanel(df_map, flag) for flag in df_m.unique()}
     # Col_name
-    df_flag.columns = [n[0] + "_" + chanels[n[1]] for n in df_flag.columns]
+    df_flag.columns = [f'{n[0]}_{chanels[n[1]]}' for n in df_flag.columns]
 
     # Lista de variables morfologicas
     morf = [name for name in df.columns if not name.startswith("f_")]
@@ -227,6 +177,7 @@ def cellidtable(path, n_data="out_all", n_mdata="mapping", v=False):
 
     """
     # Me posiciono en el directorio a buscar.
+    # mal, no se cambia el directorio
     os.chdir(path)
     # creo un DataFrame vacío.
     df = pd.DataFrame()
@@ -235,6 +186,7 @@ def cellidtable(path, n_data="out_all", n_mdata="mapping", v=False):
         # Proceso las tablas de a una
         df_i = make_df(data_table, v=v)
         # Modifica el iesimo_df, crea columnas por fluorescencia
+        # está mal el iterador
         df_i = _make_cols_chan(
             df_i, _read_df(_parse_path(find_f=n_mdata).__next__()), v=v
         )
@@ -252,33 +204,3 @@ def save_df(df, dir_name="pydata"):
     # guardo csv
     df.to_csv("df.csv", index=False)
     return f"Se guardó el archivo {df}"
-
-
-def main(argv):
-    try:
-        if len(argv) != 2:
-            raise SystemExit(
-                f"\nUso adecuado: {sys.argv[0]}" " " "path salida de cellID"
-            )
-        df = cellidtable(argv[1])
-
-        guardar = input("¿Decea guardar DataFrame? S/N ")
-        if "s" in guardar.lower():
-            save_df(df)
-
-    except SystemExit as e:
-        print(e)
-        path = input("\ningrege path de acceso a salida cellID\n")
-
-        df = cellidtable(path)
-
-        p = "¿Decea crear la carpeta pydata y guardar DataFrame? S/N "
-        guardar = input(p)
-        if "s" in guardar.lower():
-            save_df(df)
-
-
-if __name__ == "__main__":
-    import sys
-
-    main(sys.argv)

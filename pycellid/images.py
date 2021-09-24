@@ -26,8 +26,12 @@ def img_name(ucid, t_frame, chanel):
     # Obtengo str() de position 01, 02, 10, 20, 100
     pos = str(ucid // ucid_in).zfill(2)
 
-    return (f"{chanel.upper()}_Position{pos}_time{str(t_frame+1).zfill(2)}"
-            f".tif.out.tif")
+    name = (
+        f"{chanel.upper()}_Position{pos}_"
+        f"time{str(t_frame+1).zfill(2)}.tif.out.tif"
+        )
+
+    return name
 
 
 def box_img(path, im_name, x_pos, y_pos, dx=(15, 15), dy=(15, 15)):
@@ -106,10 +110,10 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
 
         # Leo las dimensiones de una imagen típica
 
-        image_name = glob.glob(".\muestras_cellid\*tif.out.tif")[0]
+        image_name = glob.glob(".//muestras_cellid//*tif.out.tif")[0]
         image_name = image_name.split("\\")[-1]
         filename = os.path.join(path, image_name)
-        im = plt.imread(filename, format="tif")  # [Y_min : Y_max, X_min : X_max]
+        im = plt.imread(filename, format="tif")
 
         im_size = im.shape
 
@@ -125,18 +129,20 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
             & (data_copy["xpos"] > 2 * radio)
             & (data_copy["xpos"] < im_size[1] - (2 * radio + 3))
         ]
-        
+
         if len(criteria) != 0:
             for criterio in criteria.keys():
                 data_copy = data_copy[
-                    (data_copy[criterio] > criteria[criterio][0]) & 
-                    (data_copy[criterio] < criteria[criterio][1])
-                    ]
+                    (data_copy[criterio] > criteria[criterio][0])
+                    & (data_copy[criterio] < criteria[criterio][1])
+                ]
 
         if data_copy.shape[0] < n:
-            raise RuntimeError(f"Los criterios especificados no son satisfechos por al menos {n} células")
+            raise RuntimeError(
+                f"Los criterios especificados no son satisfechos "
+                f"por al menos {n} células"
+            )
 
-    
         select = data_copy[["ucid", "t_frame", "xpos", "ypos"]].sample(n)
         # Registra el nombre de cada imagen en la serie 'name'
         select["name"] = select.apply(
@@ -145,10 +151,10 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
 
         # Registra un array para cada imagen en la serie 'box_img'
         # Cada imagen tiene dimenciones de 48*53 valores
-        y_min = 2 * radio  # cent_cel[0][0]
-        y_max = 2 * radio  # cent_cel[0][1]
-        x_min = 2 * radio  # cent_cel[1][0]
-        x_max = 2 * radio  # cent_cel[0][1]
+        y_min = 2 * radio
+        y_max = 2 * radio
+        x_min = 2 * radio
+        x_max = 2 * radio
 
         select["box_img"] = select.apply(
             lambda row: box_img(
@@ -157,7 +163,7 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
                 row["xpos"],
                 row["ypos"],
                 (y_min, y_max),
-                (x_min, x_max)
+                (x_min, x_max),
             ),
             axis=1,
         )
@@ -173,12 +179,11 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
         iloc = 0  # img index
         for i in range(0, shape[0]):
             for j in range(0, shape[1]):
-                # try:
-                iarray[s[0] * i:s[0] * (i + 1), s[1] * j:s[1] * (j + 1)] = select[
-                    "box_img"].iloc[iloc]
-                # except:
-                #     print(select.iloc[iloc], select["box_img"].iloc[iloc].shape)
-                #     pass
+                iarray[
+                    s[0] * i:s[0] * (i + 1), s[1] * j:s[1] * (j + 1)
+                    ] = select[
+                            "box_img"
+                            ].iloc[iloc]
                 iloc += 1
 
         plt.imshow(iarray, cmap="gist_gray")
@@ -192,12 +197,12 @@ if __name__ == "__main__":
     df = pd.read_csv(".//muestras_cellid//pydata//df.csv")
 
     criteria = {
-        "a_tot": [800.,1000.0],
-        #"min_axis": [10.,30.],
+        "a_tot": [800.0, 1200.01],
+        # "min_axis": [10.,30.],
     }
     array_img(
         df,
-        "D://Documents//Universidad//Cursos//Curso FAMAF Diseño de software "
-        "para cómputo científico//proyecto//pyCellID//muestras_cellid",
-        criteria = criteria
+        "D://Documents//Universidad//Cursos//famaf software//"
+        "proyecto//pyCellID//muestras_cellid",
+        criteria=criteria,
     )

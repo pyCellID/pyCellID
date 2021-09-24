@@ -73,21 +73,26 @@ def box_img(path, im_name, x_pos, y_pos, dx=(15, 15), dy=(15, 15)):
     return im
 
 
-def array_img(data, path, chanel="BF", n=16, shape=(4, 4)):
+def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
     """Realiza ``n`` selecciones del dataset ``data``, recorre ``path``
     buscando las imagenes correspondientes a ``chanel`` y crea una
     imagen de ``shape(filas, columnas)``.
 
-    :param chanel: str() debe segir en encoding de mapeo de canales
+    Parametros:
+    chanel: str() debe segir en encoding de mapeo de canales
                    ``('BF', 'CFP',...)``
-    :param shape: ``(int(filas)``, ``int(columnas))`` como se
+    shape: ``(int(filas)``, ``int(columnas))`` como se
                   ordenan las ``imgs``.
-    :param cent_cel: cuando se movera ``[(Y_m, Y_M),(X_m, X_M)]`` en
+    cent_cel: cuando se movera ``[(Y_m, Y_M),(X_m, X_M)]`` en
                      los ejes coordenados del valor centro aportado
                      por ``data[['x_pos', 'y_pos']]``.
-    :param n: cantidad de cells a representar .
+    n: cantidad de cells a representar.
+    shape: tupla con la forma de la grilla que representa los recortes
+            conteninedo las distintas células.
+    criteria: diccionario conteniendo distintos criterios de selección
+                para las celulas a mostrar.
 
-    :return: La imagen de salida corresponde a ``n``.
+    return: La imagen de salida corresponde a ``n``.
     """
     # Selecciono ucid al azar para las n celulas
     # select = np.random.choice(data['ucid'], 91 ,replace = False)
@@ -96,81 +101,103 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4)):
     # célula, suponiéndola esférica (con una proyección circular cuyo area es
     # df['a_tot'])
 
-    radio = int(np.round(np.sqrt(data["a_tot"].max() / np.pi)))
+    try:
+        radio = int(np.round(np.sqrt(data["a_tot"].max() / np.pi)))
 
-    # Leo las dimensiones de una imagen típica
+        # Leo las dimensiones de una imagen típica
 
-    image_name = glob.glob("*.tif.out.tif")[0]
-    filename = os.path.join(path, image_name)
-    im = plt.imread(filename, format="tif")  # [Y_min : Y_max, X_min : X_max]
+        image_name = glob.glob(".\muestras_cellid\*tif.out.tif")[0]
+        image_name = image_name.split("\\")[-1]
+        filename = os.path.join(path, image_name)
+        im = plt.imread(filename, format="tif")  # [Y_min : Y_max, X_min : X_max]
 
-    im_size = im.shape
+        im_size = im.shape
 
-    del image_name, filename
+        del image_name, filename
 
-    # im_size = im.shape
+        # im_size = im.shape
 
-    # seleccion de n filas al azar y sin repo
-    data_copy = data.copy()
-    data_copy = data_copy[
-        (data_copy["ypos"] > 2 * radio)
-        & (data_copy["ypos"] < im_size[0] - (2 * radio + 3))
-        & (data_copy["xpos"] > 2 * radio)
-        & (data_copy["xpos"] < im_size[1] - (2 * radio + 3))
-    ]
+        # seleccion de n filas al azar y sin repo
+        data_copy = data.copy()
+        data_copy = data_copy[
+            (data_copy["ypos"] > 2 * radio)
+            & (data_copy["ypos"] < im_size[0] - (2 * radio + 3))
+            & (data_copy["xpos"] > 2 * radio)
+            & (data_copy["xpos"] < im_size[1] - (2 * radio + 3))
+        ]
+        
+        if len(criteria) != 0:
+            for criterio in criteria.keys():
+                data_copy = data_copy[
+                    (data_copy[criterio] > criteria[criterio][0]) & 
+                    (data_copy[criterio] < criteria[criterio][1])
+                    ]
 
-    select = data_copy[["ucid", "t_frame", "xpos", "ypos"]].sample(n)
-    # Registra el nombre de cada imagen en la serie 'name'
-    select["name"] = select.apply(
-        lambda row: img_name(row["ucid"], row["t_frame"], chanel), axis=1
-    )
+        if data_copy.shape[0] < n:
+            raise RuntimeError(f"Los criterios especificados no son satisfechos por al menos {n} células")
 
-    # Registra un array para cada imagen en la serie 'box_img'
-    # Cada imagen tiene dimenciones de 48*53 valores
-    y_min = 2 * radio  # cent_cel[0][0]
-    y_max = 2 * radio  # cent_cel[0][1]
-    x_min = 2 * radio  # cent_cel[1][0]
-    x_max = 2 * radio  # cent_cel[0][1]
+    
+        select = data_copy[["ucid", "t_frame", "xpos", "ypos"]].sample(n)
+        # Registra el nombre de cada imagen en la serie 'name'
+        select["name"] = select.apply(
+            lambda row: img_name(row["ucid"], row["t_frame"], chanel), axis=1
+        )
 
-    select["box_img"] = select.apply(
-        lambda row: box_img(
-            path,
-            row["name"],
-            row["xpos"],
-            row["ypos"],
-            (y_min, y_max),
-            (x_min, x_max)
-        ),
-        axis=1,
-    )
+        # Registra un array para cada imagen en la serie 'box_img'
+        # Cada imagen tiene dimenciones de 48*53 valores
+        y_min = 2 * radio  # cent_cel[0][0]
+        y_max = 2 * radio  # cent_cel[0][1]
+        x_min = 2 * radio  # cent_cel[1][0]
+        x_max = 2 * radio  # cent_cel[0][1]
 
-    s = (4 * radio + 3, 4 * radio + 3)  # Shape of unitary image
+        select["box_img"] = select.apply(
+            lambda row: box_img(
+                path,
+                row["name"],
+                row["xpos"],
+                row["ypos"],
+                (y_min, y_max),
+                (x_min, x_max)
+            ),
+            axis=1,
+        )
 
-    # iarray np.ones, con dimencion para contenr todas las imgs
-    iarray = np.ones((s[0] * shape[0], s[1] * shape[1]), dtype=float)
+        s = (4 * radio + 3, 4 * radio + 3)  # Shape of unitary image
 
-    # Para las filas i y columnas j de iarray
-    # se remplazan las img de c/celula seleccionada
+        # iarray np.ones, con dimencion para contenr todas las imgs
+        iarray = np.ones((s[0] * shape[0], s[1] * shape[1]), dtype=float)
 
-    iloc = 0  # img index
-    for i in range(0, shape[0]):
-        for j in range(0, shape[1]):
-            # try:
-            iarray[s[0] * i:s[0] * (i + 1), s[1] * j:s[1] * (j + 1)] = select[
-                "box_img"].iloc[iloc]
-            # except:
-            #     print(select.iloc[iloc], select["box_img"].iloc[iloc].shape)
-            #     pass
-            iloc += 1
+        # Para las filas i y columnas j de iarray
+        # se remplazan las img de c/celula seleccionada
 
-    plt.imshow(iarray, cmap="gist_gray")
-    return iarray
+        iloc = 0  # img index
+        for i in range(0, shape[0]):
+            for j in range(0, shape[1]):
+                # try:
+                iarray[s[0] * i:s[0] * (i + 1), s[1] * j:s[1] * (j + 1)] = select[
+                    "box_img"].iloc[iloc]
+                # except:
+                #     print(select.iloc[iloc], select["box_img"].iloc[iloc].shape)
+                #     pass
+                iloc += 1
+
+        plt.imshow(iarray, cmap="gist_gray")
+        plt.show()
+        # return iarray
+    except RuntimeError as e:
+        print(e)
 
 
 if __name__ == "__main__":
-    df = pd.read_csv(".//pydata//df.csv")
+    df = pd.read_csv(".//muestras_cellid//pydata//df.csv")
+
+    criteria = {
+        "a_tot": [800.,1000.0],
+        #"min_axis": [10.,30.],
+    }
     array_img(
         df,
         "D://Documents//Universidad//Cursos//Curso FAMAF Diseño de software "
         "para cómputo científico//proyecto//pyCellID//muestras_cellid",
+        criteria = criteria
     )

@@ -20,7 +20,7 @@
 import os
 import pathlib
 
-""" preguntar ¿para qué sirve ez_setup.py? y ¿cómo se usa? 
+""" preguntar ¿para qué sirve ez_setup.py? y ¿cómo se usa?
 
 import ez_setup
 
@@ -35,7 +35,19 @@ from setuptools import setup  # noqa
 PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 
 
-REQUIREMENTS = ["pandas>=1.3.2", "attrs", "matplotlib>=3.4.3"]
+REQUIREMENTS = [
+    "attrs",
+    "cycler>=0.10.0",
+    "kiwisolver>=1.3.1",
+    "matplotlib>=3.4.3",
+    "numpy>=1.21.2",
+    "pandas>=1.3.2",
+    "Pillow>=8.3.1",
+    "pyparsing>=2.4.7",
+    "python-dateutil>=2.8.2",
+    "pytz>=2021.1",
+    "six>=1.16.0",
+]
 
 with open(PATH / "pycell" / "__init__.py") as fp:
     for line in fp.readlines():
@@ -53,9 +65,9 @@ with open("README.md") as fp:
 # =============================================================================
 
 setup(
-    name="PyCellID",
+    name="pycellid",
     version=VERSION,
-    description="An extension that analyze Cell-ID single-cell cytometry data using Python language.",
+    description="An extension that analyze Cell-ID using Python language.",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     author="",
@@ -70,14 +82,14 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Education",
         "Intended Audience :: Science/Research",
-        'Intended Audience :: Developers',
+        "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Scientific/Engineering",
-        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-        'Topic :: Software Development :: Libraries :: Python Modules'
+        "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+        "Topic :: Software Development :: Libraries :: Python Modules",
     ],
 )

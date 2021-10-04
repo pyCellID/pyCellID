@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import glob
-import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -50,7 +49,7 @@ def box_img(path, im_name, x_pos, y_pos, dx=(15, 15), dy=(15, 15)):
 
     :return: A extended array corresponding to a cell.
     """
-    path_n = os.path.join(path, im_name)
+    path_n = Path(path).joinpath(im_name)
 
     # load image
     im = plt.imread(path_n, format="tif")
@@ -110,9 +109,9 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
 
         # Leo las dimensiones de una imagen típica
 
-        image_name = glob.glob(".//muestras_cellid//*tif.out.tif")[0]
-        image_name = image_name.split("\\")[-1]
-        filename = os.path.join(path, image_name)
+        image_name = list(Path(path).glob('*.tif.out.tif'))[0]
+        image_name = str(image_name).split("\\")[-1]
+        filename = Path(path).joinpath(image_name)
         im = plt.imread(filename, format="tif")
 
         im_size = im.shape

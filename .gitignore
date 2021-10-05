@@ -2,12 +2,14 @@
 pruebas_py/
 __pycache__/
 .spydroject/
+dev/
 
 # Files
 Documento sin título 1
 pycell_respaldo_1.py
 pycell.py
 dev_test.py
+test_pycellid.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -108,6 +110,7 @@ ENV/
 env.bak/
 venv.bak/
 my_env/
+Vpycellid/
 
 # Spyder project settings
 .spyderproject

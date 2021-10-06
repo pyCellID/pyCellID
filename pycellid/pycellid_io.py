@@ -183,9 +183,14 @@ def cellid_table(path, n_data="out_all", n_mdata="*mapping", v=False):
     """
     # Initial tables
     data_tables = _parse_path(path=path, find_f=n_data)
+    table = next(data_tables)
     file_mapping = _parse_path(path, find_f=n_mdata)
 
-    df = pd.DataFrame()
+    if v:
+        print(f"Reading : \n{table}")
+    df = make_df(table)
+    df = _make_cols_chan(df, pd.read_table(next(file_mapping)))
+
     for data_table in data_tables:
         if v:
             print(f"Reading : \n{data_table}")

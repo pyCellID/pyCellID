@@ -1,7 +1,54 @@
 Get Started
 ===========
 
-The package `PyCellID <https://semantic-ui.com/>`_ is ...
+The package `PyCellID <https://semantic-ui.com/>`_ está diseñado para navegar un path y rastrear tablas con
+data y metadata(mapping) para retornar un único objeto Dataframe.::
+
+    padre/
+        hijo01/
+            data.ext
+            mapping.ext
+        hijo03/
+            data.ext
+            mapping.ext
+        hijo03/
+            data.ext
+            mapping.ext
+
+Requiere librerias python standard:
+`os <https://docs.python.org/3/library/os.html>`_,
+`re <https://docs.python.org/3/library/re.html?highlight=re#module-re>`_
+`pandas <https://pandas.pydata.org/docs/>`_,
+`matplotlib <https://matplotlib.org/stable/index.html>`_.
+
+Este proyecto comienza como soporte al software Cell-ID
+Gordon, Colman‐Lerner et al. 2007
+publicación original DOI: 10.1038/nmeth1008
+`software <https://sourceforge.net/projects/cell-id/>`_.
+Orientado, pero no limitando, a las salidas prodcidas por cell-ID:
+
+- ``input``: la ruta generada por ``cellID``.
+
+En el futuro se integrará el código en C de Cell-ID para dar una
+rutina acabada y completa.
+
+El programa recorrerá las subcarpetas. Toma de las tablas de salida ``cellID``
+(``out_all``, ``out_bf_fl_mapping``) por position. Creará una subcarpeta
+``pydata/df`` (opcional).
+
+Salida: único DataFrame con los valores de cada tabla. Agregará las series:
+
+* ``df['ucid']`` identificador de célula por posición. ``int()``.
+    ``Unic Cell ID = ucid``
+
+* ``df['pos']`` identificador de posición de adquisición. ``int()``
+
+* Para los valores de fluorescencia mapeados en ``out_bf_fl_mapping(df_mapp)``
+  se crearran tantas series como ``flags`` en ``df_mapp`` multiplicado por la
+  cantidad de variables morfológicas
+  ``df['f_tot_x1fp','f_tot_x2fp',..., 'f_tot_xnfp']``
+
+
 
 To get started, the first step is to import and load the extension
 

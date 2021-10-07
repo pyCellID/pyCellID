@@ -3,16 +3,18 @@
 
 # Created on Thursday Aug 26 10:24:27 2021
 
-# @author: Jose Antonio Clemente
+# @author: jose
 # @author: Juan David Ferreira
-# @author: Victor San Martín
+
 
 # Modulo de importación de tablas PyCell
 
+# =============================================================================
+# META
+# =============================================================================
 
-class PyCell(object):
-    """Base class for PyCell objects."""
+__version__ = "0.0.1"
 
-    def __init__(self, app=None):
-        if app is not None:
-            self.init_app(app)
+# =============================================================================
+# IMPORTS
+# =============================================================================

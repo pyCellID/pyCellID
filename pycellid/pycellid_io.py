@@ -26,7 +26,6 @@ from pathlib import Path
 import pandas as pd
 
 # %%
-
 # =============================================================================
 # FUNCTIONS
 # =============================================================================
@@ -46,7 +45,7 @@ def _read_df(path_file):
     df.columns = df.columns.str.replace(".", "_", regex=True)
     return df
 
-
+ 
 def _create_ucid(df, pos):
     """Matches the data with the numbered position from the microscopy image.
     CellID param: cellID = cell identifier into df ``df['ucid']``
@@ -62,7 +61,7 @@ def _create_ucid(df, pos):
     df["ucid"] = [calc + cellid for cellid in df["cellID"]]
     return df
 
-
+ 
 def _decod_chanel(df_mapping, flag):
     """Join the fluorescence reference and numeric flag in a string.
 
@@ -118,10 +117,11 @@ def _make_cols_chan(df, df_map):
     df = df.reset_index()
     # Relevant features
     col = ["pos", "t_frame", "ucid", "cellID"]
+    
     df = pd.concat([df[col], df.drop(col, axis=1)], axis=1)
     return df
 
-
+  
 def make_df(path_file):
     """Make a dataframe with number tracking ``ucid`` and ``position``.
 
@@ -139,7 +139,6 @@ def make_df(path_file):
     df = _create_ucid(df, pos)
     df["pos"] = [pos for _ in range(len(df))]
     return df
-
 
 # %% To find tables
 def _parse_path(path, find_f):

@@ -1,161 +1,161 @@
-#!/usr/bin/env python3
+# !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Created on Sun Nov 15 12:03:09 2020
+# This file is part of the
+#   PyCellID Project (
+#     https://github.com/pyCellID,
+#     https://github.com/darksideoftheshmoo
+# ).
+# Copyright (c) 2021, Clemente Jose
+# License: MIT
+#   Full Text: https://github.com/pyCellID/pyCellID/blob/main/LICENSE
 
-# @author: Clemente Jose Antonio
+# =============================================================================
+# DOCS
+# =============================================================================
 
-import os
+"""in-out implementations for pyCellID."""
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+# %%
 import re
+from pathlib import Path
 
 import pandas as pd
 
-def _read_df(path_file):
-    """Crea una dataframe para el path.
-    Elimina las delimitaciones por espacio de headers.
+# %%
+# =============================================================================
+# FUNCTIONS
+# =============================================================================
 
-    :param path_file: ruta al texto plano (formato tabla).
+
+# %%Processing of tables
+def _read_df(path_file):
+    """read a df in the path and remove the delimitations by space headers
+
+    :param path_file: String containing the path files.
     :return: A dataframe.
     """
-    try:
-        df = pd.read_table(path_file)
-        # Elimino los espacios en los nombres de las columnas ' x.pos '.
-        df.columns = df.columns.str.strip()
-        # Cambio (. por _) las separaciones x.pos por x_pos
-        df.columns = df.columns.str.replace(".", "_", regex=True)
-        return df
-    except FileNotFoundError:
-        return f"No such file or directory: {path_file}"
+    df = pd.read_table(path_file)
+    # Remove spaces in headers ' x.pos ' produced from cellid
+    df.columns = df.columns.str.strip()
+    # Change name delimiter "."" to "_"
+    df.columns = df.columns.str.replace(".", "_", regex=True)
+    return df
 
-
+ 
 def _create_ucid(df, pos):
-    """ucid = unique cell identifier
-    Crea una columna en el dataframe ``(df)`` con número de tracking
-    ``df[ucid].loc[0] = 100000000000`` ``para ``cellID = 0``, ``Position = 1``.
+    """Matches the data with the numbered position from the microscopy image.
+    CellID param: cellID = cell identifier into df ``df['ucid']``
+    Positional series pycellid ucid = unique cell identifier
 
-    :param ucid: ``int(numberPosition + cellID)``.
-
-    :param df: dataframe creado por ``cellID`` contiene la
-               serie ``df['cellID']``.
+    :param pos: ``int(positional image number)``.
+    :param df: dataframe from ``cellID`` whith serie ``df['cellID']``.
+    :return: same df with the ucid series.
     """
-    try:
-        if pos > 0:
-            calc = pos * 100000000000
-            df["ucid"] = [calc + cellid for cellid in df["cellID"]]
-            return df
-        else:
-            return f"ingrese nueva una posición. '{pos}' no es válida"
-    except ValueError:
-        # * No sé si es ValueError. Lo puse para que deje de joder
-        # * flake8 después lo cambio
-        return f"ingrese nueva una posición. '{pos}' no es válida"
+    if not isinstance(pos, int):
+        raise ValueError(f"{pos} must be integer")
+    calc = pos * 100000000000
+    df["ucid"] = [calc + cellid for cellid in df["cellID"]]
+    return df
 
-
+ 
 def _decod_chanel(df_mapping, flag):
-    """Decodifica el flag, alojado en df_mapping. convirtiendolo
-    en un nombre adecuado para su lectura.
+    """Join the fluorescence reference and numeric flag in a string.
 
-    :param df_mapping: recibe un DataFrame de mapeo, ``df_mapping``,
-                       con series ``['flag']=int()`` y
-                       ``['fluor']=str(path_file) ``(ver ``cellID doc``).
-    :return: ``str(chanel)`` correspondiente al ``int(flag)``.
+    :param df_mapping: Table with metadata. Must contain column e.g.
+        ``['flag']=int()`` ``['fluor']=str('xFP_Position')``
+    :return: ``str(channel)`` from ``int(flag)``.
     """
-    # La escritura del cellID tiene la siguiente expresión regular
-    # De 2 a tres caractes xFP luego  _Position
+    # Two or three characters for fluorescent proteins and _Position
+    # xFP_Position
     chanel = re.compile(r"\w{2,3}_Position")
-    # cellID codifica en la columna 'fluor'(ruta_archivo contiene
-    # str('chanel'))
-    # Filtro el DataFrame  para la coincidencia falg == fluor
+    # CellID encodes in column 'fluor'(path_file whit str('channel'))
+
     path = df_mapping[df_mapping["flag"] == flag]["fluor"].values[0]
-    name = chanel.findall(path)[0].split("_")[0].lower()
-    return name
+
+    if not path:
+        raise ValueError(f"{flag} is not encoding in {df_mapping}")
+
+    else:
+        return chanel.findall(path)[0].split("_")[0].lower()
 
 
-def _make_cols_chan(df, df_map, v=False):
-    """Modifica la entrada df proviniente del pipeline ``pyCell``.
-    Separa las series (columnas) morfológicas por canal de fluorecsencia.
-    Elimina los valores redundandes de ``cellID`` y la serie ``'flag'``.
+def _make_cols_chan(df, df_map):
+    """DataFrame df will be restructured.
+    Split morphological series by fluorescence channels.
+    Remove ``flag`` serie and redundant values ​​from CellID.
 
-    :param df: Tabla ``cellID`` contiendo ``df['ucid']``.
-    :param df_map: Tabla mapping ``cellID`` (``out_bf_fl_mapping``).
-    :return: Crea serias morfologicas por canal
+    :param df: Data Table ``cellID.out.all``.
+    :param df_map: Mapping Table ``cellID`` (``out_bf_fl_mapping``).
+    :return: Create morphological series per channel.
              ``df['f_tot_yfp',...,'f_nuc_bfp',...]``.
     """
-    if v:
-        print("Agragando columnas chanles ...")
-
-    # Variables de fluorescencia
+    # Fluorescence variables
     fluor = [f_var for f_var in df.columns if f_var.startswith("f_")]
-    # Creo un df con columnas variable_fluor por ucid y t_frame
+    # Save the series with fluorescence values ​​in df_flag
     # idx = ['ucid', 't_frame'] if 't_frame' in df else idx = ['ucid']
-    idx = ["ucid", "t_frame"]
-    df_flag = df.pivot(index=idx, columns="flag", values=fluor)
+    df_flag = df.pivot(index=["ucid", "t_frame"], columns="flag", values=fluor)
 
-    # Renombro columnas
-    # Obtengo todos los flag:chanel en mapping
-    df_m = df_map["flag"]
-    chanels = {flag: _decod_chanel(df_map, flag) for flag in df_m.unique()}
-    # Col_name
-    df_flag.columns = [f'{n[0]}_{chanels[n[1]]}' for n in df_flag.columns]
+    # Rename columns. Get all the flags:chanel in mapping
+    chanels = {fg: _decod_chanel(df_map, fg) for fg in df_map["flag"].unique()}
 
-    # Lista de variables morfologicas
+    df_flag.columns = [f"{n[0]}_{chanels[n[1]]}" for n in df_flag.columns]
+
+    # List of morphological variables
     morf = [name for name in df.columns if not name.startswith("f_")]
 
-    # Creo un df con las variables morfologicas
-    # Elimino las redundancias creadas por cellID, registo un solo flag.
+    # Remove redundant values ​​from CellID.
     df_morf = df[df.flag == 0][morf]
-
-    df_morf.set_index(idx, inplace=True)
-    # Junto los df_flag y df_morf
-    df = pd.merge(df_morf, df_flag, on=idx, how="outer")
+    df_morf.set_index(["ucid", "t_frame"], inplace=True)
+    # Merge df_flag y df_morf
+    df = pd.merge(df_morf, df_flag, on=["ucid", "t_frame"], how="outer")
     del df["flag"]
-    # Por congruencia con RCell
-    # Indices numéricos. ucid, t_frama pasan a columnas
+
     df = df.reset_index()
-    # Ordeno columnas compatible con marco de datos RCell
-    col = ["pos"] + idx[::-1] + ["cellID"]
+    # Relevant features
+    col = ["pos", "t_frame", "ucid", "cellID"]
+    
     df = pd.concat([df[col], df.drop(col, axis=1)], axis=1)
     return df
 
+  
+def make_df(path_file):
+    """Make a dataframe with number tracking ``ucid`` and ``position``.
 
-def make_df(path_file, v=False):
-    """Crea un dataframe con numero de tracking ``ucid`` y ``position``.
-
-    :param path_file: nombre del archivo de salida ``cellID`` ``out_all``
-    :return: un dataframe del archivo pasado conteniendo ``df['ucid']``.
+    :param path_file: path to data table, CellID's ``outall``.
+    :return: dataframe with ``df['ucid']`` unique cell identifier.
     """
-    # Position está codificada en el nombre del path al archivo.
-    pos = int(re.findall("\\d+", path_file)[0])
-    if v:
-        print("leyendo position: ", pos)
-    # Leo la tabla de texto plano.
+    # Position encoding.
+    try:
+        pos = int(re.search(r"(osition)(\d+)", str(path_file), flags=0)[2])
+    except TypeError:
+        print(f"Path < {path_file} > not encode position")
+
     df = _read_df(path_file)
-    # Asigno ucid
+
     df = _create_ucid(df, pos)
     df["pos"] = [pos for _ in range(len(df))]
     return df
 
+# %% To find tables
+def _parse_path(path, find_f):
+    """returns a generator list with the path file.
 
-def _parse_path(find_f, path=False):
-    """Parsea la ruta pasada y devuele de a una las
-    ubicaciones a los archivos ``find_f``, si ``path=False``
-    la búsqueda se realiza en el ``path`` actual.
-
-    :param path: str(path_to_parse).
+    :param path: path to folder root to find.
     :param find_f: str(searched_file).
-    :return: srt(path_to_find_f)
+    :return: srt(path_to_find_f).
     """
-    if path:
-        os.chdir(path)
-    # Rutas a los archivos out_all, out_bf_fl_mapping de cellID
-    for r, d, f in os.walk("."):
-        d.sort()
-        for name in f:
-            if find_f in name:
-                yield os.path.join(r, name)
+    if not Path(path).exists():
+        raise FileNotFoundError(f"Path < {path} > not exist")
+    else:
+        return (f for f in Path(path).rglob(find_f))
 
 
-def cellidtable(path, n_data="out_all", n_mdata="mapping", v=False):
+# %% Final pipeline
+def cellid_table(path, n_data="out_all", n_mdata="*mapping", v=False):
     """Concatenate the tables in the path with the pandas method.
     Transforms the identifying index of each cell from each data
     table into a temporal index UCID (Unique Cell Identifier)
@@ -164,43 +164,56 @@ def cellidtable(path, n_data="out_all", n_mdata="mapping", v=False):
     in the metadata file (mapping).
 
     :param path: global path from output ``cellID`` tables.
-    :param n_data: srt() name to finde each table data
+    :param n_data: srt() name to finde each table data.
     :param n_mdata: srt() name to finde tables metadata/mapping_tags
     :param verbose: bool, True to print in realtime pipeline
     :return: dataframe ``cellID``.
+    ---------------------------------------------------------------
 
-    Example
-    -------
-    >>> import pycellid_io as ld
+    to use:
+    import pycellid_io as ld
 
-    >>> df = ld.cellidtable(path, n_data='out_all', n_mdata='mapping', v=False)
-
+    df=ld.cellid_table(
+        path = '../my_experiment',
+        n_data ='out_all',
+        n_mdata ='mapping',
+        v=False
+    )
     """
-    # Me posiciono en el directorio a buscar.
-    # mal, no se cambia el directorio
-    os.chdir(path)
-    # creo un DataFrame vacío.
-    df = pd.DataFrame()
-    # Itero sobre la lista tablas (data).
-    for data_table in _parse_path(find_f=n_data):
-        # Proceso las tablas de a una
-        df_i = make_df(data_table, v=v)
-        # Modifica el iesimo_df, crea columnas por fluorescencia
-        # está mal el iterador
-        df_i = _make_cols_chan(
-            df_i, _read_df(_parse_path(find_f=n_mdata).__next__()), v=v
-        )
+    # Initial tables
+    data_tables = _parse_path(path=path, find_f=n_data)
+    table = next(data_tables)
+    file_mapping = _parse_path(path, find_f=n_mdata)
+
+    if v:
+        print(f"Reading : \n{table}")
+    df = make_df(table)
+    df = _make_cols_chan(df, pd.read_table(next(file_mapping)))
+
+    for data_table in data_tables:
+        if v:
+            print(f"Reading : \n{data_table}")
+        df_i = make_df(data_table)
+        df_i = _make_cols_chan(df_i, pd.read_table(next(file_mapping)))
         df = pd.concat([df, df_i], ignore_index=True)
     return df
 
 
-def save_df(df, dir_name="pydata"):
-    """Crea una carpeda ``/pydata``
-    guarda el parámetro ``df`` DataFrame"""
-    # Me fijo si no existe el directorio
-    if not os.path.exists(dir_name):
-        os.mkdir(dir_name)  # si no existe lo creo
-    os.chdir(dir_name)
-    # guardo csv
-    df.to_csv("df.csv", index=False)
-    return f"Se guardó el archivo {df}"
+# %% To complete the experimet tables
+def merge_data_csv(df, data_path, cl_mrg="pos", sep=",", *args):
+    """Add the content in the data_path table to the DataFrame.
+    There must be a matching of values and header of the
+    col_merge in both frames. Use the pandas merge method.
+
+    :param df: DataFrame to be modified
+    :param data_path: str() path to csv table to be added
+    :param col_merge: str() name of header must be coincidence
+    :param sep: separator or tab
+    :param *args:see pandas.read_csv() for extend function
+    :return: new DataFrame containing aggregate series.
+    """
+    add_d = pd.read_csv(data_path, *args)
+
+    df = pd.merge(df, right=add_d, how="left", left_on=cl_mrg, right_on=cl_mrg)
+
+    return df

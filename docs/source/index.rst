@@ -14,6 +14,7 @@ Welcome to PyCellID's documentation!
    basic-usage
    changelog
    sample
+   mis_notas
    
    modules/modules
 

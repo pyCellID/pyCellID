@@ -5,15 +5,14 @@
 
 # @author: Jose Antonio Clemente
 # @author: Juan David Ferreira
+# @author: Victor San Martín
 
+# Modulo de importación de tablas PyCell
 
-#Modulo de importación de tablas PyCell
-import pycellid.pycellid_io as ld
-from pycellid_io import read_cellidtable
 
 class PyCell(object):
     """Base class for PyCell objects."""
-    
+
     def __init__(self, app=None):
         if app is not None:
             self.init_app(app)

@@ -21,23 +21,31 @@ import numpy as np
 import pandas as pd
 
 
-def img_name(ucid, t_frame, chanel):
+def img_name(ucid, t_frame, channel):
     """This function have a initial ucid ``ucid_in = 100000000000``
     such that try a positional string given by
     ``pos = str(ucid //ucid_in).zfill(2)``.
     For example: ``ucid = int(300000000020)`` numero de traking unico.
-    - pos: ``'path : /home/../BF_Position03_time06.tif.out.tif'``
-    :param ucid: The unique traking number
-    :param t_frame: tag tiempo de la imagen
-    :param chanel: Can be one value given by BF, CFP, RFP or YFP.
-    :return: A string given by the image's name.
+    pos: ``'path : /home/../BF_Position03_time06.tif.out.tif'``
+
+    Parameters
+    ----------
+    ucid:
+        The unique traking number
+    t_frame:
+        tag tiempo de la imagen
+    channel: Can be one value given by BF, CFP, RFP or YFP.
+    
+    Return
+    ------
+        A string given by the image's name.
     """
     # ucid inicial
     ucid_in = 100000000000
     # Obtengo str() de position 01, 02, 10, 20, 100
     pos = str(ucid // ucid_in).zfill(2)
     s = str(t_frame + 1).zfill(2)
-    name = f"{chanel.upper()}_Position{pos}_time{s}.tif.out.tif"
+    name = f"{channel.upper()}_Position{pos}_time{s}.tif.out.tif"
 
     return name
 
@@ -50,11 +58,21 @@ def box_img(path, im_name, x_pos, y_pos, dx=(15, 15), dy=(15, 15)):
     ``[(start, end),(start, end)]``.
     The ``img`` date is a ``np.array`` where encode rows an columns:
     ``codifica[fila, columna]`` ``y = rows``, ``x = columns``
-    :param path: path to the image.
-    :param im_name: The image name.
-    :param x: x-coordinate where the image begins
-    :param y: y-coordinate where the image begins
-    :return: A extended array corresponding to a cell.
+
+    Parameters
+    ----------
+    path:
+        path to the image.
+    im_name:
+        The image name.
+    x:
+        x-coordinate where the image begins
+    y:
+        y-coordinate where the image begins
+    
+    Return
+    ------
+        A extended array corresponding to a cell.
     """
     path_n = Path(path).joinpath(im_name)
 
@@ -102,7 +120,10 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
             conteninedo las distintas células.
     criteria: diccionario conteniendo distintos criterios de selección
                 para las celulas a mostrar.
-    return: La imagen de salida corresponde a ``n``.
+    
+    Return
+    ------
+        La imagen de salida corresponde a ``n``.
     """
     # Selecciono ucid al azar para las n celulas
     # select = np.random.choice(data['ucid'], 91 ,replace = False)
@@ -198,18 +219,3 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
         # return iarray
     except RuntimeError as e:
         print(e)
-
-
-if __name__ == "__main__":
-    df = pd.read_csv(".//muestras_cellid//pydata//df.csv")
-
-    criteria = {
-        "a_tot": [800.0, 1200.01],
-        # "min_axis": [10.,30.],
-    }
-    array_img(
-        df,
-        "D://Documents//Universidad//Cursos//famaf software//"
-        "proyecto//pyCellID//muestras_cellid",
-        criteria=criteria,
-    )

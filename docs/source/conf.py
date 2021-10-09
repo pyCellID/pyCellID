@@ -21,14 +21,13 @@ CURRENT_PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 PYCELLID_PATH = CURRENT_PATH.parent.parent
 
 sys.path.insert(0, str(PYCELLID_PATH))
-# sys.path.insert(0, "D:/Documents/posgrado/FaMAF/pyCellID/")
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'PyCellID'
 copyright = f'{datetime.date.today().year}, PyCellID'
-author = 'Clemente, José'
+author = 'Clemente, Jose'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'

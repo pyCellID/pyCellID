@@ -18,7 +18,6 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 
 
 def img_name(ucid, t_frame, channel):
@@ -35,7 +34,7 @@ def img_name(ucid, t_frame, channel):
     t_frame:
         tag tiempo de la imagen
     channel: Can be one value given by BF, CFP, RFP or YFP.
-    
+
     Return
     ------
         A string given by the image's name.
@@ -68,8 +67,8 @@ def box_img(path, im_name, x_pos, y_pos, dx=(15, 15), dy=(15, 15)):
     x:
         x-coordinate where the image begins
     y:
-        y-coordinate where the image begins
-    
+        y-coordinate where the image begins.
+
     Return
     ------
         A extended array corresponding to a cell.
@@ -120,7 +119,7 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
             conteninedo las distintas células.
     criteria: diccionario conteniendo distintos criterios de selección
                 para las celulas a mostrar.
-    
+
     Return
     ------
         La imagen de salida corresponde a ``n``.

@@ -11,7 +11,7 @@
 # DOCS
 # =====================================================================
 
-"""This file is for distribute and install PyCell"""
+"""This file is for distribute and install PyCellID"""
 
 # ======================================================================
 # IMPORTS
@@ -19,12 +19,6 @@
 
 import os
 import pathlib
-
-""" preguntar ¿para qué sirve ez_setup.py? y ¿cómo se usa?
-
-import ez_setup
-
-ez_setup.use_setuptools() """
 
 from setuptools import setup  # noqa
 
@@ -51,17 +45,19 @@ with open("README.md") as fp:
 # =============================================================================
 # FUNCTIONS
 # =============================================================================
+
 short_description = "An extension that analyze Cell-ID single-cell."
+
 setup(
     name="PyCellID",
     version=VERSION,
     description=short_description,
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
-    author="",
+    author="Clemente, José",
     author_email="",
     url="https://github.com/pyCellID/pyCellID",
-    packages=["pycellid"],
+    packages=["pycellid", "pycellid.io"],
     license="The MIT License",
     install_requires=REQUIREMENTS,
     keywords=["pycellid", "key2", "key3"],

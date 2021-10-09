@@ -190,7 +190,7 @@ documentation root, use os.path.abspath to make it absolute, like shown here.
 
 .. code-block:: none
 
-    (venv) $> sphinx-apidoc -o source/modules ..
+    (venv) $> sphinx-apidoc -f -o source/modules ../pycellid/
 
 
 Construir el repositorio de la organización

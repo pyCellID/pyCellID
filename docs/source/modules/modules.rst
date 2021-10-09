@@ -1,7 +1,7 @@
-pycell
-======
+pycellid
+========
 
 .. toctree::
    :maxdepth: 4
 
-   pycell
+   pycellid

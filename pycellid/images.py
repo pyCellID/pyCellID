@@ -1,4 +1,18 @@
+# !/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+# This file is part of the
+#   PyCellID Project (
+#     https://github.com/pyCellID,
+#     https://github.com/darksideoftheshmoo
+# ).
+# Copyright (c) 2021. Clemente, Jose
+# License: MIT
+#   Full Text: https://github.com/pyCellID/pyCellID/blob/main/LICENSE
+
+# =============================================================================
+# DOCS
+# =============================================================================
 
 from pathlib import Path
 
@@ -73,7 +87,9 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
     """Realiza ``n`` selecciones del dataset ``data``, recorre ``path``
     buscando las imagenes correspondientes a ``chanel`` y crea una
     imagen de ``shape(filas, columnas)``.
-    Parametros:
+
+    Parameters
+    ----------
     chanel: str() debe segir en encoding de mapeo de canales
                    ``('BF', 'CFP',...)``
     shape: ``(int(filas)``, ``int(columnas))`` como se

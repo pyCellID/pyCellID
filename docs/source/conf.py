@@ -10,16 +10,25 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import datetime
 import os
+import pathlib
 import sys
-sys.path.insert(0, os.path.abspath('../../'))
+
+
+# this path is pointing to project/docs/source
+CURRENT_PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
+PYCELLID_PATH = CURRENT_PATH.parent.parent
+
+sys.path.insert(0, str(PYCELLID_PATH))
+# sys.path.insert(0, "D:/Documents/posgrado/FaMAF/pyCellID/")
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'PyCellID'
-copyright = '2021, Ferreira, Juan David'
-author = 'Ferreira, Juan David'
+copyright = f'{datetime.date.today().year}, PyCellID'
+author = 'Clemente, José'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'
@@ -36,11 +45,13 @@ import sphinx_rtd_theme
 extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.todo',
+    'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
-    'sphinx.ext.autosummary', # solamente si se la quiere usar
-    'sphinx.ext.viewcode'
+    'sphinx.ext.napoleon',
+
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.autosummary',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

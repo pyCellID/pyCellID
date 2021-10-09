@@ -35,8 +35,13 @@ import pandas as pd
 def _read_df(path_file):
     """read a df in the path and remove the delimitations by space headers
 
-    :param path_file: String containing the path files.
-    :return: A dataframe.
+    Parameters
+    ----------
+    path_file: String containing the path files.
+
+    Return
+    ------
+        A dataframe.
     """
     df = pd.read_table(path_file)
     # Remove spaces in headers ' x.pos ' produced from cellid
@@ -45,15 +50,22 @@ def _read_df(path_file):
     df.columns = df.columns.str.replace(".", "_", regex=True)
     return df
 
- 
+
 def _create_ucid(df, pos):
     """Matches the data with the numbered position from the microscopy image.
     CellID param: cellID = cell identifier into df ``df['ucid']``
     Positional series pycellid ucid = unique cell identifier
 
-    :param pos: ``int(positional image number)``.
-    :param df: dataframe from ``cellID`` whith serie ``df['cellID']``.
-    :return: same df with the ucid series.
+    Parameters
+    ----------
+    pos:
+        ``int(positional image number)``.
+    df:
+        dataframe from ``cellID`` whith serie ``df['cellID']``.
+
+    Return
+    ------
+        same df with the ucid series.
     """
     if not isinstance(pos, int):
         raise ValueError(f"{pos} must be integer")
@@ -61,13 +73,19 @@ def _create_ucid(df, pos):
     df["ucid"] = [calc + cellid for cellid in df["cellID"]]
     return df
 
- 
+
 def _decod_chanel(df_mapping, flag):
     """Join the fluorescence reference and numeric flag in a string.
 
-    :param df_mapping: Table with metadata. Must contain column e.g.
+    Parameters
+    ----------
+    df_mapping:
+        Table with metadata. Must contain column e.g.
         ``['flag']=int()`` ``['fluor']=str('xFP_Position')``
-    :return: ``str(channel)`` from ``int(flag)``.
+
+    Return
+    ------
+        ``str(channel)`` from ``int(flag)``.
     """
     # Two or three characters for fluorescent proteins and _Position
     # xFP_Position
@@ -88,9 +106,16 @@ def _make_cols_chan(df, df_map):
     Split morphological series by fluorescence channels.
     Remove ``flag`` serie and redundant values ​​from CellID.
 
-    :param df: Data Table ``cellID.out.all``.
-    :param df_map: Mapping Table ``cellID`` (``out_bf_fl_mapping``).
-    :return: Create morphological series per channel.
+    Parameters
+    ----------
+    df:
+        Data Table ``cellID.out.all``.
+    df_map:
+        Mapping Table ``cellID`` (``out_bf_fl_mapping``).
+
+    Return
+    ------
+        Create morphological series per channel.
              ``df['f_tot_yfp',...,'f_nuc_bfp',...]``.
     """
     # Fluorescence variables
@@ -117,16 +142,22 @@ def _make_cols_chan(df, df_map):
     df = df.reset_index()
     # Relevant features
     col = ["pos", "t_frame", "ucid", "cellID"]
-    
+
     df = pd.concat([df[col], df.drop(col, axis=1)], axis=1)
     return df
 
-  
+
 def make_df(path_file):
     """Make a dataframe with number tracking ``ucid`` and ``position``.
 
-    :param path_file: path to data table, CellID's ``outall``.
-    :return: dataframe with ``df['ucid']`` unique cell identifier.
+    Parameters
+    ----------
+    path_file:
+        path to data table, CellID's ``outall``.
+
+    Return
+    ------
+        a dataframe with ``df['ucid']`` unique cell identifier.
     """
     # Position encoding.
     try:
@@ -140,13 +171,21 @@ def make_df(path_file):
     df["pos"] = [pos for _ in range(len(df))]
     return df
 
+
 # %% To find tables
 def _parse_path(path, find_f):
     """returns a generator list with the path file.
 
-    :param path: path to folder root to find.
-    :param find_f: str(searched_file).
-    :return: srt(path_to_find_f).
+    Parameters
+    ----------
+    path:
+        path to folder root to find.
+    find_f:
+        str(searched_file).
+
+    Return
+    ------
+        srt(path_to_find_f).
     """
     if not Path(path).exists():
         raise FileNotFoundError(f"Path < {path} > not exist")
@@ -163,17 +202,25 @@ def cellid_table(path, n_data="out_all", n_mdata="*mapping", v=False):
     columns by fluorescence channel. It uses the mapping present
     in the metadata file (mapping).
 
-    :param path: global path from output ``cellID`` tables.
-    :param n_data: srt() name to finde each table data.
-    :param n_mdata: srt() name to finde tables metadata/mapping_tags
-    :param verbose: bool, True to print in realtime pipeline
-    :return: dataframe ``cellID``.
-    ---------------------------------------------------------------
+    Parameters
+    ----------
+    path:
+        global path from output ``cellID`` tables.
+    n_data:
+        srt() name to finde each table data.
+    n_mdata:
+        srt() name to finde tables metadata/mapping_tags
+    verbose:
+        bool, True to print in realtime pipeline
 
-    to use:
-    import pycellid_io as ld
+    Return
+    ------
+        A dataframe ``cellID``.
 
-    df=ld.cellid_table(
+    * to use:
+
+    >>> import pycellid_io as ld
+    >>> df=ld.cellid_table(
         path = '../my_experiment',
         n_data ='out_all',
         n_mdata ='mapping',
@@ -201,16 +248,26 @@ def cellid_table(path, n_data="out_all", n_mdata="*mapping", v=False):
 
 # %% To complete the experimet tables
 def merge_data_csv(df, data_path, cl_mrg="pos", sep=",", *args):
-    """Add the content in the data_path table to the DataFrame.
+    """Add the content in the ``data_path`` table to the ``DataFrame``.
     There must be a matching of values and header of the
-    col_merge in both frames. Use the pandas merge method.
+    ``col_merge`` in both frames. Use the pandas merge method.
 
-    :param df: DataFrame to be modified
-    :param data_path: str() path to csv table to be added
-    :param col_merge: str() name of header must be coincidence
-    :param sep: separator or tab
-    :param *args:see pandas.read_csv() for extend function
-    :return: new DataFrame containing aggregate series.
+    Parameters
+    ----------
+    df:
+        DataFrame to be modified.
+    data_path:
+        str() path to csv table to be added.
+    col_merge:
+        str() name of header must be coincidence.
+    sep:
+        separator or tab.
+    *args:
+        see pandas.read_csv() for extend function.
+
+    Return
+    ------
+        new DataFrame containing aggregate series.
     """
     add_d = pd.read_csv(data_path, *args)
 

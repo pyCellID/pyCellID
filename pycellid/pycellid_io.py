@@ -58,10 +58,10 @@ def _create_ucid(df, pos):
 
     Parameters
     ----------
-    pos:
-        ``int(positional image number)``.
     df:
         dataframe from ``cellID`` whith serie ``df['cellID']``.
+    pos:
+        ``int(positional image number)``.
 
     Return
     ------
@@ -75,7 +75,7 @@ def _create_ucid(df, pos):
 
 
 def _decod_chanel(df_mapping, flag):
-    """Join the fluorescence reference and numeric flag in a string.
+    """Join the fluorescence reference and numeric ``flag`` in a string.
 
     Parameters
     ----------

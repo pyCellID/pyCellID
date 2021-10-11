@@ -1,10 +1,34 @@
-#!/usr/bin/env python3
+# !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Created on Thursday Aug 26 10:24:27 2021
+# This file is part of the
+#   PyCellID Project (
+#     https://github.com/pyCellID,
+#     https://github.com/darksideoftheshmoo
+# ).
+# Copyright (c) 2021. Clemente, Jose
+# License: MIT
+#   Full Text: https://github.com/pyCellID/pyCellID/blob/main/LICENSE
 
-# @author: jose
-# @author: Juan David Ferreira
+# =============================================================================
+# DOCS
+# =============================================================================
 
+"""
+pyCellID.
 
-#Modulo de importación de tablas PyCell
+An extension that analyze Cell-ID single-cell.
+"""
+
+# =============================================================================
+# META
+# =============================================================================
+
+__version__ = "0.0.1"
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+from .images import *  # noqa
+from .pycellid_io import *  # noqa

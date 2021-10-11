@@ -11,7 +11,7 @@
 # DOCS
 # =====================================================================
 
-"""This file is for distribute and install PyCell"""
+"""This file is for distribute and install PyCellID"""
 
 # ======================================================================
 # IMPORTS
@@ -19,12 +19,6 @@
 
 import os
 import pathlib
-
-""" preguntar ¿para qué sirve ez_setup.py? y ¿cómo se usa?
-
-import ez_setup
-
-ez_setup.use_setuptools() """
 
 from setuptools import setup  # noqa
 
@@ -35,21 +29,9 @@ from setuptools import setup  # noqa
 PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 
 
-REQUIREMENTS = [
-    "attrs",
-    "cycler>=0.10.0",
-    "kiwisolver>=1.3.1",
-    "matplotlib>=3.4.3",
-    "numpy>=1.21.2",
-    "pandas>=1.3.2",
-    "Pillow>=8.3.1",
-    "pyparsing>=2.4.7",
-    "python-dateutil>=2.8.2",
-    "pytz>=2021.1",
-    "six>=1.16.0",
-]
+REQUIREMENTS = ["pandas>=1.3.2", "matplotlib>=3.4.3"]
 
-with open(PATH / "pycell" / "__init__.py") as fp:
+with open(PATH / "pycellid" / "__init__.py") as fp:
     for line in fp.readlines():
         if line.startswith("__version__ = "):
             VERSION = line.split("=", 1)[-1].replace('"', "").strip()
@@ -64,20 +46,21 @@ with open("README.md") as fp:
 # FUNCTIONS
 # =============================================================================
 
+short_description = "An extension that analyze Cell-ID single-cell."
+
 setup(
     name="pycellid",
     version=VERSION,
-    description="An extension that analyze Cell-ID using Python language.",
+    description=short_description,
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
-    author="",
+    author="Clemente, José",
     author_email="",
     url="https://github.com/pyCellID/pyCellID",
-    py_modules=["ez_setup"],
-    packages=["pycellid"],
+    packages=["pycellid", "pycellid.io"],
     license="The MIT License",
     install_requires=REQUIREMENTS,
-    keywords=["pycell", "key2", "key3"],
+    keywords=["pycellid", "key2", "key3"],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Education",

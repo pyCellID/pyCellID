@@ -19,21 +19,20 @@
 # =============================================================================
 # IMPORTS
 # =============================================================================
-# %%
+
 import re
 from pathlib import Path
 
 import pandas as pd
 
-# %%
 # =============================================================================
 # FUNCTIONS
 # =============================================================================
 
 
-# %%Processing of tables
+# Processing of tables
 def _read_df(path_file):
-    """read a df in the path and remove the delimitations by space headers
+    """Read a df in the path and remove the delimitations by space headers.
 
     Parameters
     ----------
@@ -52,7 +51,8 @@ def _read_df(path_file):
 
 
 def _create_ucid(df, pos):
-    """Matches the data with the numbered position from the microscopy image.
+    """Match the data with the numbered position from the microscopy image.
+
     CellID param: cellID = cell identifier into df ``df['ucid']``
     Positional series pycellid ucid = unique cell identifier
 
@@ -82,6 +82,8 @@ def _decod_chanel(df_mapping, flag):
     df_mapping:
         Table with metadata. Must contain column e.g.
         ``['flag']=int()`` ``['fluor']=str('xFP_Position')``
+    flag:
+        A numeric reference.
 
     Return
     ------
@@ -102,7 +104,8 @@ def _decod_chanel(df_mapping, flag):
 
 
 def _make_cols_chan(df, df_map):
-    """DataFrame df will be restructured.
+    """Dataframe df will be restructured.
+
     Split morphological series by fluorescence channels.
     Remove ``flag`` serie and redundant values ​​from CellID.
 
@@ -157,7 +160,7 @@ def make_df(path_file):
 
     Return
     ------
-        a dataframe with ``df['ucid']`` unique cell identifier.
+        A dataframe with ``df['ucid']`` unique cell identifier.
     """
     # Position encoding.
     try:
@@ -172,15 +175,15 @@ def make_df(path_file):
     return df
 
 
-# %% To find tables
+# To find tables
 def _parse_path(path, find_f):
-    """returns a generator list with the path file.
+    """Construct a generator list with the path file.
 
     Parameters
     ----------
-    path:
+    path : str
         path to folder root to find.
-    find_f:
+    find_f : str
         str(searched_file).
 
     Return
@@ -193,9 +196,10 @@ def _parse_path(path, find_f):
         return (f for f in Path(path).rglob(find_f))
 
 
-# %% Final pipeline
+# Final pipeline
 def cellid_table(path, n_data="out_all", n_mdata="*mapping", v=False):
     """Concatenate the tables in the path with the pandas method.
+
     Transforms the identifying index of each cell from each data
     table into a temporal index UCID (Unique Cell Identifier)
     Disaggregate the columns of morphological measurements into
@@ -246,9 +250,10 @@ def cellid_table(path, n_data="out_all", n_mdata="*mapping", v=False):
     return df
 
 
-# %% To complete the experimet tables
+# To complete the experimet tables
 def merge_data_csv(df, data_path, cl_mrg="pos", sep=",", *args):
     """Add the content in the ``data_path`` table to the ``DataFrame``.
+
     There must be a matching of values and header of the
     ``col_merge`` in both frames. Use the pandas merge method.
 

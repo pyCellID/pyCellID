@@ -26,7 +26,7 @@ import numpy as np
 
 def img_name(ucid, t_frame, channel):
     """Contruct te image's name correspondig with CellID output images.
-    
+
     This function have a initial ucid ``ucid_in = 100000000000``
     such that try a positional string given by
     ``pos = str(ucid //ucid_in).zfill(2)``.

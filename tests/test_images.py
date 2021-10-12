@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-import tifffile as tif
 
 import pycellid
+
+import tifffile as tif
 
 
 def test_img_name():

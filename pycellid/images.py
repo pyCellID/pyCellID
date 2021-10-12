@@ -152,13 +152,16 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
         # seleccion de n filas al azar y sin repo
         data_copy = data.copy()
         data_copy = data_copy[
-            (diameter < data_copy["ypos"] < im_size[0] - (diameter + 3)) &
-            (diameter < data_copy["xpos"] < im_size[1] - (diameter + 3))
+            (diameter < data_copy["ypos"]) &
+            (data_copy["ypos"] < (im_size[0] - diameter - 3)) &
+            (diameter < data_copy["xpos"]) &
+            (data_copy["xpos"] < (im_size[1] - diameter - 3))
         ]
         if len(criteria) != 0:
             for c in criteria.keys():
                 data_copy = data_copy[
-                    (criteria[c][0] < data_copy[c] < criteria[c][1])
+                    (criteria[c][0] < data_copy[c]) &
+                    (data_copy[c] < criteria[c][1])
                 ]
         if data_copy.shape[0] < n:
             raise RuntimeError(

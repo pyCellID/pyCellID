@@ -140,7 +140,7 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
     # célula, suponiéndola esférica (con una proyección circular cuyo area es
     # df['a_tot'])
     try:
-        diametro = int(2 * np.round(np.sqrt(data["a_tot"].max() / np.pi)))
+        diameter = int(2 * np.round(np.sqrt(data["a_tot"].max() / np.pi)))
         # Leo las dimensiones de una imagen típica
         image_name = list(Path(path).glob("*.tif.out.tif"))[0]
         image_name = str(image_name).split("\\")[-1]
@@ -151,8 +151,8 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
         # seleccion de n filas al azar y sin repo
         data_copy = data.copy()
         data_copy = data_copy[
-            (diametro < data_copy["ypos"] < im_size[0] - (diametro + 3)) &
-            (diametro < data_copy["xpos"] < im_size[1] - (diametro + 3))
+            (diameter < data_copy["ypos"] < im_size[0] - (diameter + 3)) &
+            (diameter < data_copy["xpos"] < im_size[1] - (diameter + 3))
         ]
         if len(criteria) != 0:
             for c in criteria.keys():
@@ -170,7 +170,7 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
         )
         # Registra un array para cada imagen en la serie 'box_img'
         # Cada imagen tiene dimenciones de 48*53 valores
-        y_min = y_max = x_min = x_max = diametro
+        y_min = y_max = x_min = x_max = diameter
         select["box_img"] = select.apply(
             lambda row: box_img(
                 path,
@@ -182,7 +182,7 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
             ),
             axis=1,
         )
-        s = (2 * diametro + 3, 2 * diametro + 3)  # Shape of unitary image
+        s = (2 * diameter + 3, 2 * diameter + 3)  # Shape of unitary image
         # iarray np.ones, con dimencion para contenr todas las imgs
         iarray = np.ones((s[0] * shape[0], s[1] * shape[1]), dtype=float)
         # Para las filas i y columnas j de iarray

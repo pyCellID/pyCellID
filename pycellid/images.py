@@ -18,6 +18,7 @@
 
 """Images for PyCellID."""
 
+import re
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -25,7 +26,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def img_name(ucid, t_frame, channel):
+def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
     """Contruct te image's name correspondig with CellID output images.
 
     This function have a initial ucid ``ucid_in = 100000000000``
@@ -48,16 +49,21 @@ def img_name(ucid, t_frame, channel):
     ------
         A string given by the image's name.
     """
-    # initial ucid
-    ucid_in = 100000000000
+    base_dir = Path(path)
+
     # We obtain a positional string e.g 01, 02, 10, 20, 100
-    pos = str(ucid // ucid_in).zfill(2)
-    s = str(t_frame + 1).zfill(2)
-    name = f"{channel.upper()}_Position{pos}_time{s}.tif.out.tif"
+    pos = re.search(r"\d+(?=\d{11})", str(ucid)).group(0)
+    pos = pos.zfill(2)
+    if isinstance(t_frame, np.int64):
+        s = str(t_frame + 1).zfill(2)
+        name = f"{channel.upper()}_Position{pos}_time{s}{fmt}"
+    elif t_frame is None:
+        name = f"{channel.upper()}_Position{pos}{fmt}"
+    name = base_dir.joinpath(name)
     return name
 
 
-def box_img(path, im_name, x_pos, y_pos, dx=(15, 15), dy=(15, 15)):
+def box_img(im, x_pos, y_pos, dx=(15, 15), dy=(15, 15)):
     """Contruct a array of the intensity values (:math:`<= 256`, by pixels).
 
     The extended matrix in three bottom rows and three right columns
@@ -82,28 +88,45 @@ def box_img(path, im_name, x_pos, y_pos, dx=(15, 15), dy=(15, 15)):
     ------
         A extended array corresponding to a cell.
     """
-    path_n = Path(path).joinpath(im_name)
+    # path_n = Path(path).joinpath(im_name)
     # load image
-    im = plt.imread(path_n, format="tif")
-    im = im.copy()
+    # im = plt.imread(path_n, format="tif")
+    # im = im.copy()
     centro = np.zeros((2, 2))
+    height = np.sum(dy)
+    width = np.sum(dx)
+    im_shape = im.shape
     im[y_pos - 1:y_pos + 1, x_pos - 1:x_pos + 1] = centro
     # Hago un crop de la imagen
-    y_min = y_pos - dx[0]
-    y_max = y_pos + dx[1]
-    x_min = x_pos - dx[0]
-    x_max = x_pos + dx[1]
+    y_min = max([y_pos - dy[0], 0])
+    y_max = min([y_pos + dy[1], im_shape[0]])
+    x_min = max([x_pos - dx[0], 0])
+    x_max = min([x_pos + dx[1], im_shape[1]])
     im = im[y_min:y_max, x_min:x_max]
+    iarray = np.zeros((height, width))
+    # if im.shape ==iarray.shape:
+    #     iarray = im
+    if y_pos - dy[0] < 0:
+        im = np.concatenate(
+            [np.zeros((np.abs(y_pos - dy[0]), im.shape[1])), im],
+            0
+            )
+    if x_pos - dx[0] < 0:
+        im = np.concatenate(
+            [np.zeros((im.shape[0], np.abs(x_pos - dx[0]))), im],
+            1
+            )
+    iarray[0:im.shape[0], 0:im.shape[1]] = im
     # Frame
-    alto = np.zeros((im.shape[0], 3))
-    largo = np.zeros((3, (im.shape[1] + 3)))
+    alto = np.zeros((height, 3))
+    largo = np.zeros((3, (width + 3)))
     # Recuadro
-    im = np.concatenate([im, alto], 1)
-    im = np.concatenate([im, largo], 0)
-    return im
+    iarray = np.concatenate([iarray, alto], 1)
+    iarray = np.concatenate([iarray, largo], 0)
+    return iarray
 
 
-def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
+def array_img(data, path, channel="BF", n=16, shape=(4, 4), criteria={}):
     """Make ``n`` selections on dataset ``data`` in the ``path``.
 
     walk the ``path`` looking for the images
@@ -142,21 +165,16 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
     # df['a_tot'])
     try:
         diameter = int(2 * np.round(np.sqrt(data["a_tot"].max() / np.pi)))
-        # Leo las dimensiones de una imagen típica
-        image_name = list(Path(path).glob("*.tif.out.tif"))[0]
-        image_name = str(image_name).split("\\")[-1]
-        filename = Path(path).joinpath(image_name)
-        im = plt.imread(filename, format="tif")
-        im_size = im.shape
-        del image_name, filename
+        # # Leo las dimensiones de una imagen típica
+        # image_name = list(Path(path).glob("*.tif.out.tif"))[0]
+        # image_name = str(image_name).split("\\")[-1]
+        # filename = Path(path).joinpath(image_name)
+        # im = plt.imread(filename, format="tif")
+        # im_size = im.shape
+        # del image_name, filename
         # seleccion de n filas al azar y sin repo
         data_copy = data.copy()
-        data_copy = data_copy[
-            (diameter < data_copy["ypos"]) &
-            (data_copy["ypos"] < (im_size[0] - diameter - 3)) &
-            (diameter < data_copy["xpos"]) &
-            (data_copy["xpos"] < (im_size[1] - diameter - 3))
-        ]
+
         if len(criteria) != 0:
             for c in criteria.keys():
                 data_copy = data_copy[
@@ -164,21 +182,25 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
                     (data_copy[c] < criteria[c][1])
                 ]
         if data_copy.shape[0] < n:
-            raise RuntimeError(
-                f"The specified criteria are not satisfied by {n} cells"
-            )
+            message = f"The specified criteria are not satisfied by {n} cells"
+            raise ValueError(message)
         select = data_copy[["ucid", "t_frame", "xpos", "ypos"]].sample(n)
         # Registra el nombre de cada imagen en la serie 'name'
         select["name"] = select.apply(
-            lambda row: img_name(row["ucid"], row["t_frame"], chanel), axis=1
-        )
+            lambda row: img_name(
+                path,
+                row["ucid"],
+                channel,
+                row["t_frame"]),
+            axis=1
+            )
         # Registra un array para cada imagen en la serie 'box_img'
         # Cada imagen tiene dimenciones de 48*53 valores
+
         y_min = y_max = x_min = x_max = diameter
         select["box_img"] = select.apply(
             lambda row: box_img(
-                path,
-                row["name"],
+                plt.imread(row["name"], format="tif"),
                 row["xpos"],
                 row["ypos"],
                 (y_min, y_max),
@@ -201,5 +223,25 @@ def array_img(data, path, chanel="BF", n=16, shape=(4, 4), criteria={}):
                 iarray[xi:xf, yi:yf] = select["box_img"].iloc[iloc]
                 iloc += 1
         return iarray
-    except RuntimeError as e:
+    except ValueError as e:
         print(e)
+        raise
+
+
+# if __name__ == "__main__":
+#     df = pd.read_csv(".//muestras_cellid//pydata//df.csv")
+
+#     criteria = {
+#         "ypos": [0.0, 100.],
+#         # "min_axis": [10.,30.],
+#     }
+#     iarray = array_img(
+#         df,
+#         "D://Documents//Universidad//Cursos//famaf software//"
+#         "proyecto//pyCellID//muestras_cellid",
+#         n=12, shape=(4, 3),
+#         criteria=criteria,
+#     )
+#     print(iarray.shape)
+#     plt.imshow(iarray, cmap="gist_gray")
+#     plt.show()

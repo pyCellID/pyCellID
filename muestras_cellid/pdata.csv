@@ -1,0 +1,4 @@
+pos,strain,type,treatment,concentration
+1,ACL379,WT,NaCl,50
+2,ACL379,WT,aF,200
+3,YPP5932,Ste7DS_2xSwi6NLS,aF,200

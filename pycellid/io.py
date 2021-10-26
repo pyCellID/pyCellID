@@ -197,7 +197,7 @@ def _parse_path(path, find_f):
 
 
 # Final pipeline
-def cellid_table(path, n_data="out_all", n_mdata="*mapping", v=False):
+def merge_id_tables(path, n_data="out_all", n_mdata="*mapping", v=False):
     """Concatenate the tables in the path with the pandas method.
 
     Transforms the identifying index of each cell from each data
@@ -251,7 +251,7 @@ def cellid_table(path, n_data="out_all", n_mdata="*mapping", v=False):
 
 
 # To complete the experimet tables
-def merge_data_csv(df, data_path, cl_mrg="pos", sep=",", *args):
+def merge_pdata_csv(df, data_path, cl_mrg="pos", sep=",", *args):
     """Add the content in the ``data_path`` table to the ``DataFrame``.
 
     There must be a matching of values and header of the

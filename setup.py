@@ -57,7 +57,7 @@ setup(
     author="Clemente, José",
     author_email="",
     url="https://github.com/pyCellID/pyCellID",
-    packages=["pycellid", "pycellid.io"],
+    packages=["pycellid"],
     license="The MIT License",
     install_requires=REQUIREMENTS,
     keywords=["pycellid", "key2", "key3"],

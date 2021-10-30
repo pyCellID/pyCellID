@@ -113,9 +113,9 @@ def test_box_img():
 
     x_pos = radius + 1
     y_pos = radius + 1
-    dx = (radius, radius)
-    dy = (radius, radius)
-    imresult = pycellid.box_img(imarray, x_pos, y_pos, dx, dy)
+    # dx = (radius, radius)
+    # dy = (radius, radius)
+    imresult = pycellid.box_img(imarray, x_pos, y_pos, radius)
     centro = imresult[y_pos - 2:y_pos, x_pos - 2:x_pos]
     alto = imresult[:, -3:]
     largo = imresult[-3:, :]

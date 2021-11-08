@@ -2,6 +2,7 @@
 pruebas_py/
 __pycache__/
 .spydroject/
+.vscode/
 dev/
 
 # Files

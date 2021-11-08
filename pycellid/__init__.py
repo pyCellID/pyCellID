@@ -30,5 +30,5 @@ __version__ = "0.0.1"
 # IMPORTS
 # =============================================================================
 
-from tools.images import *  # noqa
-from tools.io import *  # noqa
+from .images import *  # noqa
+from .io import *  # noqa

@@ -88,7 +88,7 @@ def box_img(path, im_name, x_pos, y_pos, dx=(15, 15), dy=(15, 15)):
     im = plt.imread(path_n, format="tif")
     im = im.copy()
     centro = np.zeros((2, 2))
-    im[y_pos - 1:y_pos + 1, x_pos - 1:x_pos + 1] = centro
+    im[y_pos - 1 : y_pos + 1, x_pos - 1 : x_pos + 1] = centro
     # Hago un crop de la imagen tomando como margen 20 pixels
     # im = im[abs(y - 20):(y + 25), abs(x - 10):(x + 40)]
     y_min = y_pos - dx[0]

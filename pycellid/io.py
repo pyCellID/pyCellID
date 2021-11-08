@@ -22,6 +22,7 @@
 
 import re
 from pathlib import Path
+from _pytest.config import ExitCode
 
 import pandas as pd
 
@@ -66,9 +67,10 @@ def _create_ucid(df, pos):
     Return
     ------
         same df with the ucid series.
+
     """
     if not isinstance(pos, int):
-        raise ValueError(f"{pos} must be integer")
+        raise TypeError(f"{pos} must be integer")
     calc = pos * 100000000000
     df["ucid"] = [calc + cellid for cellid in df["cellID"]]
     return df
@@ -91,7 +93,8 @@ def _decod_chanel(df_mapping, flag):
     """
     # Two or three characters for fluorescent proteins and _Position
     # xFP_Position
-    chanel = re.compile(r"\w{2,3}_Position")
+    channel = re.compile(r"([\w][f|F][\w]{,1})([_|\D][p|P][\D]*)")
+    # re.compile(r"\w{2,3}_Position")
     # CellID encodes in column 'fluor'(path_file whit str('channel'))
 
     path = df_mapping[df_mapping["flag"] == flag]["fluor"].values[0]
@@ -100,7 +103,8 @@ def _decod_chanel(df_mapping, flag):
         raise ValueError(f"{flag} is not encoding in {df_mapping}")
 
     else:
-        return chanel.findall(path)[0].split("_")[0].lower()
+        return channel.findall(path)[0][0].lower()
+    # channel.findall(path)[0].split("_")[0].lower()
 
 
 def _make_cols_chan(df, df_map):
@@ -140,7 +144,6 @@ def _make_cols_chan(df, df_map):
     df_morf.set_index(["ucid", "t_frame"], inplace=True)
     # Merge df_flag y df_morf
     df = pd.merge(df_morf, df_flag, on=["ucid", "t_frame"], how="outer")
-    del df["flag"]
 
     df = df.reset_index()
     # Relevant features
@@ -164,15 +167,18 @@ def make_df(path_file):
     """
     # Position encoding.
     try:
-        pos = int(re.search(r"(osition)(\d+)", str(path_file), flags=0)[2])
-    except TypeError:
-        print(f"Path < {path_file} > not encode position")
-
-    df = _read_df(path_file)
-
-    df = _create_ucid(df, pos)
-    df["pos"] = [pos for _ in range(len(df))]
-    return df
+        pos = int(re.search(r"([p|P][\D]*)(\d+)", str(path_file), flags=0)[2])
+    except TypeError as err:
+        print(f"{err = }\nPath < {path_file} > does not encode valid position")
+        pos = None
+    if pos:
+        try:
+            df = _read_df(path_file)
+            df = _create_ucid(df, pos)
+            df["pos"] = [pos for _ in range(len(df))]
+            return df
+        except (FileNotFoundError, TypeError) as err:
+            print(f"{err = }\n {path_file}")
 
 
 # To find tables
@@ -233,9 +239,9 @@ def merge_id_tables(path, n_data="out_all", n_mdata="*mapping", v=False):
     """
     # Initial tables
     data_tables = _parse_path(path=path, find_f=n_data)
+    file_mapping = _parse_path(path=path, find_f=n_mdata)
     table = next(data_tables)
-    file_mapping = _parse_path(path, find_f=n_mdata)
-
+    
     if v:
         print(f"Reading : \n{table}")
     df = make_df(table)
@@ -248,6 +254,7 @@ def merge_id_tables(path, n_data="out_all", n_mdata="*mapping", v=False):
         df_i = _make_cols_chan(df_i, pd.read_table(next(file_mapping)))
         df = pd.concat([df, df_i], ignore_index=True)
     return df
+
 
 
 # To complete the experimet tables

@@ -1,8 +1,8 @@
 #%%
 import attr
 
-from pycellid.tools import io as cellio
-from pycellid.tools import images
+import pycellid.io as cellio
+from pycellid import images
 
 
 @attr.s

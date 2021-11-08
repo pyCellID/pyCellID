@@ -1,26 +1,26 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
-# %%
+
+
 import os
 import io
-from pathlib import Path
 
 import numpy as np
 from numpy.random import RandomState, SeedSequence
 
 import pandas as pd
-from pandas.testing import assert_extension_array_equal
-from pandas._testing import assert_frame_equal
-from pandas._testing import assert_index_equal
+# from pandas.testing import assert_extension_array_equal
+# from pandas._testing import assert_frame_equal
+# from pandas._testing import assert_index_equal
 
 import pytest
 
-import re
+# import re
 
-import tempfile
+# import tempfile
 
 import pycellid.io as ld
-# %%
+
 
 # =============================================================================
 # Parameter & fixtures
@@ -46,6 +46,7 @@ def invalid_pos_fail():
     pos = np.random.choice(l_pos)
     ph = os.path.join(base, "muestras_cellid", f"{pos}", "out_all")
     return ph
+
 
 @pytest.fixture
 def rand_make_df():
@@ -205,19 +206,21 @@ def test_make_df_c_names(rand_make_df):
 
 
 def test_fluor_col(create_out_all_file, create_mapping_file):
-    ch = ['BF', 'YFP', 'CFP', 'RFP']
-    var = ['f_nuc', 'f_tot', 'f_vac']
-    var_ch = [f'{v}_{c.lower()}' for v in var for c in ch]
-    
+    ch = ["BF", "YFP", "CFP", "RFP"]
+    var = ["f_nuc", "f_tot", "f_vac"]
+    var_ch = [f"{v}_{c.lower()}" for v in var for c in ch]
+
     df_out_all = ld._read_df(create_out_all_file)
-    df_mapp = ld._read_df(create_mapping_file)  
+    df_mapp = ld._read_df(create_mapping_file)
 
     df = ld._make_cols_chan(df_out_all, df_mapp)
 
     for name in df.columns:
-        if name.startswith('f_'):
+        if name.startswith("f_"):
             assert name in var_ch
-            #var_ch = var_ch.remove(name)
+
+
+#            var_ch = var_ch.remove(name)
 
 
 def test_make_df_ucid(rand_make_df):
@@ -246,10 +249,10 @@ def test_make_df_values():
 
 
 def test_make_cols_cahnnels(create_out_all_file_min, create_mapping_file_min):
-    '''
+    """
     Variables starting with f_ (f_vacuole) are disaggregated by channel
     f_vacuole_yfp f_vacuole_tfp f_vacuole_rfp f_vacuole_tfp f_vacuole_bf
-    '''
+    """
     df_out_all = ld._read_df(create_out_all_file_min)
     df_mapp = ld._read_df(create_mapping_file_min)
 
@@ -284,7 +287,6 @@ def test_make_cols_cahnnels(create_out_all_file_min, create_mapping_file_min):
 
 
 # def foo():
-    
 #     ld._make_cols_chan(ld.make_df(out_all), mapping)
 #     pass
 

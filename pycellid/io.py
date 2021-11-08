@@ -22,7 +22,6 @@
 
 import re
 from pathlib import Path
-from _pytest.config import ExitCode
 
 import pandas as pd
 
@@ -241,7 +240,7 @@ def merge_id_tables(path, n_data="out_all", n_mdata="*mapping", v=False):
     data_tables = _parse_path(path=path, find_f=n_data)
     file_mapping = _parse_path(path=path, find_f=n_mdata)
     table = next(data_tables)
-    
+
     if v:
         print(f"Reading : \n{table}")
     df = make_df(table)
@@ -254,7 +253,6 @@ def merge_id_tables(path, n_data="out_all", n_mdata="*mapping", v=False):
         df_i = _make_cols_chan(df_i, pd.read_table(next(file_mapping)))
         df = pd.concat([df, df_i], ignore_index=True)
     return df
-
 
 
 # To complete the experimet tables

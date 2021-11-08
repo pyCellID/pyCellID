@@ -1,14 +1,26 @@
-#%%
+# !/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# =============================================================================
+# DOCS
+# =============================================================================
+
+"""in-out implementations for pyCellID."""
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
 import attr
 
-import pycellid.io as cellio
-from pycellid import images
+from pycellid.io  import merge_id_tables
+import pycellid.images as cellimgs
 
 
 @attr.s
 class CellData:
 
-    _df = attr.ib(cellio.merge_id_tables(path))
+    _df = attr.ib(merge_id_tables(path))
     
     def __repr__(self):
         """repr(x) <=> x.__repr__()."""

@@ -11,6 +11,7 @@ pycell_respaldo_1.py
 pycell.py
 dev_test.py
 test_pycellid.py
+dev.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

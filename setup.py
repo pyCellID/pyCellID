@@ -29,7 +29,7 @@ from setuptools import setup  # noqa
 PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 
 
-REQUIREMENTS = ["pandas>=1.3.2", "matplotlib>=3.4.3"]
+REQUIREMENTS = ["attrs>=21.2.0", "pandas>=1.3.2", "matplotlib>=3.4.3"]
 
 with open(PATH / "pycellid" / "__init__.py") as fp:
     for line in fp.readlines():
@@ -55,9 +55,9 @@ setup(
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     author="Clemente, José",
-    author_email="",
+    author_email="clemente.jac@gmail.com",
     url="https://github.com/pyCellID/pyCellID",
-    packages=["pycellid", "pycellid.io"],
+    packages=["pycellid"],
     license="The MIT License",
     install_requires=REQUIREMENTS,
     keywords=["pycellid", "key2", "key3"],

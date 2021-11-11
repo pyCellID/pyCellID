@@ -1,21 +1,29 @@
 pycellid package
 ================
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   pycellid.io
-
 Submodules
 ----------
+
+pycellid.celldata module
+------------------------
+
+.. automodule:: pycellid.celldata
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 pycellid.images module
 ----------------------
 
 .. automodule:: pycellid.images
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pycellid.io module
+------------------
+
+.. automodule:: pycellid.io
    :members:
    :undoc-members:
    :show-inheritance:

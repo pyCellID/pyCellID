@@ -38,6 +38,7 @@ def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
     channel : str
         Fluorescence channel of the image.
         The values allowed are 'BF', 'CFP', 'RFP' or 'YFP'.
+    
     Returns
     -------
     ``str`` :
@@ -91,9 +92,11 @@ def _img_crop(im, x_pos, y_pos, diameter, im_shape):
 
 
 def box_img(im, x_pos, y_pos, radius=90):
-    """Creates a single image contatinig an individualised cell.
+    """Create a single image contatinig an individualised cell.
+
     The resulting image posses a mark in the center of the individualised
     cell and a pair of delimiters in the right and bottm edges.
+    
     Parameters
     ----------
     im : numpy.array
@@ -128,10 +131,13 @@ def box_img(im, x_pos, y_pos, radius=90):
 
 
 def array_img(data, path, channel="BF", n=16, shape=(4, 4), criteria={}):
-    """Creates a grid of images containing cells which satisfy given criteria.
-    Resulting image has 'n' instances ordered in a grid of shape 'shape'. Each
-    instance corresponds to a image centered in a cell satisfying provided
+    """Create a grid of images containing cells which satisfy given criteria.
+    
+    Resulting image has 'n' instances ordered in a grid of shape 'shape'.
+
+    Each instance corresponds to a image centered in a cell satisfying provided
     criteria.
+
     Parameters
     ----------
     data : pandas dataframe
@@ -148,17 +154,18 @@ def array_img(data, path, channel="BF", n=16, shape=(4, 4), criteria={}):
         Shape (rows, columns) of the final grid of images.
     criteria : dict
         Dictionay containing the criteria of selection of cells.
+    
     Return
     ------
     numpy.array
         A grid of 'n' images of cells satisfying given criteria.
+    
     Raises
     ------
     ValueError
         If the number of cells satisfying the selection criteria is less
         than the number of cells to be shown.
     """
-
     try:
         # Estimate the maximum of the diameters of the cells in data based on
         # their area and assuming round-like cells

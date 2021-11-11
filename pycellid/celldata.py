@@ -24,7 +24,8 @@ from pycellid.io import merge_id_tables
 
 @attr.s
 class Data(object):
-    """The Class for data object by images"""
+    """The Class for data object by images."""
+    
     path = attr.ib()
     model = attr.ib(validator=attr.validators.instance_of(str), init=False)
     model_df = attr.ib(
@@ -33,11 +34,13 @@ class Data(object):
 
     @property
     def df(self):
+        """Create a dataFrame."""
         if "_df" not in vars(self):
             self._df = merge_id_tables(self.path)
         return self._df.copy()
 
     def __getattr__(self, a):
+        """x[k] <=> x.__getattr__()."""
         return getattr(self.df, a)
 
     def __getitem__(self, slice):

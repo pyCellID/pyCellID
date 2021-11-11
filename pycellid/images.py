@@ -2,7 +2,6 @@
 
 # -*- coding: utf-8 -*-
 
-
 # This file is part of the
 #   PyCellID Project (
 #     https://github.com/pyCellID,
@@ -27,8 +26,10 @@ import numpy as np
 
 
 def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
-    """Construct the name of an image according to the output format of CellID.
+    """Construct the image's name according to the output format of CellID.
+    
     The returned string contains the path and name of the image.
+    
     Parameters
     ----------
     ucid : int
@@ -40,7 +41,7 @@ def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
         The values allowed are 'BF', 'CFP', 'RFP' or 'YFP'.
     Returns
     -------
-    str
+    ``str`` :
         Name and path of an image according to the output format of CellID.
     """
     base_dir = Path(path)

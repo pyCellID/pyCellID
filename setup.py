@@ -49,7 +49,7 @@ with open("README.md") as fp:
 short_description = "An extension that analyze Cell-ID single-cell."
 
 setup(
-    name="PyCellID",
+    name="pycellid",
     version=VERSION,
     description=short_description,
     long_description=LONG_DESCRIPTION,

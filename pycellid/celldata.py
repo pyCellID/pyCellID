@@ -25,7 +25,7 @@ from pycellid.io import merge_id_tables
 @attr.s
 class Data(object):
     """The Class for data object by images."""
-    
+
     path = attr.ib()
     model = attr.ib(validator=attr.validators.instance_of(str), init=False)
     model_df = attr.ib(

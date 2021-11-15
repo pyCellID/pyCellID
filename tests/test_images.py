@@ -118,8 +118,6 @@ def test_box_img():
 
     x_pos = radius + 1
     y_pos = radius + 1
-    # dx = (radius, radius)
-    # dy = (radius, radius)
     imresult = pycellid.box_img(imarray, x_pos, y_pos, radius)
     centro = imresult[y_pos - 2:y_pos, x_pos - 2:x_pos]
     alto = imresult[:, -3:]
@@ -135,9 +133,8 @@ def test_array_img():
     criteria = {"a_tot": [800.0, 1200.01]}
     iarray = pycellid.array_img(
         df,
-        ".//muestras_cellid",
+        os.path.join(base, "muestras_cellid"),
         n=n,
-        shape=shape,
         criteria=criteria,
     )
 
@@ -156,9 +153,8 @@ def test_array_img_2():
     criteria = {"a_tot": [800.0, 1200.01], "ypos": [0.0, 50.0]}
     iarray = pycellid.array_img(
         df,
-        ".//muestras_cellid",
+        os.path.join(base, "muestras_cellid"),
         n=n,
-        shape=shape,
         criteria=criteria,
     )
     diameter = int(2 * np.round(np.sqrt(criteria["a_tot"][0] / np.pi)))
@@ -176,9 +172,8 @@ def test_array_img_3():
     criteria = {"a_tot": [800.0, 1200.01], "xpos": [0.0, 50.0]}
     iarray = pycellid.array_img(
         df,
-        ".//muestras_cellid",
+        os.path.join(base, "muestras_cellid"),
         n=n,
-        shape=shape,
         criteria=criteria,
     )
     diameter = int(2 * np.round(np.sqrt(criteria["a_tot"][0] / np.pi)))
@@ -193,13 +188,11 @@ def test_array_img_valueerror():
         file = os.path.join(base, "muestras_cellid", "pydata", "df.csv")
         df = pd.read_csv(file)
         n = 16
-        shape = (4, 4)
         criteria = {"a_tot": [800.0, 700.00]}
         iarray = pycellid.array_img(
             df,
-            ".//muestras_cellid",
+            os.path.join(base, "muestras_cellid"),
             n=n,
-            shape=shape,
             criteria=criteria,
         )
         print(iarray.shape)

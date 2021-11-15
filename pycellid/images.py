@@ -16,7 +16,6 @@
 # DOCS
 # =============================================================================
 
-
 """Images for PyCellID."""
 
 import re
@@ -60,7 +59,7 @@ def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
     return name
 
 
-def _test_y_pos(im, y_pos, radius):
+def _check_y_pos(im, y_pos, radius):
     if y_pos - radius < 0:
         im = np.concatenate(
             [np.zeros((np.abs(y_pos - radius), im.shape[1])), im],
@@ -69,7 +68,7 @@ def _test_y_pos(im, y_pos, radius):
     return im
 
 
-def _test_x_pos(im, x_pos, radius):
+def _check_x_pos(im, x_pos, radius):
     if x_pos - radius < 0:
         im = np.concatenate(
             [np.zeros((im.shape[0], np.abs(x_pos - radius))), im],
@@ -119,8 +118,8 @@ def box_img(im, x_pos, y_pos, radius=90):
     # crop the region of the image containing the cell of interest
     im = _img_crop(im, x_pos, y_pos, radius, im_shape)
     iarray = np.zeros((height, width))
-    im = _test_y_pos(im, y_pos, radius)
-    im = _test_x_pos(im, x_pos, radius)
+    im = _check_y_pos(im, y_pos, radius)
+    im = _check_x_pos(im, x_pos, radius)
     iarray[0:im.shape[0], 0:im.shape[1]] = im
     # Adding delimiters
     rule_height = np.zeros((height, 3))
@@ -130,7 +129,7 @@ def box_img(im, x_pos, y_pos, radius=90):
     return iarray
 
 
-def array_img(data, path, channel="BF", n=16, shape=(4, 4), criteria={}):
+def array_img(data, path, channel="BF", n=16, criteria={}):
     """Creates a grid of images containing cells which satisfy given criteria.
     Resulting image has 'n' instances ordered in a grid of shape 'shape'. Each
     instance corresponds to a image centered in a cell satisfying provided
@@ -147,8 +146,6 @@ def array_img(data, path, channel="BF", n=16, shape=(4, 4), criteria={}):
         The values allowed are 'BF', 'CFP', 'RFP' or 'YFP'.
     n : int
         Number of instances composing the grid.
-    shape : tuple
-        Shape (rows, columns) of the final grid of images.
     criteria : dict
         Dictionay containing the criteria of selection of cells.
     Return
@@ -166,6 +163,8 @@ def array_img(data, path, channel="BF", n=16, shape=(4, 4), criteria={}):
         # Estimate the maximum of the diameters of the cells in data based on
         # their area and assuming round-like cells
         diameter = int(2 * np.round(np.sqrt(data["a_tot"].max() / np.pi)))
+
+        shape = (int(np.floor(np.sqrt(n))), int(np.ceil(np.sqrt(n))))
 
         data_copy = data.copy()
         # Checking for extra selection criteria
@@ -214,6 +213,10 @@ def array_img(data, path, channel="BF", n=16, shape=(4, 4), criteria={}):
                 yf = s[1] * (j + 1)
                 iarray[xi:xf, yi:yf] = select["box_img"].iloc[iloc]
                 iloc += 1
+                if iloc == n:
+                    break
+            if iloc == n:
+                break
         return iarray
     except ValueError as e:
         print(e)

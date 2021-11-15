@@ -32,4 +32,4 @@ __version__ = "0.0.1"
 
 from .images import *  # noqa
 from .io import *  # noqa
-from .celldata import *  # noqa
+from .cell_data import *  # noqa

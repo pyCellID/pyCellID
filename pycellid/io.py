@@ -36,7 +36,8 @@ def _read_df(path_file):
 
     Parameters
     ----------
-    path_file: String containing the path files.
+    path_file: ``str``
+        String containing the path files.
 
     Return
     ------
@@ -65,7 +66,7 @@ def _create_ucid(df, pos):
 
     Return
     ------
-        same df with the ucid series.
+        Same df with the ``ucid`` series.
 
     """
     if not isinstance(pos, int):

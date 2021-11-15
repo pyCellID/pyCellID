@@ -28,14 +28,6 @@ pycellid.io module
    :undoc-members:
    :show-inheritance:
 
-pycellid.pycellid\_io module
-----------------------------
-
-.. automodule:: pycellid.pycellid_io
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

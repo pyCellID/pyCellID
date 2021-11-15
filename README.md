@@ -1,5 +1,6 @@
 # PyCell (building...)
 
+[![Build status](https://github.com/pyCellID/pyCellID/actions/workflows/CI.yml/badge.svg)](https://github.com/pyCellID/pyCellID/actions)
 [![issues](https://img.shields.io/github/issues/pyCellID/pyCellID)](https://img.shields.io/github/issues/pyCellID/pyCellID)
 [![license](https://img.shields.io/github/license/pyCellID/pyCellID)](https://github.com/pyCellID/pyCellID/blob/main/LICENSE)
 [![forks](https://img.shields.io/github/forks/pyCellID/pyCellID)](https://github.com/pyCellID/pyCellID/)

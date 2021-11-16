@@ -12,6 +12,7 @@ pycell.py
 dev_test.py
 test_pycellid.py
 dev.py
+pycellid.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

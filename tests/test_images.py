@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+
+import os
 from pathlib import Path
 
 import numpy as np
@@ -8,6 +10,9 @@ import pandas as pd
 import pycellid
 
 import pytest
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+base = os.path.dirname(ROOT_DIR)
 
 
 @pytest.mark.parametrize(
@@ -113,8 +118,6 @@ def test_box_img():
 
     x_pos = radius + 1
     y_pos = radius + 1
-    # dx = (radius, radius)
-    # dy = (radius, radius)
     imresult = pycellid.box_img(imarray, x_pos, y_pos, radius)
     centro = imresult[y_pos - 2:y_pos, x_pos - 2:x_pos]
     alto = imresult[:, -3:]
@@ -123,16 +126,15 @@ def test_box_img():
 
 
 def test_array_img():
-    df = pd.read_csv(".//muestras_cellid//pydata//df.csv")
+    file = os.path.join(base, "muestras_cellid", "pydata", "df.csv")
+    df = pd.read_csv(file)
     n = 16
     shape = (4, 4)
     criteria = {"a_tot": [800.0, 1200.01]}
     iarray = pycellid.array_img(
         df,
-        "D://Documents//Universidad//Cursos//famaf software//"
-        "proyecto//pyCellID//muestras_cellid",
+        os.path.join(base, "muestras_cellid"),
         n=n,
-        shape=shape,
         criteria=criteria,
     )
 
@@ -144,16 +146,15 @@ def test_array_img():
 
 
 def test_array_img_2():
-    df = pd.read_csv(".//muestras_cellid//pydata//df.csv")
+    file = os.path.join(base, "muestras_cellid", "pydata", "df.csv")
+    df = pd.read_csv(file)
     n = 12
     shape = (4, 3)
     criteria = {"a_tot": [800.0, 1200.01], "ypos": [0.0, 50.0]}
     iarray = pycellid.array_img(
         df,
-        "D://Documents//Universidad//Cursos//famaf software//"
-        "proyecto//pyCellID//muestras_cellid",
+        os.path.join(base, "muestras_cellid"),
         n=n,
-        shape=shape,
         criteria=criteria,
     )
     diameter = int(2 * np.round(np.sqrt(criteria["a_tot"][0] / np.pi)))
@@ -164,16 +165,15 @@ def test_array_img_2():
 
 
 def test_array_img_3():
-    df = pd.read_csv(".//muestras_cellid//pydata//df.csv")
+    file = os.path.join(base, "muestras_cellid", "pydata", "df.csv")
+    df = pd.read_csv(file)
     n = 12
     shape = (4, 3)
     criteria = {"a_tot": [800.0, 1200.01], "xpos": [0.0, 50.0]}
     iarray = pycellid.array_img(
         df,
-        "D://Documents//Universidad//Cursos//famaf software//"
-        "proyecto//pyCellID//muestras_cellid",
+        os.path.join(base, "muestras_cellid"),
         n=n,
-        shape=shape,
         criteria=criteria,
     )
     diameter = int(2 * np.round(np.sqrt(criteria["a_tot"][0] / np.pi)))
@@ -185,16 +185,14 @@ def test_array_img_3():
 
 def test_array_img_valueerror():
     with pytest.raises(ValueError):
-        df = pd.read_csv(".//muestras_cellid//pydata//df.csv")
+        file = os.path.join(base, "muestras_cellid", "pydata", "df.csv")
+        df = pd.read_csv(file)
         n = 16
-        shape = (4, 4)
         criteria = {"a_tot": [800.0, 700.00]}
         iarray = pycellid.array_img(
             df,
-            "D://Documents//Universidad//Cursos//famaf software//"
-            "proyecto//pyCellID//muestras_cellid",
+            os.path.join(base, "muestras_cellid"),
             n=n,
-            shape=shape,
             criteria=criteria,
         )
         print(iarray.shape)

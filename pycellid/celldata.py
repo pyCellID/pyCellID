@@ -71,9 +71,6 @@ class Data(object):
         validator=attr.validators.instance_of(str), default="*mapping"
     )
 
-    vervose = attr.ib(
-        validator=attr.validators.instance_of(bool), default=False
-    )
 
     @path.validator
     def _check_path(self, attribute, value):
@@ -86,8 +83,7 @@ class Data(object):
             self._df = merge_id_tables(
                 path=self.path,
                 n_data=self.name_data,
-                n_mdata=self.name_meta_data,
-                v=self.vervose,
+                n_mdata=self.name_meta_data
             )
         return self._df.copy()
 
@@ -121,7 +117,6 @@ class Data(object):
         data,
         ch="BF",
         n=16,
-        shape=(4, 4),
         criteria={},
         figsize=(3, 3),
         dpi=200,
@@ -135,7 +130,6 @@ class Data(object):
             path=self.path,
             channel=ch,
             n=n,
-            shape=shape,
             criteria=criteria,
         )
 

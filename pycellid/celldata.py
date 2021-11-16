@@ -15,207 +15,139 @@
 # DOCS
 # =============================================================================
 
-"""Images for PyCellID."""
+"""Merge and analyze the tables of characteristics calculated cell by cell
+and quickly find the images."""
 
-import re
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
 from pathlib import Path
+
+import attr
 
 import matplotlib.pyplot as plt
 
-import numpy as np
+from pycellid import images
+from pycellid.io import merge_id_tables
 
 
-def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
-    """Construct the image's name according to the output format of CellID.
-
-    The returned string contains the path and name of the image.
-
-    Parameters
-    ----------
-    ucid : ``int``
-                    The unique traking number.
-    t_frame : ``int``
-                    Time tag of the image.
-    channel : ``str``
-                    Fluorescence channel of the image. The values allowed
-                    are 'BF', 'CFP', 'RFP' or 'YFP'.
-
-    Returns
-    -------
-    ``str`` :
-             Name and image's path according to the output format of CellID.
-    """
-    base_dir = Path(path)
-
-    # Extract the position from 'ucid'
-    pos = re.search(r"\d+(?=\d{11})", str(ucid)).group(0)
-    pos = pos.zfill(2)
-    # Check if 't_frame' is provided and onstruct the name of the image
-    if isinstance(t_frame, np.int64):
-        s = str(t_frame + 1).zfill(2)
-        name = f"{channel.upper()}_Position{pos}_time{s}{fmt}"
-    elif t_frame is None:
-        name = f"{channel.upper()}_Position{pos}{fmt}"
-    # Join base directory to name
-    name = base_dir.joinpath(name)
-    return name
+# make tempdir _cache see librery tempdir
+# PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__))) / "_cache"
 
 
-def _test_y_pos(im, y_pos, radius):
-    if y_pos - radius < 0:
-        im = np.concatenate(
-            [np.zeros((np.abs(y_pos - radius), im.shape[1])), im], 0
-        )
-    return im
+@attr.s(repr=False)
+class Data(object):
+    """Collapse the data in the path.
 
 
-def _test_x_pos(im, x_pos, radius):
-    if x_pos - radius < 0:
-        im = np.concatenate(
-            [np.zeros((im.shape[0], np.abs(x_pos - radius))), im], 1
-        )
-    return im
-
-
-def _mark_center(im, x_pos, y_pos):
-    center = np.zeros((2, 2))
-    im[y_pos - 1:y_pos + 1, x_pos - 1:x_pos + 1] = center
-    return im
-
-
-def _img_crop(im, x_pos, y_pos, diameter, im_shape):
-    y_min = max([y_pos - diameter, 0])
-    y_max = min([y_pos + diameter, im_shape[0]])
-    x_min = max([x_pos - diameter, 0])
-    x_max = min([x_pos + diameter, im_shape[1]])
-    im = im[y_min:y_max, x_min:x_max]
-    return im
-
-
-def box_img(im, x_pos, y_pos, radius=90):
-    """Create a single image contatinig an individualised cell.
-
-    The resulting image posses a mark in the center of the individualised
-    cell and a pair of delimiters in the right and bottm edges.
+    Merge the tables into a single dataset, create a unique
+    cell-ID, and inspect related images
 
     Parameters
     ----------
-    im : ``numpy.array``
-        A full fluorescence microscopy image.
-    x_pos : ``int``
-        x-coordinate of the center of the cell of interest.
-    y_pos : ``int``
-        y-coordinate of the center of the cell of interest.
-    radius : ``int``
-        lenght (in pixels) between the center of the image and each edge.
+    path:
+        global path from output ``cellID`` tables.
 
     Return
     ------
-    ``numpy.array`` :
-        An array (image) containing an individualised, center-pinned, cell.
+        A dataframe ``cellID``.
+
+    * to use:
+
+    >>> from pycellid.celldata import Data
+    >>> df = Data(
+        path = '../my_experiment'
+    )
+
+    Other Parameters
+    ----------------
+    name_data:
+        srt() name to finde each table data.
+    name_meta_data:
+        srt() name to finde tables metadata/mapping_tags
+    verbose:
+        bool, True to print in realtime pipeline
+
     """
-    height = width = radius * 2
-    im_shape = im.shape
-    # Mark the center of the cell
-    im = _mark_center(im, x_pos, y_pos)
-    # crop the region of the image containing the cell of interest
-    im = _img_crop(im, x_pos, y_pos, radius, im_shape)
-    iarray = np.zeros((height, width))
-    im = _test_y_pos(im, y_pos, radius)
-    im = _test_x_pos(im, x_pos, radius)
-    iarray[0:im.shape[0], 0:im.shape[1]] = im
-    # Adding delimiters
-    rule_height = np.zeros((height, 3))
-    rule_width = np.zeros((3, (width + 3)))
-    iarray = np.concatenate([iarray, rule_height], 1)
-    iarray = np.concatenate([iarray, rule_width], 0)
-    return iarray
+
+    path = attr.ib(validator=attr.validators.instance_of(str))
+
+    name_data = attr.ib(
+        validator=attr.validators.instance_of(str), default="out_all"
+    )
+
+    name_meta_data = attr.ib(
+        validator=attr.validators.instance_of(str), default="*mapping"
+    )
 
 
-def array_img(data, path, channel="BF", n=16, shape=(4, 4), criteria={}):
-    """Create a grid of images containing cells which satisfy given criteria.
+    @path.validator
+    def _check_path(self, attribute, value):
+        if not Path(value).exists():
+            raise FileNotFoundError(f"Path < {value} > not exist")
 
-    Resulting image has 'n' instances ordered in a grid of shape 'shape'.
-    Each instance corresponds to a image centered in a cell satisfying provided
-    criteria.
+    @property
+    def df(self):
+        if "_df" not in vars(self):
+            self._df = merge_id_tables(
+                path=self.path,
+                n_data=self.name_data,
+                n_mdata=self.name_meta_data
+            )
+        return self._df.copy()
 
-    Parameters
-    ----------
-    data : ``pandas dataframe``
-        Dataframe (output of CellID) containing all the measured parameters
-        of each cell.
-    path : ``str``
-        Path to the directory containing the images asociated to 'data'.
-    channel : ``str``
-        Fluorescence channel of the image.
-        The values allowed are 'BF', 'CFP', 'RFP' or 'YFP'.
-    n : ``int``
-        Number of instances composing the grid.
-    shape : ``tuple``
-        Shape (rows, columns) of the final grid of images.
-    criteria : ``dict``
-        Dictionay containing the criteria of selection of cells.
+    def __getattr__(self, a):
+        return getattr(self.df, a)
 
-    Return
-    ------
-    ``numpy.array`` :
-        A grid of 'n' images of cells satisfying given criteria.
+    def __getitem__(self, k):
+        """x[k] <=> x.__getitem__(k)."""
+        return self.df.__getitem__(k)
 
-    Raises
-    ------
-    ValueError
-        If the number of cells satisfying the selection criteria is less
-        than the number of cells to be shown.
-    """
-    try:
-        # Estimate the maximum of the diameters of the cells in data based on
-        # their area and assuming round-like cells
-        diameter = int(2 * np.round(np.sqrt(data["a_tot"].max() / np.pi)))
+    def __iter__(self):
+        """iter(x) <=> x.__iter__()."""
+        return iter(self.df)
 
-        data_copy = data.copy()
-        # Checking for extra selection criteria
-        if len(criteria) != 0:
-            for c in criteria.keys():
-                data_copy = data_copy[
-                    (criteria[c][0] < data_copy[c])
-                    & (data_copy[c] < criteria[c][1])
-                ]
-        # Checking if the number of cells satisfying the criteria matches the
-        # number of cells to be shown
-        if data_copy.shape[0] < n:
-            message = f"The specified criteria are not satisfied by {n} cells"
-            raise ValueError(message)
-        select = data_copy[["ucid", "t_frame", "xpos", "ypos"]].sample(n)
-        # Registers the name of each image in the series 'name'
-        select["name"] = select.apply(
-            lambda row: img_name(path, row["ucid"], channel, row["t_frame"]),
-            axis=1,
+    def __len__(self):
+        """len(x) <=> x.__len__()."""
+        return len(self.df)
+
+    def __repr__(self):
+        """repr(x) <=> x.__repr__()."""
+        return f"DataTables({repr(self.df)})"
+
+    def __repr_html__(self):
+        return self.df._repr_html_()
+
+    def __setitem__(self, key, values):
+        self._df[key] = values
+
+    def show(
+        self,
+        data,
+        ch="BF",
+        n=16,
+        criteria={},
+        figsize=(3, 3),
+        dpi=200,
+        cmap="gray",
+        *args,
+        **kwargs,
+    ):
+        """Show values in df"""
+        arr = images.array_img(
+            data,
+            path=self.path,
+            channel=ch,
+            n=n,
+            criteria=criteria,
         )
-        # Registers the individual image corresponding to each cell in the
-        # series 'box_img'
-        select["box_img"] = select.apply(
-            lambda row: box_img(
-                plt.imread(row["name"], format="tif"),
-                row["xpos"],
-                row["ypos"],
-                diameter,
-            ),
-            axis=1,
-        )
-        s = (2 * diameter + 3, 2 * diameter + 3)  # Shape of unitary image
-        # iarray np.ones, with size for contining all individual images
-        iarray = np.ones((s[0] * shape[0], s[1] * shape[1]), dtype=float)
 
-        iloc = 0  # img index
-        for i in range(0, shape[0]):
-            for j in range(0, shape[1]):
-                xi = s[0] * i
-                xf = s[0] * (i + 1)
-                yi = s[1] * j
-                yf = s[1] * (j + 1)
-                iarray[xi:xf, yi:yf] = select["box_img"].iloc[iloc]
-                iloc += 1
-        return iarray
-    except ValueError as e:
-        print(e)
-        raise
+        fig = plt.figure(figsize=figsize, dpi=dpi, *args, *kwargs)
+        ax = fig.add_subplot(1, 1, 1)
+        ax.imshow(arr, cmap=cmap, *args, **kwargs)
+        ax.axis("off")
+
+        plt.show()
+        # plt.xticks(X+0.38, ["A","B","C","D"])
+

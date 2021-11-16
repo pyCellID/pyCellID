@@ -15,7 +15,6 @@ import os
 import pathlib
 import sys
 
-
 # this path is pointing to project/docs/source
 CURRENT_PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 PYCELLID_PATH = CURRENT_PATH.parent.parent
@@ -39,7 +38,6 @@ release = '0.0.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 
-import sphinx_rtd_theme
 
 extensions = [
     'sphinx_rtd_theme',

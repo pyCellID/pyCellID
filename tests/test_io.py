@@ -1,25 +1,19 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
-import os
 import io
+import os
 
 import numpy as np
 from numpy.random import RandomState, SeedSequence
 
 import pandas as pd
-# from pandas.testing import assert_extension_array_equal
-# from pandas._testing import assert_frame_equal
-# from pandas._testing import assert_index_equal
+
+import pycellid.io as ld
 
 import pytest
 
-# import re
 
-# import tempfile
-
-import pycellid.io as ld
 
 
 # =============================================================================
@@ -143,15 +137,15 @@ def test_make_df_file_pos_fails():
     ld.make_df(invalid_pos_fail)
 
 
-def test_merge_id_tables_FND():
+def test_merge_id_tables_fnd():
     f = np.random.choice(["P", "p", "Pos", "Position", "Posicion"])
     n = np.random.randint(5, 200)
-    FND = os.path.join(base, "muestras_cellid", f"{f}{n}")
+    fnd = os.path.join(base, "muestras_cellid", f"{f}{n}")
     with pytest.raises(FileNotFoundError):
-        ld.merge_id_tables(FND)
+        ld.merge_id_tables(fnd)
 
 
-def test_merge_id_tables_FND_file():
+def test_merge_id_tables_fnd_file():
     n = np.random.randint(1, 4)
     folder = os.path.join(base, "muestras_cellid", f"P{n}")
     data_table = np.random.choice(
@@ -226,8 +220,8 @@ def test_fluor_col(create_out_all_file, create_mapping_file):
 def test_make_df_ucid(rand_make_df):
     ucid = rand_make_df.ucid
     pos = rand_make_df.pos
-    cellID = rand_make_df.cellID
-    assert np.array_equal(ucid, pos * 100000000000 + cellID)
+    cellid = rand_make_df.cellid
+    assert np.array_equal(ucid, pos * 100000000000 + cellid)
 
 
 # =============================================================================

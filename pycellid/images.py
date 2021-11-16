@@ -29,6 +29,7 @@ import numpy as np
 def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
     """Construct the name of an image according to the output format of CellID.
     The returned string contains the path and name of the image.
+
     Parameters
     ----------
     ucid : int
@@ -38,6 +39,7 @@ def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
     channel : str
         Fluorescence channel of the image.
         The values allowed are 'BF', 'CFP', 'RFP' or 'YFP'.
+
     Returns
     -------
     str
@@ -62,18 +64,16 @@ def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
 def _test_y_pos(im, y_pos, radius):
     if y_pos - radius < 0:
         im = np.concatenate(
-            [np.zeros((np.abs(y_pos - radius), im.shape[1])), im],
-            0
-            )
+            [np.zeros((np.abs(y_pos - radius), im.shape[1])), im], 0
+        )
     return im
 
 
 def _test_x_pos(im, x_pos, radius):
     if x_pos - radius < 0:
         im = np.concatenate(
-            [np.zeros((im.shape[0], np.abs(x_pos - radius))), im],
-            1
-            )
+            [np.zeros((im.shape[0], np.abs(x_pos - radius))), im], 1
+        )
     return im
 
 
@@ -96,6 +96,7 @@ def box_img(im, x_pos, y_pos, radius=90):
     """Creates a single image contatinig an individualised cell.
     The resulting image posses a mark in the center of the individualised
     cell and a pair of delimiters in the right and bottm edges.
+
     Parameters
     ----------
     im : numpy.array
@@ -106,6 +107,7 @@ def box_img(im, x_pos, y_pos, radius=90):
         y-coordinate of the center of the cell of interest.
     radius : int
         lenght (in pixels) between the center of the image and each edge.
+
     Return
     ------
     numpy.array
@@ -134,6 +136,7 @@ def array_img(data, path, channel="BF", n=16, shape=(4, 4), criteria={}):
     Resulting image has 'n' instances ordered in a grid of shape 'shape'. Each
     instance corresponds to a image centered in a cell satisfying provided
     criteria.
+
     Parameters
     ----------
     data : pandas dataframe
@@ -150,15 +153,18 @@ def array_img(data, path, channel="BF", n=16, shape=(4, 4), criteria={}):
         Shape (rows, columns) of the final grid of images.
     criteria : dict
         Dictionay containing the criteria of selection of cells.
+
     Return
     ------
     numpy.array
         A grid of 'n' images of cells satisfying given criteria.
+
     Raises
     ------
     ValueError
         If the number of cells satisfying the selection criteria is less
         than the number of cells to be shown.
+
     """
 
     try:
@@ -171,8 +177,8 @@ def array_img(data, path, channel="BF", n=16, shape=(4, 4), criteria={}):
         if len(criteria) != 0:
             for c in criteria.keys():
                 data_copy = data_copy[
-                    (criteria[c][0] < data_copy[c]) &
-                    (data_copy[c] < criteria[c][1])
+                    (criteria[c][0] < data_copy[c])
+                    & (data_copy[c] < criteria[c][1])
                 ]
         # Checking if the number of cells satisfying the criteria matches the
         # number of cells to be shown
@@ -182,13 +188,9 @@ def array_img(data, path, channel="BF", n=16, shape=(4, 4), criteria={}):
         select = data_copy[["ucid", "t_frame", "xpos", "ypos"]].sample(n)
         # Registers the name of each image in the series 'name'
         select["name"] = select.apply(
-            lambda row: img_name(
-                path,
-                row["ucid"],
-                channel,
-                row["t_frame"]),
-            axis=1
-            )
+            lambda row: img_name(path, row["ucid"], channel, row["t_frame"]),
+            axis=1,
+        )
         # Registers the individual image corresponding to each cell in the
         # series 'box_img'
         select["box_img"] = select.apply(
@@ -196,7 +198,7 @@ def array_img(data, path, channel="BF", n=16, shape=(4, 4), criteria={}):
                 plt.imread(row["name"], format="tif"),
                 row["xpos"],
                 row["ypos"],
-                diameter
+                diameter,
             ),
             axis=1,
         )

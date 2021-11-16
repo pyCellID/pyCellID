@@ -21,9 +21,19 @@
 # =============================================================================
 
 import re
+
+import numpy as np
+
 from pathlib import Path
 
 import pandas as pd
+
+# =============================================================================
+# GLOBAL PARAMETER
+# =============================================================================
+
+CHANNEL_REX = re.compile(r"([\w][f|F][\w]{,1})([_|\D][p|P][\D]*)")
+POSITION_REX = re.compile(r"([p|P][\D]*)(\d+)")
 
 # =============================================================================
 # FUNCTIONS
@@ -70,7 +80,7 @@ def _create_ucid(df, pos):
     """
     if not isinstance(pos, int):
         raise TypeError(f"{pos} must be integer")
-    calc = pos * 100000000000
+    calc = int(pos * 1e11)
     df["ucid"] = [calc + cellid for cellid in df["cellID"]]
     return df
 
@@ -90,10 +100,7 @@ def _decod_chanel(df_mapping, flag):
     ------
         ``str(channel)`` from ``int(flag)``.
     """
-    # Two or three characters for fluorescent proteins and _Position
-    # xFP_Position
-    channel = re.compile(r"([\w][f|F][\w]{,1})([_|\D][p|P][\D]*)")
-    # re.compile(r"\w{2,3}_Position")
+    # Fluorescent proteins and Position xFP_Position
     # CellID encodes in column 'fluor'(path_file whit str('channel'))
 
     path = df_mapping[df_mapping["flag"] == flag]["fluor"].values[0]
@@ -101,9 +108,7 @@ def _decod_chanel(df_mapping, flag):
     if not path:
         raise ValueError(f"{flag} is not encoding in {df_mapping}")
 
-    else:
-        return channel.findall(path)[0][0].lower()
-    # channel.findall(path)[0].split("_")[0].lower()
+    return CHANNEL_REX.findall(path)[0][0].lower()
 
 
 def _make_cols_chan(df, df_map):
@@ -166,43 +171,23 @@ def make_df(path_file):
     """
     # Position encoding.
     try:
-        pos = int(re.search(r"([p|P][\D]*)(\d+)", str(path_file), flags=0)[2])
+        if isinstance(path_file, str):
+            pos = int(POSITION_REX.findall(path_file)[0][1])
+        else:
+            pos = int(POSITION_REX.findall(path_file.as_posix())[0][1])
     except TypeError as err:
         print(f"{err = }\nPath < {path_file} > does not encode valid position")
-        pos = None
-    if pos:
-        try:
-            df = _read_df(path_file)
-            df = _create_ucid(df, pos)
-            df["pos"] = [pos for _ in range(len(df))]
-            return df
-        except (FileNotFoundError, TypeError) as err:
-            print(f"{err = }\n {path_file}")
 
-
-# To find tables
-def _parse_path(path, find_f):
-    """Construct a generator list with the path file.
-
-    Parameters
-    ----------
-    path : str
-        path to folder root to find.
-    find_f : str
-        str(searched_file).
-
-    Return
-    ------
-        srt(path_to_find_f).
-    """
-    if not Path(path).exists():
-        raise FileNotFoundError(f"Path < {path} > not exist")
-    else:
-        return (f for f in Path(path).rglob(find_f))
+    df = _read_df(path_file)
+    df = _create_ucid(df, pos)
+    df["pos"] = np.linspace(pos, pos, len(df), dtype=int)
+    return df
 
 
 # Final pipeline
-def merge_id_tables(path, n_data="out_all", n_mdata="*mapping", v=False):
+def merge_id_tables(
+    path, n_data="out_all", n_mdata="*mapping", exp_data=None, *args
+):
     """Concatenate the tables in the path with the pandas method.
 
     Transforms the identifying index of each cell from each data
@@ -228,59 +213,39 @@ def merge_id_tables(path, n_data="out_all", n_mdata="*mapping", v=False):
 
     * to use:
 
-    >>> import pycellid_io as ld
+    >>> import pycellid.io as ld
     >>> df=ld.cellid_table(
         path = '../my_experiment',
         n_data ='out_all',
         n_mdata ='mapping',
         v=False
     )
+
+    Other Parameters
+    ----------------
+    exp_data:
+    srt() name to finde each table data.
+
+
     """
     # Initial tables
-    data_tables = _parse_path(path=path, find_f=n_data)
-    file_mapping = _parse_path(path=path, find_f=n_mdata)
+    data_tables = (f for f in Path(path).rglob(n_data))
+    file_mapping = (f for f in Path(path).rglob(n_mdata))
+
     table = next(data_tables)
 
-    if v:
-        print(f"Reading : \n{table}")
     df = make_df(table)
     df = _make_cols_chan(df, pd.read_table(next(file_mapping)))
 
     for data_table in data_tables:
-        if v:
-            print(f"Reading : \n{data_table}")
         df_i = make_df(data_table)
         df_i = _make_cols_chan(df_i, pd.read_table(next(file_mapping)))
         df = pd.concat([df, df_i], ignore_index=True)
-    return df
 
-
-# To complete the experimet tables
-def merge_pdata_csv(df, data_path, cl_mrg="pos", sep=",", *args):
-    """Add the content in the ``data_path`` table to the ``DataFrame``.
-
-    There must be a matching of values and header of the
-    ``col_merge`` in both frames. Use the pandas merge method.
-
-    Parameters
-    ----------
-    df:
-        DataFrame to be modified.
-    data_path:
-        str() path to csv table to be added.
-    col_merge:
-        str() name of header must be coincidence.
-    sep:
-        separator or tab.
-    *args:
-        see pandas.read_csv() for extend function.
-
-    Return
-    ------
-        new DataFrame containing aggregate series.
-    """
-    add_d = pd.read_csv(data_path, *args)
-
-    df = pd.merge(df, right=add_d, how="left", left_on=cl_mrg, right_on=cl_mrg)
+    if exp_data:
+        add_d = pd.read_csv(exp_data, *args)
+        df = pd.merge(
+            df, right=add_d, how="left", left_on="pos", right_on="pos"
+        )
 
     return df

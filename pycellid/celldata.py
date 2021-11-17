@@ -11,12 +11,12 @@
 # License: MIT
 #   Full Text: https://github.com/pyCellID/pyCellID/blob/main/LICENSE
 
+
 # =============================================================================
 # DOCS
 # =============================================================================
 
-"""Merge and analyze the tables of characteristics calculated cell by cell
-and quickly find the images."""
+"""Merge and analyze tables. Find images quickly cell by cell."""
 
 # =============================================================================
 # IMPORTS
@@ -35,11 +35,9 @@ from pycellid.io import merge_id_tables
 # make tempdir _cache see librery tempdir
 # PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__))) / "_cache"
 
-
 @attr.s(repr=False)
 class Data(object):
     """Collapse the data in the path.
-
 
     Merge the tables into a single dataset, create a unique
     cell-ID, and inspect related images
@@ -81,7 +79,6 @@ class Data(object):
         validator=attr.validators.instance_of(str), default="*mapping"
     )
 
-
     @path.validator
     def _check_path(self, attribute, value):
         if not Path(value).exists():
@@ -89,6 +86,7 @@ class Data(object):
 
     @property
     def df(self):
+        """Build a dataset with the tables in the path."""
         if "_df" not in vars(self):
             self._df = merge_id_tables(
                 path=self.path,
@@ -98,6 +96,7 @@ class Data(object):
         return self._df.copy()
 
     def __getattr__(self, a):
+        """getattr(x, y) <==> x.__getattr__(y) <==> getattr(x, y)."""
         return getattr(self.df, a)
 
     def __getitem__(self, k):
@@ -117,9 +116,11 @@ class Data(object):
         return f"DataTables({repr(self.df)})"
 
     def __repr_html__(self):
+        """repr(x) <=> x.__repr__()."""
         return self.df._repr_html_()
 
     def __setitem__(self, key, values):
+        """x[k] = v ."""
         self._df[key] = values
 
     def show(
@@ -134,7 +135,7 @@ class Data(object):
         *args,
         **kwargs,
     ):
-        """Show values in df"""
+        """Show values in df."""
         arr = images.array_img(
             data,
             path=self.path,
@@ -149,5 +150,3 @@ class Data(object):
         ax.axis("off")
 
         plt.show()
-        # plt.xticks(X+0.38, ["A","B","C","D"])
-

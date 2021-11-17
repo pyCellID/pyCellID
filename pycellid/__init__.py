@@ -2,17 +2,18 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of the
-#   PyCellID Project (
+#   PyCellID and darksideoftheshmoo Project (
 #     https://github.com/pyCellID,
 #     https://github.com/darksideoftheshmoo
 # ).
-# Copyright (c) 2021. Clemente, Jose
+# Copyright (c) 2021. Clemente Jose A, Ferreira Juan David, San Martín Victor
 # License: MIT
 #   Full Text: https://github.com/pyCellID/pyCellID/blob/main/LICENSE
 
 # =============================================================================
 # DOCS
 # =============================================================================
+
 
 """
 pyCellID.

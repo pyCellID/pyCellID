@@ -1,4 +1,5 @@
 # !/usr/bin/env python
+
 # -*- coding: utf-8 -*-
 
 # This file is part of the
@@ -6,7 +7,7 @@
 #     https://github.com/pyCellID,
 #     https://github.com/darksideoftheshmoo
 # ).
-# Copyright (c) 2021, Clemente Jose
+# Copyright (c) 2021. Clemente, Jose
 # License: MIT
 #   Full Text: https://github.com/pyCellID/pyCellID/blob/main/LICENSE
 
@@ -16,15 +17,10 @@
 
 """in-out implementations for pyCellID."""
 
-# =============================================================================
-# IMPORTS
-# =============================================================================
-
 import re
+from pathlib import Path
 
 import numpy as np
-
-from pathlib import Path
 
 import pandas as pd
 

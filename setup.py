@@ -2,20 +2,23 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of the
-#   Pyedra Project (https://github.com/darksideoftheshmoo/pycell/).
-# Copyright (c) 2021, Author1, Author2, Author3, Author4, Author5
+#   PyCellID and darksideoftheshmoo Project (
+#     https://github.com/pyCellID,
+#     https://github.com/darksideoftheshmoo
+# ).
+# Copyright (c) 2021. Clemente Jose A, Ferreira Juan David, San Martín Victor
 # License: MIT
-#   Full Text: https://github.com/darksideoftheshmoo/pycell/blob/master/LICENSE
+#   Full Text: https://github.com/pyCellID/pyCellID/blob/main/LICENSE
 
-# =====================================================================
+# =============================================================================
 # DOCS
-# =====================================================================
+# =============================================================================
 
 """This file is for distribute and install PyCellID"""
 
-# ======================================================================
+# =============================================================================
 # IMPORTS
-# ======================================================================
+# =============================================================================
 
 import os
 import pathlib
@@ -29,7 +32,9 @@ from setuptools import setup  # noqa
 PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 
 
-REQUIREMENTS = ["attrs>=21.2.0", "pandas>=1.3.2", "matplotlib>=3.4.3"]
+REQUIREMENTS = [
+    "attr>=0.3.1", "pandas>=1.3.2", "matplotlib>=3.4.3", "numpy>=1.21.2"
+    ]
 
 with open(PATH / "pycellid" / "__init__.py") as fp:
     for line in fp.readlines():
@@ -42,11 +47,11 @@ with open("README.md") as fp:
     LONG_DESCRIPTION = fp.read()
 
 
-# =============================================================================
+# ==============================================================================
 # FUNCTIONS
-# =============================================================================
+# ==============================================================================
 
-short_description = "An extension that analyze Cell-ID single-cell."
+short_description = "Functions to analyze single-cell"
 
 setup(
     name="pycellid",
@@ -60,7 +65,7 @@ setup(
     packages=["pycellid"],
     license="The MIT License",
     install_requires=REQUIREMENTS,
-    keywords=["pycellid", "key2", "key3"],
+    keywords=["pycellid", "cytometry", "microscopy", "cellid", "vcellid"],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Education",

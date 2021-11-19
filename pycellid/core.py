@@ -35,6 +35,7 @@ from pycellid.io import merge_id_tables
 # make tempdir _cache see librery tempdir
 # PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__))) / "_cache"
 
+
 @attr.s(repr=False)
 class Data(object):
     """Collapse the data in the path.
@@ -96,31 +97,51 @@ class Data(object):
         return self._df.copy()
 
     def __getattr__(self, a):
-        """getattr(x, y) <==> x.__getattr__(y) <==> getattr(x, y)."""
+        """
+        Is called when the default attribute access fails (AttributeError).
+
+        getattr(x, y) <==> x.__getattr__(y) <==> getattr(x, y).
+        """
         return getattr(self.df, a)
 
     def __getitem__(self, k):
-        """x[k] <=> x.__getitem__(k)."""
+        """
+        Call to implement evaluation of self[key].
+
+        x[k] <=> x.__getitem__(k).
+        """
         return self.df.__getitem__(k)
 
     def __iter__(self):
-        """iter(x) <=> x.__iter__()."""
+        """
+        Call when an iterator is required for a container.
+
+        iter(x) <=> x.__iter__().
+        """
         return iter(self.df)
 
     def __len__(self):
-        """len(x) <=> x.__len__()."""
+        """
+        Call to implement the built-in function len().
+
+        len(x) <=> x.__len__().
+        """
         return len(self.df)
 
     def __repr__(self):
-        """repr(x) <=> x.__repr__()."""
+        """
+        Compute the “official” string representation of an object.
+
+        repr(x) <=> x.__repr__().
+        """
         return f"DataTables({repr(self.df)})"
 
     def __repr_html__(self):
-        """repr(x) <=> x.__repr__()."""
+        """Print a rich HTML version of your object."""
         return self.df._repr_html_()
 
     def __setitem__(self, key, values):
-        """x[k] = v ."""
+        """Call to implement assignment to self[key]."""
         self._df[key] = values
 
     def show(

@@ -25,12 +25,12 @@ An extension that analyze Cell-ID single-cell.
 # META
 # =============================================================================
 
-__version__ = "0.0.1"
+__version__ = "0.0.17"
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
+from .core import *  # noqa
 from .images import *  # noqa
 from .io import *  # noqa
-from .celldata import *  # noqa

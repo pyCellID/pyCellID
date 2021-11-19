@@ -4,6 +4,7 @@ __pycache__/
 .spydroject/
 .vscode/
 dev/
+dist/
 
 # Files
 Documento sin título 1

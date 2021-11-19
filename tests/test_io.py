@@ -3,6 +3,7 @@
 
 import io
 import os
+import random
 
 import numpy as np
 
@@ -25,18 +26,19 @@ base = os.path.dirname(ROOT_DIR)
 
 @pt.fixture
 def invalid_f_name_fail():
+    folder_n = ["osition", "p/osition", ""]
     file = ["out_all", "bf_vcellid", "fl_vcellid", "out_bf_fl_mapping"]
     f = np.random.choice(file)
-    n = np.random.randint(5, 200)
-    f_ph = os.path.join(base, "muestras_cellid", f"Position{n}", f"{f}")
+    n = np.random.randint(1, 3)
+    f_ph = os.path.join(base, "samples_cellid", f"{folder_n}{n}", f"{f}")
     return f_ph
 
 
 @pt.fixture
 def invalid_pos_fail():
-    l_pos = ["osition", "Posicion", "01", "osition01", "p", "P"]
+    l_pos = ["osition", "Posicion", "1e10", "osition01", "p", "P", "p2345"]
     pos = np.random.choice(l_pos)
-    ph = os.path.join(base, "muestras_cellid", f"{pos}", "out_all")
+    ph = os.path.join(base, "samples_cellid", f"{pos}", "out_all")
     return ph
 
 
@@ -44,7 +46,7 @@ def invalid_pos_fail():
 def rand_make_df():
     """Choise a random table from the folder mustras_cellid"""
     p = np.random.randint(1, 4)
-    path = os.path.join(base, "muestras_cellid", f"Position0{p}", "out_all")
+    path = os.path.join(base, "samples_cellid", f"Position0{p}", "out_all")
     df = ld.make_df(path)
     return df
 
@@ -124,33 +126,33 @@ def read_out_all_file(create_out_all_file):
 # Test read, parse: Folders, File names
 # =============================================================================
 
-
+# ok
 @pt.mark.xfail(raises=FileNotFoundError)
-def test_make_df_file_path_fails():
+def test_make_df_file_path_fails(invalid_f_name_fail):
     ld.make_df(invalid_f_name_fail)
 
 
-@pt.mark.xfail(raises=TypeError)
-def test_make_df_file_pos_fails():
+@pt.mark.xfail(raises=FileNotFoundError)
+def test_make_df_file_pos_fails(invalid_pos_fail):
     ld.make_df(invalid_pos_fail)
 
 
 def test_merge_id_tables_fnd():
     f = np.random.choice(["P", "p", "Pos", "Position", "Posicion"])
     n = np.random.randint(5, 200)
-    fnd = os.path.join(base, "muestras_cellid", f"{f}{n}")
-    with pt.raises(FileNotFoundError):
+    fnd = os.path.join(base, "samples_cellid", f"{f}{n}")
+    with pt.raises(StopIteration):
         ld.merge_id_tables(fnd)
 
 
 def test_merge_id_tables_fnd_file():
     n = np.random.randint(1, 4)
-    folder = os.path.join(base, "muestras_cellid", f"P{n}")
-    data_table = np.random.choice(
+    folder = os.path.join(base, "samples_cellid", f"P{n}")
+    data_table = random.choice(
         ["out", "out_alll", "Pos", "tablas", "datos.txt"]
     )
-    m_data = np.random.choice(["map", "mapeo", "m", "seguimiento"])
-    with pt.raises(FileNotFoundError):
+    m_data = random.choice(["map", "mapeo", "m", "seguimiento"])
+    with pt.raises(StopIteration):
         ld.merge_id_tables(path=folder, n_data=data_table, n_mdata=m_data)
 
 
@@ -228,7 +230,7 @@ def test_make_df_ucid(rand_make_df):
 
 
 def test_make_df_values():
-    p_out_all = os.path.join(base, "muestras_cellid", "Position01", "out_all")
+    p_out_all = os.path.join(base, "samples_cellid", "Position01", "out_all")
     df1 = ld.make_df(p_out_all)
     df1 = df1.drop(["ucid", "pos"], axis=1)
     df2 = pd.read_table(p_out_all)

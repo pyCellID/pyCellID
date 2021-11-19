@@ -33,8 +33,11 @@ PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 
 
 REQUIREMENTS = [
-    "attr>=0.3.1", "pandas>=1.3.2", "matplotlib>=3.4.3", "numpy>=1.21.2"
-    ]
+    "attrs(>=21.1.0)",
+    "pandas(>=1.3.0)",
+    "matplotlib(>=3.4.0)",
+    "numpy(>=1.21.0)",
+]
 
 with open(PATH / "pycellid" / "__init__.py") as fp:
     for line in fp.readlines():
@@ -73,11 +76,12 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Programming Language :: Python",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Scientific/Engineering",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
+    python_requires=">= 3.8",
 )

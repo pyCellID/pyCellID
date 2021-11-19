@@ -2,6 +2,7 @@
 
 # -*- coding: utf-8 -*-
 
+
 # This file is part of the
 #   PyCellID Project (
 #     https://github.com/pyCellID,
@@ -26,24 +27,28 @@ import numpy as np
 
 
 def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
-    """Construct the image's name according to the output format of CellID.
+    """Construct the name of an image according to the output format of CellID.
 
     The returned string contains the path and name of the image.
 
     Parameters
     ----------
-    ucid : ``int``
-                    The unique traking number.
-    t_frame : ``int``
-                    Time tag of the image.
-    channel : ``str``
-                    Fluorescence channel of the image. The values allowed
-                    are 'BF', 'CFP', 'RFP' or 'YFP'.
+    path : str
+        Path to the directory containing the images asociated to 'data'.
+    ucid : int
+        The unique traking number.
+    channel : str
+        Fluorescence channel of the image.
+        The values allowed are 'BF', 'CFP', 'RFP' or 'YFP'.
+    t_frame : int
+        Time tag of the image.
+    fmt : str
+        Format of the image to be readen.
 
     Returns
     -------
-    ``str`` :
-             Name and image's path according to the output format of CellID.
+    str
+        Name and path of an image according to the output format of CellID.
     """
     base_dir = Path(path)
 
@@ -62,6 +67,26 @@ def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
 
 
 def _check_y_pos(im, y_pos, radius):
+    """Check if the cell of interesst is in the upper edge of the image.
+
+    If the cell is closer to the edge than a 'radius', the it corrects the
+    outcome adding zero-valued rows at the begining of the image.
+
+    Parameters
+    ----------
+    im : numpy.array
+        A full fluorescence microscopy image.
+    y_pos : int
+        y-coordinate of the center of the cell of interest.
+    radius : int
+        lenght (in pixels) between the center of the image and each edge.
+
+    Returns
+    -------
+    numpy.array
+        An array (image) containing an individualised cell, corrected in case
+        that the cell is close to the upper edge of the original image.
+    """
     if y_pos - radius < 0:
         im = np.concatenate(
             [np.zeros((np.abs(y_pos - radius), im.shape[1])), im], 0
@@ -70,6 +95,26 @@ def _check_y_pos(im, y_pos, radius):
 
 
 def _check_x_pos(im, x_pos, radius):
+    """Check if the cell of interesst is in the left edge of the image.
+
+    If the cell is closer to the edge than a 'radius', the it corrects the
+    outcome adding zero-valued columns at the begining of the image.
+
+    Parameters
+    ----------
+    im : numpy.array
+        A full fluorescence microscopy image.
+    x_pos : int
+        x-coordinate of the center of the cell of interest.
+    radius : int
+        lenght (in pixels) between the center of the image and each edge.
+
+    Returns
+    -------
+    numpy.array
+        An array (image) containing an individualised cell, corrected in case
+        that the cell is close to the left edge of the original image.
+    """
     if x_pos - radius < 0:
         im = np.concatenate(
             [np.zeros((im.shape[0], np.abs(x_pos - radius))), im], 1
@@ -78,6 +123,25 @@ def _check_x_pos(im, x_pos, radius):
 
 
 def _mark_center(im, x_pos, y_pos):
+    """Pin the center of the cell of interest in the original image.
+
+    Adds a mark in the center of the individualised cell.
+
+    Parameters
+    ----------
+    im : numpy.array
+        A full fluorescence microscopy image.
+    x_pos : int
+        x-coordinate of the center of the cell of interest.
+    y_pos : int
+        y-coordinate of the center of the cell of interest.
+
+    Returns
+    -------
+    numpy.array
+        An array (image) of the same size as the original image with
+        a mark in the center of the individualised cell.
+    """
     center = np.zeros((2, 2))
     im[y_pos - 1:y_pos + 1, x_pos - 1:x_pos + 1] = center
     return im
@@ -100,18 +164,18 @@ def box_img(im, x_pos, y_pos, radius=90):
 
     Parameters
     ----------
-    im : ``numpy.array``
+    im : numpy.array
         A full fluorescence microscopy image.
-    x_pos : ``int``
+    x_pos : int
         x-coordinate of the center of the cell of interest.
-    y_pos : ``int``
+    y_pos : int
         y-coordinate of the center of the cell of interest.
-    radius : ``int``
+    radius : int
         lenght (in pixels) between the center of the image and each edge.
 
     Return
     ------
-    ``numpy.array`` :
+    numpy.array
         An array (image) containing an individualised, center-pinned, cell.
     """
     height = width = radius * 2
@@ -132,33 +196,31 @@ def box_img(im, x_pos, y_pos, radius=90):
     return iarray
 
 
-def array_img(data, path, channel="BF", n=16, shape=(4, 4), criteria={}):
+def array_img(data, path, channel="BF", n=16, criteria={}):
     """Create a grid of images containing cells which satisfy given criteria.
 
-    Resulting image has 'n' instances ordered in a grid of shape 'shape'.
-    Each instance corresponds to a image centered in a cell satisfying provided
+    Resulting image has 'n' instances ordered in a grid of shape 'shape'. Each
+    instance corresponds to a image centered in a cell satisfying provided
     criteria.
 
     Parameters
     ----------
-    data : ``pandas dataframe``
+    data : pandas dataframe
         Dataframe (output of CellID) containing all the measured parameters
         of each cell.
-    path : ``str``
+    path : str
         Path to the directory containing the images asociated to 'data'.
-    channel : ``str``
+    channel : str
         Fluorescence channel of the image.
         The values allowed are 'BF', 'CFP', 'RFP' or 'YFP'.
-    n : ``int``
+    n : int
         Number of instances composing the grid.
-    shape : ``tuple``
-        Shape (rows, columns) of the final grid of images.
-    criteria : ``dict``
+    criteria : dict
         Dictionay containing the criteria of selection of cells.
 
     Return
     ------
-    ``numpy.array`` :
+    numpy.array
         A grid of 'n' images of cells satisfying given criteria.
 
     Raises
@@ -166,7 +228,6 @@ def array_img(data, path, channel="BF", n=16, shape=(4, 4), criteria={}):
     ValueError
         If the number of cells satisfying the selection criteria is less
         than the number of cells to be shown.
-
     """
     try:
         # Estimate the maximum of the diameters of the cells in data based on

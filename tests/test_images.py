@@ -71,14 +71,14 @@ def test_box_img():
 
 
 def test_array_img():
-    file = os.path.join(base, "muestras_cellid", "pydata", "df.csv")
+    file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
     df = pd.read_csv(file)
     n = 16
     shape = (4, 4)
     criteria = {"a_tot": [800.0, 1200.01]}
     iarray = pycellid.array_img(
         df,
-        os.path.join(base, "muestras_cellid"),
+        os.path.join(base, "samples_cellid"),
         n=n,
         criteria=criteria,
     )
@@ -91,14 +91,14 @@ def test_array_img():
 
 
 def test_array_img_2():
-    file = os.path.join(base, "muestras_cellid", "pydata", "df.csv")
+    file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
     df = pd.read_csv(file)
     n = 12
     shape = (4, 3)
     criteria = {"a_tot": [800.0, 1200.01], "ypos": [0.0, 50.0]}
     iarray = pycellid.array_img(
         df,
-        os.path.join(base, "muestras_cellid"),
+        os.path.join(base, "samples_cellid"),
         n=n,
         criteria=criteria,
     )
@@ -110,14 +110,14 @@ def test_array_img_2():
 
 
 def test_array_img_3():
-    file = os.path.join(base, "muestras_cellid", "pydata", "df.csv")
+    file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
     df = pd.read_csv(file)
     n = 12
     shape = (4, 3)
     criteria = {"a_tot": [800.0, 1200.01], "xpos": [0.0, 50.0]}
     iarray = pycellid.array_img(
         df,
-        os.path.join(base, "muestras_cellid"),
+        os.path.join(base, "samples_cellid"),
         n=n,
         criteria=criteria,
     )
@@ -130,13 +130,13 @@ def test_array_img_3():
 
 def test_array_img_valueerror():
     with pytest.raises(ValueError):
-        file = os.path.join(base, "muestras_cellid", "pydata", "df.csv")
+        file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
         df = pd.read_csv(file)
         n = 16
         criteria = {"a_tot": [800.0, 700.00]}
         iarray = pycellid.array_img(
             df,
-            os.path.join(base, "muestras_cellid"),
+            os.path.join(base, "samples_cellid"),
             n=n,
             criteria=criteria,
         )

@@ -28,8 +28,11 @@ import pandas as pd
 # GLOBAL PARAMETER
 # =============================================================================
 
+# : Encoding channel name fluorescence
 CHANNEL_REX = re.compile(r"([\w][f|F][\w]{,1})([_|\D][p|P][\D]*)")
-POSITION_REX = re.compile(r"([p|P][\D]*)(\d+)")
+
+# : Tracking and positional file number
+POSITION_REX = re.compile(r"([p|P])([a-zA-Z]*)([-|_]*)(\d+)")
 
 # =============================================================================
 # FUNCTIONS
@@ -169,11 +172,11 @@ def make_df(path_file):
     # Position encoding.
     try:
         if isinstance(path_file, str):
-            pos = int(POSITION_REX.findall(path_file)[0][1])
+            pos = int(POSITION_REX.findall(path_file)[0][-1])
         else:
-            pos = int(POSITION_REX.findall(path_file.as_posix())[0][1])
-    except TypeError as err:
-        print(f"{err = }\nPath < {path_file} > does not encode valid position")
+            pos = int(POSITION_REX.findall(path_file.as_posix())[0][-1])
+    except IndexError as err:
+        print(f"{err = }\nPath < {path_file} > does not encode valid name")
 
     df = _read_df(path_file)
     df = _create_ucid(df, pos)

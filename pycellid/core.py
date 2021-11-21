@@ -22,14 +22,16 @@
 # IMPORTS
 # =============================================================================
 
+# from os import EX_CANTCREAT
 from pathlib import Path
 
 import attr
 
 import matplotlib.pyplot as plt
+# from numpy import exp
 
 from pycellid import images
-from pycellid.io import merge_id_tables
+from pycellid.io import merge_tables
 
 
 # make tempdir _cache see librery tempdir
@@ -89,10 +91,10 @@ class Data(object):
     def df(self):
         """Build a dataset with the tables in the path."""
         if "_df" not in vars(self):
-            self._df = merge_id_tables(
+            self._df = merge_tables(
                 path=self.path,
                 n_data=self.name_data,
-                n_mdata=self.name_meta_data
+                n_mdata=self.name_meta_data,
             )
         return self._df.copy()
 

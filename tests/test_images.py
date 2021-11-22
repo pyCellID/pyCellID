@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import os
+import random
 from pathlib import Path
 
 import numpy as np
-import random
 
 import pandas as pd
 
@@ -185,9 +185,10 @@ def test_array_img_3():
 
     assert iarray.shape >= (total_size, total_size)
 
+
 def test_array_img_warning_1():
     message = "The specified criteria is not satisfied by any cell"
-    with pytest.warns(UserWarning,match = message):
+    with pytest.warns(UserWarning, match=message):
         file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
         df = pd.read_csv(file)
         n = n = random.randint(16, 100)
@@ -201,10 +202,11 @@ def test_array_img_warning_1():
         )
         print(iarray.shape)
 
+
 def test_array_img_warning_2():
     n = random.randint(16, 100)
-    message =f"The specified criteria are not satisfied by {n} cells"
-    with pytest.warns(UserWarning,match = message):
+    message = f"The specified criteria are not satisfied by {n} cells"
+    with pytest.warns(UserWarning, match=message):
         file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
         df = pd.read_csv(file)
         criteria = {"a_tot": [700.0, 702.00]}
@@ -215,18 +217,3 @@ def test_array_img_warning_2():
             criteria=criteria,
         )
         print(iarray.shape)
-
-
-# def test_array_img_valueerror():
-#     with pytest.raises(ValueError):
-#         file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
-#         df = pd.read_csv(file)
-#         n = 16
-#         criteria = {"a_tot": [800.0, 700.00]}
-#         iarray = pycellid.array_img(
-#             df,
-#             os.path.join(base, "samples_cellid"),
-#             n=n,
-#             criteria=criteria,
-#         )
-#         print(iarray.shape)

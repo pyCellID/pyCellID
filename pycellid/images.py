@@ -24,7 +24,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 import numpy as np
-
+import warnings
 
 def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
     """Construct the name of an image according to the output format of CellID.
@@ -198,7 +198,7 @@ def box_img(im, x_pos, y_pos, radius=90):
     return iarray
 
 
-def array_img(data, path, channel="BF", n=16, criteria={}):
+def array_img(data, path, channel="BF", n=16, criteria=None):
     """Create a grid of images containing cells which satisfy given criteria.
 
     Resulting image has 'n' instances ordered in a grid of shape 'shape'. Each
@@ -231,65 +231,71 @@ def array_img(data, path, channel="BF", n=16, criteria={}):
         If the number of cells satisfying the selection criteria is less
         than the number of cells to be shown.
     """
-    try:
-        # Estimate the maximum of the diameters of the cells in data based on
-        # their area and assuming round-like cells
-        diameter = int(2 * np.round(np.sqrt(data["a_tot"].max() / np.pi)))
+    #try:
+    # Estimate the maximum of the diameters of the cells in data based on
+    # their area and assuming round-like cells
+    diameter = int(2 * np.round(np.sqrt(data["a_tot"].max() / np.pi)))
 
+    shape = (int(np.floor(np.sqrt(n))), int(np.ceil(np.sqrt(n))))
+
+    s = (2 * diameter + 3, 2 * diameter + 3)  # Shape of unitary image
+    # iarray np.ones, with size for contining all individual images
+    iarray = np.ones((s[0] * shape[0], s[1] * shape[1]), dtype=float)
+
+    data_copy = data.copy()
+    # Checking for extra selection criteria
+    criteria = {} if criteria is None else criteria
+    if len(criteria) != 0:
+        for c in criteria.keys():
+            data_copy = data_copy[
+                (criteria[c][0] < data_copy[c]) &
+                (data_copy[c] < criteria[c][1])
+            ]
+    # Checking if the number of cells satisfying the criteria matches the
+    # number of cells to be shown
+    if data_copy.shape[0] < n:
+        if data_copy.shape[0] == 0:
+            message = "The specified criteria is not satisfied by any cell"
+            warnings.warn(message)
+            return iarray
+        message =f"The specified criteria are not satisfied by {n} cells"
+        warnings.warn(message)
+        n = data_copy.shape[0]
         shape = (int(np.floor(np.sqrt(n))), int(np.ceil(np.sqrt(n))))
-
-        data_copy = data.copy()
-        # Checking for extra selection criteria
-        if len(criteria) != 0:
-            for c in criteria.keys():
-                data_copy = data_copy[
-                    (criteria[c][0] < data_copy[c]) &
-                    (data_copy[c] < criteria[c][1])
-                ]
-        # Checking if the number of cells satisfying the criteria matches the
-        # number of cells to be shown
-        if data_copy.shape[0] < n:
-            message = f"The specified criteria are not satisfied by {n} cells"
-            raise ValueError(message)
-        select = data_copy[["ucid", "t_frame", "xpos", "ypos"]].sample(n)
-        # Registers the name of each image in the series 'name'
-        select["name"] = select.apply(
-            lambda row: img_name(
-                path,
-                row["ucid"],
-                channel,
-                row["t_frame"]),
-            axis=1
-            )
-        # Registers the individual image corresponding to each cell in the
-        # series 'box_img'
-        select["box_img"] = select.apply(
-            lambda row: box_img(
-                plt.imread(row["name"], format="tif"),
-                row["xpos"],
-                row["ypos"],
-                diameter
-            ),
-            axis=1,
-        )
-        s = (2 * diameter + 3, 2 * diameter + 3)  # Shape of unitary image
-        # iarray np.ones, with size for contining all individual images
         iarray = np.ones((s[0] * shape[0], s[1] * shape[1]), dtype=float)
-
-        iloc = 0  # img index
-        for i in range(0, shape[0]):
-            for j in range(0, shape[1]):
-                xi = s[0] * i
-                xf = s[0] * (i + 1)
-                yi = s[1] * j
-                yf = s[1] * (j + 1)
-                iarray[xi:xf, yi:yf] = select["box_img"].iloc[iloc]
-                iloc += 1
-                if iloc == n:
-                    break
+    select = data_copy[["ucid", "t_frame", "xpos", "ypos"]].sample(n)
+    # Registers the name of each image in the series 'name'
+    select["name"] = select.apply(
+        lambda row: img_name(
+            path,
+            row["ucid"],
+            channel,
+            row["t_frame"]),
+        axis=1
+        )
+    # Registers the individual image corresponding to each cell in the
+    # series 'box_img'
+    select["box_img"] = select.apply(
+        lambda row: box_img(
+            plt.imread(row["name"], format="tif"),
+            row["xpos"],
+            row["ypos"],
+            diameter
+        ),
+        axis=1,
+    )
+    
+    iloc = 0  # img index
+    for i in range(0, shape[0]):
+        for j in range(0, shape[1]):
+            xi = s[0] * i
+            xf = s[0] * (i + 1)
+            yi = s[1] * j
+            yf = s[1] * (j + 1)
+            iarray[xi:xf, yi:yf] = select["box_img"].iloc[iloc]
+            iloc += 1
             if iloc == n:
                 break
-        return iarray
-    except ValueError as e:
-        print(e)
-        raise
+        if iloc == n:
+            break
+    return iarray

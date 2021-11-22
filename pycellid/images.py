@@ -19,12 +19,13 @@
 """Images for PyCellID."""
 
 import re
+import warnings
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 
 import numpy as np
-import warnings
+
 
 def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
     """Construct the name of an image according to the output format of CellID.
@@ -231,7 +232,6 @@ def array_img(data, path, channel="BF", n=16, criteria=None):
         If the number of cells satisfying the selection criteria is less
         than the number of cells to be shown.
     """
-    #try:
     # Estimate the maximum of the diameters of the cells in data based on
     # their area and assuming round-like cells
     diameter = int(2 * np.round(np.sqrt(data["a_tot"].max() / np.pi)))
@@ -258,7 +258,7 @@ def array_img(data, path, channel="BF", n=16, criteria=None):
             message = "The specified criteria is not satisfied by any cell"
             warnings.warn(message)
             return iarray
-        message =f"The specified criteria are not satisfied by {n} cells"
+        message = f"The specified criteria are not satisfied by {n} cells"
         warnings.warn(message)
         n = data_copy.shape[0]
         shape = (int(np.floor(np.sqrt(n))), int(np.ceil(np.sqrt(n))))
@@ -284,7 +284,7 @@ def array_img(data, path, channel="BF", n=16, criteria=None):
         ),
         axis=1,
     )
-    
+
     iloc = 0  # img index
     for i in range(0, shape[0]):
         for j in range(0, shape[1]):

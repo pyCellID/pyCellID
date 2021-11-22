@@ -4,10 +4,10 @@ pycellid package
 Submodules
 ----------
 
-pycellid.celldata module
-------------------------
+pycellid.core module
+--------------------
 
-.. automodule:: pycellid.celldata
+.. automodule:: pycellid.core
    :members:
    :undoc-members:
    :show-inheritance:

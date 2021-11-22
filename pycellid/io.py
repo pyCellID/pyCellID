@@ -1,4 +1,5 @@
 # !/usr/bin/env python
+
 # -*- coding: utf-8 -*-
 
 # This file is part of the
@@ -6,7 +7,7 @@
 #     https://github.com/pyCellID,
 #     https://github.com/darksideoftheshmoo
 # ).
-# Copyright (c) 2021, Clemente Jose
+# Copyright (c) 2021. Clemente, Jose
 # License: MIT
 #   Full Text: https://github.com/pyCellID/pyCellID/blob/main/LICENSE
 
@@ -15,10 +16,6 @@
 # =============================================================================
 
 """in-out implementations for pyCellID."""
-
-# =============================================================================
-# IMPORTS
-# =============================================================================
 
 import re
 from pathlib import Path
@@ -31,8 +28,15 @@ import pandas as pd
 # GLOBAL PARAMETER
 # =============================================================================
 
+# : Encoding channel name fluorescence
 CHANNEL_REX = re.compile(r"([\w][f|F][\w]{,1})([_|\D][p|P][\D]*)")
-POSITION_REX = re.compile(r"([p|P][\D]*)(\d+)")
+
+
+POS = r"[p|P][a-zA-Z]*[-|_]*"
+SC_NOTATION = r"-?[\d.]+(?:e-?\d+)+(?:[+]-?\d+)?"
+
+# : Tracking/positional file number. Accepts scientific notation.
+POSITION_REX = re.compile(fr"{POS}({SC_NOTATION}|\d+)")
 
 # =============================================================================
 # FUNCTIONS
@@ -40,7 +44,7 @@ POSITION_REX = re.compile(r"([p|P][\D]*)(\d+)")
 
 
 # Processing of tables
-def _read_df(path_file):
+def read_df(path_file):
     """Read a df in the path and remove the delimitations by space headers.
 
     Parameters
@@ -78,8 +82,6 @@ def _create_ucid(df, pos):
         Same df with the ``ucid`` series.
 
     """
-    if not isinstance(pos, int):
-        raise TypeError(f"{pos} must be integer")
     calc = int(pos * 1e11)
     df["ucid"] = [calc + cellid for cellid in df["cellID"]]
     return df
@@ -169,25 +171,32 @@ def make_df(path_file):
     ------
         A dataframe with ``df['ucid']`` unique cell identifier.
     """
-    # Position encoding.
-    try:
-        if isinstance(path_file, str):
-            pos = int(POSITION_REX.findall(path_file)[0][1])
-        else:
-            pos = int(POSITION_REX.findall(path_file.as_posix())[0][1])
-    except TypeError as err:
-        print(f"{err = }\nPath < {path_file} > does not encode valid position")
+    df = read_df(path_file)
 
-    df = _read_df(path_file)
+    # Position encoding.
+    # If the position > 1e20 it may fail
+    if isinstance(path_file, str):
+        pos = POSITION_REX.findall(path_file)
+    else:
+        pos = POSITION_REX.findall(path_file.as_posix())
+
+    if not pos:
+        raise FileNotFoundError(f"{path_file} does not encode valid position")
+
+    if "+" in pos[0]:
+        sc_num, num = pos[0].split("+")
+        pos = int(float(sc_num)) + int(float(num))
+    else:
+        pos = int(float(pos[0]))
+
     df = _create_ucid(df, pos)
     df["pos"] = np.linspace(pos, pos, len(df), dtype=int)
+
     return df
 
 
 # Final pipeline
-def merge_id_tables(
-    path, n_data="out_all", n_mdata="*mapping", exp_data=None, *args
-):
+def merge_tables(path, n_data="out_all", n_mdata="*mapping"):
     """Concatenate the tables in the path with the pandas method.
 
     Transforms the identifying index of each cell from each data
@@ -241,11 +250,5 @@ def merge_id_tables(
         df_i = make_df(data_table)
         df_i = _make_cols_chan(df_i, pd.read_table(next(file_mapping)))
         df = pd.concat([df, df_i], ignore_index=True)
-
-    if exp_data:
-        add_d = pd.read_csv(exp_data, *args)
-        df = pd.merge(
-            df, right=add_d, how="left", left_on="pos", right_on="pos"
-        )
 
     return df

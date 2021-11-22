@@ -3,6 +3,7 @@
 
 import io
 import os
+import random
 
 import numpy as np
 
@@ -25,18 +26,19 @@ base = os.path.dirname(ROOT_DIR)
 
 @pt.fixture
 def invalid_f_name_fail():
+    folder_n = ["osition", "p/osition", "Pos2e2+"]
     file = ["out_all", "bf_vcellid", "fl_vcellid", "out_bf_fl_mapping"]
     f = np.random.choice(file)
-    n = np.random.randint(5, 200)
-    f_ph = os.path.join(base, "muestras_cellid", f"Position{n}", f"{f}")
+    n = np.random.randint(1, 3)
+    f_ph = os.path.join(base, "samples_cellid", f"{folder_n}{n}", f"{f}")
     return f_ph
 
 
 @pt.fixture
 def invalid_pos_fail():
-    l_pos = ["osition", "Posicion", "01", "osition01", "p", "P"]
+    l_pos = ["osition", "Posicion", "1e10", "osition01", "p", "P", "p2345"]
     pos = np.random.choice(l_pos)
-    ph = os.path.join(base, "muestras_cellid", f"{pos}", "out_all")
+    ph = os.path.join(base, "samples_cellid", f"{pos}", "out_all")
     return ph
 
 
@@ -44,7 +46,7 @@ def invalid_pos_fail():
 def rand_make_df():
     """Choise a random table from the folder mustras_cellid"""
     p = np.random.randint(1, 4)
-    path = os.path.join(base, "muestras_cellid", f"Position0{p}", "out_all")
+    path = os.path.join(base, "samples_cellid", f"Position0{p}", "out_all")
     df = ld.make_df(path)
     return df
 
@@ -126,36 +128,44 @@ def read_out_all_file(create_out_all_file):
 
 
 @pt.mark.xfail(raises=FileNotFoundError)
-def test_make_df_file_path_fails():
+def test_make_df_file_path_fails(invalid_f_name_fail):
     ld.make_df(invalid_f_name_fail)
 
 
-@pt.mark.xfail(raises=TypeError)
-def test_make_df_file_pos_fails():
+@pt.mark.xfail(raises=FileNotFoundError)
+def test_make_df_file_pos_fails(invalid_pos_fail):
     ld.make_df(invalid_pos_fail)
 
 
-def test_merge_id_tables_fnd():
+def test_make_df_file():
+    file = os.path.join(
+        base, "samples_cellid", "pydata", "Position2e2+2", "out_all"
+    )
+    df = ld.make_df(file)
+    assert df["pos"].unique() == 202
+
+
+def test_merge_tables_fnd():
     f = np.random.choice(["P", "p", "Pos", "Position", "Posicion"])
     n = np.random.randint(5, 200)
-    fnd = os.path.join(base, "muestras_cellid", f"{f}{n}")
-    with pt.raises(FileNotFoundError):
-        ld.merge_id_tables(fnd)
+    fnd = os.path.join(base, "samples_cellid", f"{f}{n}")
+    with pt.raises(StopIteration):
+        ld.merge_tables(fnd)
 
 
-def test_merge_id_tables_fnd_file():
+def test_merge_tables_fnd_file():
     n = np.random.randint(1, 4)
-    folder = os.path.join(base, "muestras_cellid", f"P{n}")
-    data_table = np.random.choice(
+    folder = os.path.join(base, "samples_cellid", f"P{n}")
+    data_table = random.choice(
         ["out", "out_alll", "Pos", "tablas", "datos.txt"]
     )
-    m_data = np.random.choice(["map", "mapeo", "m", "seguimiento"])
-    with pt.raises(FileNotFoundError):
-        ld.merge_id_tables(path=folder, n_data=data_table, n_mdata=m_data)
+    m_data = random.choice(["map", "mapeo", "m", "seguimiento"])
+    with pt.raises(StopIteration):
+        ld.merge_tables(path=folder, n_data=data_table, n_mdata=m_data)
 
 
 def test_read_mapping_file(create_mapping_file):
-    df1 = ld._read_df(create_mapping_file)
+    df1 = ld.read_df(create_mapping_file)
     df2 = pd.DataFrame(
         {
             "flag": [0, 1, 2, 3],
@@ -167,7 +177,7 @@ def test_read_mapping_file(create_mapping_file):
 
 def test_read_out_all_file(create_out_all_file):
     rs = np.random.RandomState(np.random.MT19937(np.random.SeedSequence(1234)))
-    df1 = ld._read_df(create_out_all_file)
+    df1 = ld.read_df(create_out_all_file)
     df2 = pd.DataFrame(
         {
             "area": np.linspace(200, 1000, 300, dtype=int),
@@ -202,17 +212,14 @@ def test_fluor_col(create_out_all_file, create_mapping_file):
     var = ["f_nuc", "f_tot", "f_vac"]
     var_ch = [f"{v}_{c.lower()}" for v in var for c in ch]
 
-    df_out_all = ld._read_df(create_out_all_file)
-    df_mapp = ld._read_df(create_mapping_file)
+    df_out_all = ld.read_df(create_out_all_file)
+    df_mapp = ld.read_df(create_mapping_file)
 
     df = ld._make_cols_chan(df_out_all, df_mapp)
 
     for name in df.columns:
         if name.startswith("f_"):
             assert name in var_ch
-
-
-#            var_ch = var_ch.remove(name)
 
 
 def test_make_df_ucid(rand_make_df):
@@ -228,11 +235,52 @@ def test_make_df_ucid(rand_make_df):
 
 
 def test_make_df_values():
-    p_out_all = os.path.join(base, "muestras_cellid", "Position01", "out_all")
+    p_out_all = os.path.join(base, "samples_cellid", "Position01", "out_all")
     df1 = ld.make_df(p_out_all)
     df1 = df1.drop(["ucid", "pos"], axis=1)
     df2 = pd.read_table(p_out_all)
     assert np.array_equal(df1.values, df2.values)
+
+
+@pt.mark.parametrize(
+    "string,expected",
+    [
+        ("BF_Position01_time01.tif.out.tif", "bf"),
+        ("bF_Position01_t01.tif.out.tif", "bf"),
+        ("bf_Position01_tiemp01.tif.out.tif", "bf"),
+        ("dsf/BF_Position01_time01.tif.out.tif", "bf"),
+        ("d34sf/BF_Position01_time01.tif.out.tif", "bf"),
+        ("dsf/BF-Position01_time01.tif.out.tif", "bf"),
+        ("d34sf/BF-Position01_time01.tif.out.tif", "bf"),
+        ("RFP_Position01_time01.tif.out.tif", "rfp"),
+        ("RFP_Position01_time01.tif.out.tif", "rfp"),
+        ("RFp_Position01_time01.tif.out.tif", "rfp"),
+        ("dsf/RfP_Position01_time01.tif.out.tif", "rfp"),
+        ("d34sf/rFp_Position01_time01.tif.out.tif", "rfp"),
+        ("dsf/YfP-Position01_time01.tif.out.tif", "yfp"),
+        ("d34sf/YFP-Position01_time01.tif.out.tif", "yfp"),
+    ],
+)
+def test_channels_rex(string, expected):
+    assert ld.CHANNEL_REX.findall(string)[0][0].lower() == expected
+
+
+@pt.mark.parametrize(
+    "string,expected",
+    [
+        ("BF_Position1_t01.tif.out.tif", ["1"]),
+        ("bF_Position01_time10.tif.out.tif", ["01"]),
+        ("bf_P00001_time010.tif.out.tif", ["00001"]),
+        ("dsf/position1e3_time01.tif.out.tif", ["1e3"]),
+        ("d34sf/_Pos23e2+1.tif.out.tif", ["23e2+1"]),
+        ("dsf/BF-Position23+12_time01.tif.out.tif", ["23"]),
+        ("d34sf/BF-P01_time01.tif.out.tif", ["01"]),
+        ("RFP_p01_time01.tif.out.tif", ["01"]),
+        ("RFP/Pdasasfaf$sasd01_time01.tif.out.tif", []),
+    ],
+)
+def test_position_rex(string, expected):
+    assert ld.POSITION_REX.findall(string) == expected
 
 
 # =============================================================================
@@ -245,8 +293,8 @@ def test_make_cols_cahnnels(create_out_all_file_min, create_mapping_file_min):
     Variables starting with f_ (f_vacuole) are disaggregated by channel
     f_vacuole_yfp f_vacuole_tfp f_vacuole_rfp f_vacuole_tfp f_vacuole_bf
     """
-    df_out_all = ld._read_df(create_out_all_file_min)
-    df_mapp = ld._read_df(create_mapping_file_min)
+    df_out_all = ld.read_df(create_out_all_file_min)
+    df_mapp = ld.read_df(create_mapping_file_min)
 
     df_pycellid = ld._make_cols_chan(df_out_all, df_mapp)
 
@@ -278,80 +326,103 @@ def test_make_cols_cahnnels(create_out_all_file_min, create_mapping_file_min):
 # =============================================================================
 
 
-# def foo():
-#     ld._make_cols_chan(ld.make_df(out_all), mapping)
-#     pass
+def test_merge_tables():
+    # these are synthetic values ​​for test
+    path = os.path.join(base, "samples_cellid", "pydata", "test")
+    synthetic = ld.merge_tables(path=path).copy()
+
+    ch_crtl = [
+        "f_tot_yfp",
+        "f_tot_cfp",
+        "f_tot_tfp",
+        "f_local_bg_yfp",
+        "f_local_bg_cfp",
+        "f_local_bg_tfp",
+        "f_nucl_yfp",
+        "f_nucl_cfp",
+        "f_nucl_tfp",
+    ]
+
+    ucid_crtl = {
+        1100000000001,
+        1100000000002,
+        2200000000001,
+        2200000000002,
+        3300000000001,
+        3300000000002,
+    }
+
+    ch_var = []
+
+    for name in synthetic.columns:
+        assert "." not in name
+        assert " " not in name[0]
+        assert " " not in name[-1]
+        if name.startswith("f_"):
+            ch_var.append(name)
+
+    assert ch_var == ch_crtl
+    assert set(synthetic["pos"]) == {11, 22, 33}
+    assert set(synthetic["ucid"]) == ucid_crtl
 
 
 # =============================================================================
-# ToDo
+# To build controls
 # =============================================================================
 
-# def test_make_df_values():
-#    df1 = ld.make_df(p_out_all)
-#    df1 = df1.drop(["ucid", "pos"], axis=1)
-#    df2 = pd.read_table(p_out_all)
-#       assert np.array_equal(df1.values, df2.values)
+# %%
 
+# Synthetic data for control.
+# Simulation: acquisition of 3 fluorescent channels, 4 time-lapse in 3
+# positions and measurement of 2 cells per image.
+# Minimum tree of files (metadata and measurements) returned by CellID.
 
-# def test_make_df_values2(tmpdir):
-#    data_in = 'out_all'
-#    f_path = f'{tmpdir}/test.txt'
-#    df = ld.make_df(f_path)
-#
-#    with open(f_path) as file_out:
-#        data_out = file_out.read()
+# rs = np.random.RandomState(np.random.MT19937(np.random.SeedSequence(1234)))
 
-#    assert df == data_out
+# folder_test = os.path.join(base, "samples_cellid", "pydata", "test")
+# folder = ["Pos0011", "Position02e1+2", "p33"]
+# ch = ["YFP", "CFP", "TFP"]
+# m = []
+# oa = []
+# for f in folder:
+#     path = os.path.join(folder_test, f)
+#     os.mkdir(path)
 
+#     img = [os.path.join(folder_test, f'{c}_{f}_time{t}.tif')
+#            for c in ch for t in range(1,5)]
 
-# @pt.fixture(scope="session")
-# def out_all_mapping_file(tmp_path_factory):
-#     folder = tmp_path_factory.mktemp("Pos01")
-#     #.join("out_all.txt")
-#     out_all = pd.DataFrame(
+#     img_bf = [os.path.join(folder_test, f'BF_{f}_time{t}.tif')
+#               for t in range(1,5)]
+
+#     meta_data = pd.DataFrame(
 #         {
-#             'area': np.linspace(200, 1000, 300),
-#             'f_nuc': np.linspace(50, 500, 300),
-#             'f_tot': np.linspace(50, 500, 300),
-#             'flag': np.random.randint(0,4, 300, dtype=int),
-#             'cellID': np.linspace(100, 400, 300, endpoint=True, dtype=int),
-#             'ucid': np.linspace(100,400, 300, endpoint=True) + 100000000000,
-#             't_frame': np.random.randint(1,13,300),
-#             'pos': np.ones(300,dtype=int)
+#             'fluor' : img,
+#             'flag' :  np.repeat(np.linspace(0, 2, 3, dtype=int), 4),
+#             't.frame' : np.repeat(np.linspace(0, 2, 3, dtype=int), 4),
+#             'bright' : img_bf * 3,
+#             'bf.as.fl' : np.zeros(12, dtype=int),
 #         }
-#     ).to_csv(os.path.join(f'{folder}', 'out_all'))
+#     )
+#     meta_data.to_csv(
+#         path_or_buf= os.path.join(folder_test, f, "out_bf_fl_mapping"),
+#         sep="\t",
+#         index=False,
+#     )
+#     m.append(meta_data)
 
-#     mapping_file = pd.DataFrame(
+#     df_crl = pd.DataFrame(
 #         {
-#             'flag': [0,1,2,3],
-#             'fluor': ['BF_Pos02', 'YFP_Pos02', 'CFP_Pos02', 'RFP_Pos02']
+#           'cellID ' : np.repeat(np.linspace(1, 2, 2, dtype=int), 12),
+#           't.frame' : list(np.repeat(np.linspace(0, 3, 4, dtype=int), 3))*2,
+#           ' flag ' : [0,1,2] * 8,
+#           ' f.tot ' : rs.rand(24),
+#           ' f.local.bg ': rs.rand(24)*256,
+#           ' f.nucl ': rs.rand(24)*256,
 #         }
-#     ).to_csv(os.path.join(f'{folder}', 'mapping_file'))
-
-#     return folder
-
-
-# CONTENT = "content"
-
-
-# def test_create_file(tmp_path):
-#     d = tmp_path / "sub"
-#     d.mkdir()
-#     p = d / "hello.txt"
-#     p.write_text(CONTENT)
-#     assert p.read_text() == CONTENT
-#     assert len(list(tmp_path.iterdir())) == 1
-#     assert 0
-
-
-# def test_pivot(path=out_all_mapping_file):
-#     df = ld.merge_id_tables(path,
-#         n_data='out_all_file',
-#         n_mdata='mapping_file'
-#         )
-#     fluor_var = ['f_nuc', 'f_tot']
-#     ch = ['bf', 'cfp', 'yfp', 'rfp', 'tfp']
-#     var = [f'{f}_{c}' for c in ch for f in fluor_var]
-
-#     assert var in df.columns
+#     )
+#     df_crl.to_csv(
+#         path_or_buf= os.path.join(folder_test, f, "out_all"),
+#         sep="\t",
+#         index=False,
+#     )
+#     oa.append(df_crl)

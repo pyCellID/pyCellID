@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import random
 from pathlib import Path
 
 import numpy as np
@@ -150,7 +151,8 @@ def test_array_img_2():
     df = pd.read_csv(file)
     n = 12
     shape = (4, 3)
-    criteria = {"a_tot": [800.0, 1200.01], "ypos": [0.0, 50.0]}
+    ypos_lim = random.uniform(50.0, 60.0)
+    criteria = {"a_tot": [800.0, 1200.01], "ypos": [0.0, ypos_lim]}
     iarray = pycellid.array_img(
         df,
         os.path.join(base, "samples_cellid"),
@@ -169,7 +171,8 @@ def test_array_img_3():
     df = pd.read_csv(file)
     n = 12
     shape = (4, 3)
-    criteria = {"a_tot": [800.0, 1200.01], "xpos": [0.0, 50.0]}
+    xpos_lim = random.uniform(50.0, 60.0)
+    criteria = {"a_tot": [800.0, 1200.01], "xpos": [0.0, xpos_lim]}
     iarray = pycellid.array_img(
         df,
         os.path.join(base, "samples_cellid"),
@@ -183,12 +186,30 @@ def test_array_img_3():
     assert iarray.shape >= (total_size, total_size)
 
 
-def test_array_img_valueerror():
-    with pytest.raises(ValueError):
+def test_array_img_warning_1():
+    message = "The specified criteria is not satisfied by any cell"
+    with pytest.warns(UserWarning, match=message):
         file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
         df = pd.read_csv(file)
-        n = 16
-        criteria = {"a_tot": [800.0, 700.00]}
+        n = n = random.randint(16, 100)
+        lim = random.uniform(100.0, 1000.0)
+        criteria = {"a_tot": [lim, lim]}
+        iarray = pycellid.array_img(
+            df,
+            os.path.join(base, "samples_cellid"),
+            n=n,
+            criteria=criteria,
+        )
+        print(iarray.shape)
+
+
+def test_array_img_warning_2():
+    n = random.randint(16, 100)
+    message = f"The specified criteria are not satisfied by {n} cells"
+    with pytest.warns(UserWarning, match=message):
+        file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
+        df = pd.read_csv(file)
+        criteria = {"a_tot": [700.0, 702.00]}
         iarray = pycellid.array_img(
             df,
             os.path.join(base, "samples_cellid"),

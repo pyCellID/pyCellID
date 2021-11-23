@@ -1,6 +1,6 @@
 # PyCell (building...)
 
-![Alt text](https://github.com/pyCellID/pyCellID/tree/clementejose/res/PycellID_logo.jpg?raw=true "Title")
+[![Alt text](https://github.com/pyCellID/pyCellID/tree/clementejose/res/PycellID_logo.jpg?raw=true "Title")
 [![Build status](https://github.com/pyCellID/pyCellID/actions/workflows/CI.yml/badge.svg)](https://github.com/pyCellID/pyCellID/actions)
 [![issues](https://img.shields.io/github/issues/pyCellID/pyCellID)](https://img.shields.io/github/issues/pyCellID/pyCellID)
 [![license](https://img.shields.io/github/license/pyCellID/pyCellID)](https://github.com/pyCellID/pyCellID/blob/main/LICENSE)

@@ -1,3 +1,5 @@
+![logo](https://raw.githubusercontent.com/pyCellID/pyCellID/clementejose/res/PycellID_logo.jpg)
+
 # PyCell (building...)
 
 [![Build status](https://github.com/pyCellID/pyCellID/actions/workflows/CI.yml/badge.svg)](https://github.com/pyCellID/pyCellID/actions)

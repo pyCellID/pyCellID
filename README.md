@@ -1,4 +1,4 @@
-![Alt text](https://github.com/pyCellID/pyCellID/tree/clementejose/res/PycellID_logo.jpg?raw=true "Title")
+![Alt text](https://github.com/pyCellID/pyCellID/tree/clementejose/res/PycellID_logo.jpg)
 # PyCell (building...)
 
 [![Build status](https://github.com/pyCellID/pyCellID/actions/workflows/CI.yml/badge.svg)](https://github.com/pyCellID/pyCellID/actions)

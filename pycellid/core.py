@@ -30,9 +30,37 @@ import attr
 import matplotlib.pyplot as plt
 # from numpy import exp
 
-from pycellid import images
+from pycellid import images as img
 from pycellid.io import merge_tables
 
+@attr.s(repr=False)
+class CellsPloter:
+
+    cells = attr.ib()
+
+    def cimage(self, ax=None, imshow_kws=None, array_img_kws=None):
+        
+        data_c = self.cells
+
+        ax = plt.gca() if ax is None else ax
+
+        imshow_kws = {} if imshow_kws is None else imshow_kws
+        array_img_kws = {} if array_img_kws is None else array_img_kws
+
+        imshow_kws.setdefault('cmap', 'Greys')
+        array_img_kws.setdefault('channel', 'BF', 'n', '16')
+
+        arr_c = img.array_img(
+            data=data_c,
+            path=self.path,
+            **array_img_kws
+        )
+        
+        ax.imshow(arr_c, **imshow_kws)
+        
+        return ax
+
+        
 
 # make tempdir _cache see librery tempdir
 # PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__))) / "_cache"
@@ -169,8 +197,8 @@ class Data(object):
 
         fig = plt.figure(figsize=figsize, dpi=dpi, *args, *kwargs)
         ax = fig.add_subplot(1, 1, 1)
-        ax.imshow(arr, cmap=cmap, *args, **kwargs)
-        ax.axis("off")
 
         plt.show()
-        # plt.xticks(X+0.38, ["A","B","C","D"])
+        # plt.xticks(X+0.38, ["A","B","C","D"])        ax.imshow(arr, cmap=cmap, *args, **kwargs)
+        ax.axis("off")
+

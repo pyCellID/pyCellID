@@ -237,6 +237,9 @@ def merge_tables(path, n_data="out_all", n_mdata="*mapping"):
 
 
     """
+    if not Path(path).exists():
+        raise FileExistsError (f'invalid path: {path}')
+    
     # Initial tables
     data_tables = (f for f in Path(path).rglob(n_data))
     file_mapping = (f for f in Path(path).rglob(n_mdata))

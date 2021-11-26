@@ -11,7 +11,6 @@
 # License: MIT
 #   Full Text: https://github.com/pyCellID/pyCellID/blob/main/LICENSE
 
-
 # =============================================================================
 # DOCS
 # =============================================================================
@@ -27,6 +26,7 @@ from pathlib import Path
 
 import attr
 
+import pandas as pd
 import matplotlib.pyplot as plt
 
 from pycellid import images as img
@@ -84,10 +84,12 @@ class CellData(object):
         validator=attr.validators.instance_of(str), default="*mapping"
     )
 
+
     @path.validator
     def _check_path(self, attribute, value):
         if not Path(value).exists():
             raise FileNotFoundError(f"Path < {value} > not exist")
+
 
     @property
     def df(self):
@@ -103,6 +105,7 @@ class CellData(object):
             )
         return self._df.copy()
 
+
     @property
     def plot(self):
         """Represent set of ``cells_image`` or numerical data.
@@ -111,52 +114,92 @@ class CellData(object):
         """
         return CellsPloter(self)
 
+
     def __getattr__(self, a):
-        """
-        Is called when the default attribute access fails (AttributeError).
+        """Is called when the default attribute access fails (AttributeError).
 
         getattr(x, y) <==> x.__getattr__(y) <==> getattr(x, y).
         """
         return getattr(self.df, a)
 
+
     def __getitem__(self, k):
-        """
-        Call to implement evaluation of self[key].
+        """Call to implement evaluation of self[key].
 
         x[k] <=> x.__getitem__(k).
         """
         return self.df.__getitem__(k)
 
+    # def __getitem__(self, slice):
+    #     """x[y] <==> x.__getitem__(y)."""
+    #     sliced = self.df.__getitem__(slice)
+    #     return CellData(
+    #         model=self.model,
+    #         model_df=sliced,
+    #         plot_cls=self.plot_cls,
+    #         metadata=dict(self.metadata),
+    #     )
+
+
     def __iter__(self):
-        """
-        Call when an iterator is required for a container.
+        """Call when an iterator is required for a container.
 
         iter(x) <=> x.__iter__().
         """
         return iter(self.df)
 
+
     def __len__(self):
-        """
-        Call to implement the built-in function len().
+        """Call to implement the built-in function len().
 
         len(x) <=> x.__len__().
         """
         return len(self.df)
 
+
     def __repr__(self):
-        """
-        Compute the “official” string representation of an object.
+        """Compute the “official” string representation of an object.
 
         repr(x) <=> x.__repr__().
         """
-        return f"CellData(data={hex(id(self.df))})"
+        with pd.option_context("display.show_dimensions", False):
+            idx = [0, 1, 3, 4, -4, -3, -2, -1]
+            df_body = repr(self.df.iloc[idx,idx]).splitlines()
+        df_dim = list(self.df.shape)
+        sdf_dim = f"{df_dim[0]} rows x {df_dim[1]} columns"
 
-    def __repr_html__(self):
-        """Print a rich HTML version of your object."""
-        return self.df._repr_html_()
+        fotter = f"\nPyCellID.CellData - {sdf_dim}"
+        cell_data_repr = "\n".join(df_body +[fotter])
+        return cell_data_repr
+
+
+    def _repr_html_(self):
+        """Print a rich HTML version of your object.
+        """
+        ad_id = id(self)
+
+        with pd.option_context("display.show_dimensions", False):
+            df_html = self.df._repr_html_()
+
+        rows = f"{self.df.shape[0]} rows"
+        columns = f"{self.df.shape[1]} columns"
+
+        footer = f"PyCellID.CellData - {rows} x {columns}"
+
+        parts = [
+            f'<div class="PyCellID.CellData" id={ad_id}>',
+            df_html,
+            footer,
+            "</div>",
+        ]
+
+        html = "".join(parts)
+        return html
+
 
     def __setitem__(self, key, values):
-        """Call to implement assignment to self[key]."""
+        """Call to implement assignment to self[key].
+        """
         self._df[key] = values
 
 
@@ -188,6 +231,7 @@ class CellsPloter:
 
     cells = attr.ib()
 
+
     def __repr__(self):
         """
         Compute the “official” string representation of an object.
@@ -195,6 +239,7 @@ class CellsPloter:
         repr(x) <=> x.__repr__().
         """
         return f"CellsPloter(cells={hex(id(self.cells))})"
+
 
     def __call__(self, kind="cells_image", **kwargs):
         """
@@ -207,6 +252,7 @@ class CellsPloter:
             method = getattr(self.cells._df.plot, kind)
         return method(**kwargs)
 
+
     def __getattr__(self, a):
         """
         Is called when the default attribute access fails (AttributeError).
@@ -214,6 +260,16 @@ class CellsPloter:
         getattr(x, y) <==> x.__getattr__(y) <==> getattr(x, y).
         """
         return getattr(self.cells._df.plot, a)
+
+
+    def __getitem__(self, k):
+        """
+        Call to implement evaluation of self[key].
+
+        x[k] <=> x.__getitem__(k).
+        """
+        return self.cells.df.__getitem__(k)        
+
 
     def cells_image(self, array_img_kws=None, imshow_kws=None, ax=None):
         """Representation of a set of cells.
@@ -251,6 +307,7 @@ class CellsPloter:
         ax.imshow(arr_c, **imshow_kws)
         ax.axis("off")
         return ax
+
 
     def cimage(self, idtfer, box_img_kws=None, imshow_kws=None, ax=None):
         """Representation of a sigle cell or image.

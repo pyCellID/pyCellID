@@ -19,90 +19,35 @@ base = os.path.dirname(ROOT_DIR)
 @pytest.mark.parametrize(
     "ucid, channel, t_frame, expected",
     [
-        (
-            100000000020,
-            "BF",
-            np.int64(0),
-            "BF_Position01_time01.tif.out.tif"
-            ),
+        (100000000020, "BF", np.int64(0), "BF_Position01_time01.tif.out.tif"),
         (
             100000000020,
             "CFP",
             np.int64(1),
-            "CFP_Position01_time02.tif.out.tif"
-            ),
+            "CFP_Position01_time02.tif.out.tif",
+        ),
         (
             200000000020,
             "RFP",
             np.int64(2),
-            "RFP_Position02_time03.tif.out.tif"
-            ),
+            "RFP_Position02_time03.tif.out.tif",
+        ),
         (
             200000000020,
             "YFP",
             np.int64(3),
-            "YFP_Position02_time04.tif.out.tif"
-            ),
-        (
-            300000000020,
-            "BF",
-            np.int64(4),
-            "BF_Position03_time05.tif.out.tif"
-            ),
-        (
-            300000000020,
-            "BF",
-            np.int64(5),
-            "BF_Position03_time06.tif.out.tif"
-            ),
-        (
-            200000000020,
-            "BF",
-            np.int64(6),
-            "BF_Position02_time07.tif.out.tif"
-            ),
-        (
-            200000000020,
-            "BF",
-            np.int64(7),
-            "BF_Position02_time08.tif.out.tif"
-            ),
-        (
-            100000000020,
-            "BF",
-            np.int64(8),
-            "BF_Position01_time09.tif.out.tif"
-            ),
-        (
-            100000000020,
-            "BF",
-            np.int64(9),
-            "BF_Position01_time10.tif.out.tif"
-            ),
-        (
-            300000000020,
-            "BF",
-            np.int64(10),
-            "BF_Position03_time11.tif.out.tif"
-            ),
-        (
-            300000000020,
-            "BF",
-            np.int64(11),
-            "BF_Position03_time12.tif.out.tif"
-            ),
-        (
-            300000000020,
-            "BF",
-            np.int64(12),
-            "BF_Position03_time13.tif.out.tif"
-            ),
-        (
-            300000000020,
-            "BF",
-            None,
-            "BF_Position03.tif.out.tif"
-            ),
+            "YFP_Position02_time04.tif.out.tif",
+        ),
+        (300000000020, "BF", np.int64(4), "BF_Position03_time05.tif.out.tif"),
+        (300000000020, "BF", np.int64(5), "BF_Position03_time06.tif.out.tif"),
+        (200000000020, "BF", np.int64(6), "BF_Position02_time07.tif.out.tif"),
+        (200000000020, "BF", np.int64(7), "BF_Position02_time08.tif.out.tif"),
+        (100000000020, "BF", np.int64(8), "BF_Position01_time09.tif.out.tif"),
+        (100000000020, "BF", np.int64(9), "BF_Position01_time10.tif.out.tif"),
+        (300000000020, "BF", np.int64(10), "BF_Position03_time11.tif.out.tif"),
+        (300000000020, "BF", np.int64(11), "BF_Position03_time12.tif.out.tif"),
+        (300000000020, "BF", np.int64(12), "BF_Position03_time13.tif.out.tif"),
+        (300000000020, "BF", None, "BF_Position03.tif.out.tif"),
     ],
 )
 def test_img_name(ucid, channel, t_frame, expected):
@@ -119,7 +64,9 @@ def test_box_img():
 
     x_pos = radius + 1
     y_pos = radius + 1
-    imresult = pycellid.box_img(imarray, x_pos, y_pos, radius)
+    imresult = pycellid.box_img(
+        imarray, x_pos, y_pos, radius, mark_center=True
+    )
     centro = imresult[y_pos - 2:y_pos, x_pos - 2:x_pos]
     alto = imresult[:, -3:]
     largo = imresult[-3:, :]
@@ -127,7 +74,7 @@ def test_box_img():
 
 
 def test_array_img():
-    file = os.path.join(base, "test", "pydata", "df.csv")
+    file = os.path.join(base, "tests", "pydata", "df.csv")
     df = pd.read_csv(file)
     n = 16
     shape = (4, 4)
@@ -147,7 +94,7 @@ def test_array_img():
 
 
 def test_array_img_2():
-    file = os.path.join(base, "test", "pydata", "df.csv")
+    file = os.path.join(base, "tests", "pydata", "df.csv")
     df = pd.read_csv(file)
     n = 12
     shape = (4, 3)
@@ -167,7 +114,7 @@ def test_array_img_2():
 
 
 def test_array_img_3():
-    file = os.path.join(base, "test", "pydata", "df.csv")
+    file = os.path.join(base, "tests", "pydata", "df.csv")
     df = pd.read_csv(file)
     n = 12
     shape = (4, 3)
@@ -189,7 +136,7 @@ def test_array_img_3():
 def test_array_img_warning_1():
     message = "The specified criteria is not satisfied by any cell"
     with pytest.warns(UserWarning, match=message):
-        file = os.path.join(base, "test", "pydata", "df.csv")
+        file = os.path.join(base, "tests", "pydata", "df.csv")
         df = pd.read_csv(file)
         n = n = random.randint(16, 100)
         lim = random.uniform(100.0, 1000.0)
@@ -207,7 +154,7 @@ def test_array_img_warning_2():
     n = random.randint(16, 100)
     message = f"The specified criteria are not satisfied by {n} cells"
     with pytest.warns(UserWarning, match=message):
-        file = os.path.join(base, "test", "pydata", "df.csv")
+        file = os.path.join(base, "tests", "pydata", "df.csv")
         df = pd.read_csv(file)
         criteria = {"a_tot": [700.0, 702.00]}
         iarray = pycellid.array_img(

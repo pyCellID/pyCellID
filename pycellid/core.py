@@ -22,16 +22,12 @@
 # IMPORTS
 # =============================================================================
 
-
-from pathlib import Path
-
 import warnings
+from pathlib import Path
 
 import attr
 
 import matplotlib.pyplot as plt
-
-# from numpy import exp
 
 from pycellid import images as img
 from pycellid.io import merge_tables
@@ -95,8 +91,9 @@ class CellData(object):
 
     @property
     def df(self):
-        """
-        Return a copy of the underlying Dataframe.
+        """Return a copy of the underlying Dataframe.
+
+        This property cosntruct the data tables.
         """
         if "_df" not in vars(self):
             self._df = merge_tables(
@@ -108,11 +105,9 @@ class CellData(object):
 
     @property
     def plot(self):
-        """
-        Called to represent set of "cells_image",
-        a cell "cimage" or numerical representations.
+        """Represent set of ``cells_image`` or numerical data.
 
-        For ``cimage method`` you must specify an identifier id={}.
+        For ``cimage`` method you must specify an identifier id={}.
         """
         return CellsPloter(self)
 
@@ -203,7 +198,7 @@ class CellsPloter:
 
     def __call__(self, kind="cells_image", **kwargs):
         """
-        Called when the instance is “called” as a function.
+        When the instance is “called” as a function.
 
         type(x).__call__(x, arg1, ...).
         """
@@ -221,8 +216,7 @@ class CellsPloter:
         return getattr(self.cells._df.plot, a)
 
     def cells_image(self, array_img_kws=None, imshow_kws=None, ax=None):
-        """
-        Representation of a set of cells.
+        """Representation of a set of cells.
 
         By default it represents a 4 X 4 matrix chosen at random.
 
@@ -243,7 +237,6 @@ class CellsPloter:
         ax:
             Use your axes to plot.
         """
-
         data_c = self.cells
 
         ax = plt.gca() if ax is None else ax
@@ -259,13 +252,22 @@ class CellsPloter:
         ax.axis("off")
         return ax
 
-    def cimage(self, id, box_img_kws=None, imshow_kws=None, ax=None):
-        """
-        Representation of a sigle cell or image.
+    def cimage(self, idtfer, box_img_kws=None, imshow_kws=None, ax=None):
+        """Representation of a sigle cell or image.
 
-        Identifier ``id`` is required. Reference a valid image or position.
+        Identifier ``idtfer`` is required. Reference a valid image or position.
         By default, an image with a size of (1392 X 1040)px will be rendered.
         Use the arguments of box_img_kws to choose as you like.
+
+        Params
+        ------
+        idtfer : path or dict.
+            path to an image file
+            dict = {
+                "channel":str,
+                "UCID":int,
+                "t_frame":int,
+            }
 
         Returns
         -------
@@ -302,10 +304,9 @@ class CellsPloter:
 
         imshow_kws.setdefault("cmap", "Greys")
 
-        if isinstance(id, dict):
-
-            ucid = id["ucid"]
-            t_frame = id["t_frame"]
+        if isinstance(idtfer, dict):
+            ucid = idtfer["ucid"]
+            t_frame = idtfer["t_frame"]
             try:
                 [[x, y]] = data_c[
                     (data_c.ucid == ucid) & (data_c.t_frame == t_frame)
@@ -316,7 +317,7 @@ class CellsPloter:
                 message = "not match ucid and t_frame. See picture!"
                 warnings.warn(message)
 
-            id = img.img_name(data_c.path, **id)
+            idtfer = img.img_name(data_c.path, **idtfer)
 
         else:
             x, y, r = int(1392 / 2), int(1040 / 2), int(1040 / 2)
@@ -325,7 +326,7 @@ class CellsPloter:
         box_img_kws.setdefault("y_pos", y)
         box_img_kws.setdefault("radius", r)
 
-        arr = plt.imread(id)
+        arr = plt.imread(idtfer)
         arr_c = img.box_img(im=arr, **box_img_kws)
 
         ax.imshow(arr_c, **imshow_kws)

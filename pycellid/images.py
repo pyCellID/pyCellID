@@ -16,7 +16,17 @@
 # DOCS
 # =============================================================================
 
-"""Images for PyCellID."""
+"""Images for PyCellID.
+
+Attention! This module will not provide images.
+This module provides matrix representations for your analysis or to work with
+your favorite framework.
+"""
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
 
 import re
 import warnings
@@ -57,11 +67,11 @@ def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
     pos = re.search(r"\d+(?=\d{11})", str(ucid)).group(0)
     pos = pos.zfill(2)
     # Check if 't_frame' is provided and onstruct the name of the image
-    if isinstance(t_frame, np.int64):
-        s = str(t_frame + 1).zfill(2)
-        name = f"{channel.upper()}_Position{pos}_time{s}{fmt}"
-    elif t_frame is None:
+    if t_frame is None:
         name = f"{channel.upper()}_Position{pos}{fmt}"
+    else:
+        s = str(int(t_frame) + 1).zfill(2)
+        name = f"{channel.upper()}_Position{pos}_time{s}{fmt}"
     # Join base directory to name
     name = base_dir.joinpath(name)
     return name
@@ -90,9 +100,8 @@ def _check_y_pos(im, y_pos, radius):
     """
     if y_pos - radius < 0:
         im = np.concatenate(
-            [np.zeros((np.abs(y_pos - radius), im.shape[1])), im],
-            0
-            )
+            [np.zeros((np.abs(y_pos - radius), im.shape[1])), im], 0
+        )
     return im
 
 
@@ -119,9 +128,8 @@ def _check_x_pos(im, x_pos, radius):
     """
     if x_pos - radius < 0:
         im = np.concatenate(
-            [np.zeros((im.shape[0], np.abs(x_pos - radius))), im],
-            1
-            )
+            [np.zeros((im.shape[0], np.abs(x_pos - radius))), im], 1
+        )
     return im
 
 
@@ -159,7 +167,7 @@ def _img_crop(im, x_pos, y_pos, diameter, im_shape):
     return im
 
 
-def box_img(im, x_pos, y_pos, radius=90):
+def box_img(im, x_pos, y_pos, radius=90, mark_center=False):
     """Create a single image contatinig an individualised cell.
 
     The resulting image posses a mark in the center of the individualised
@@ -175,6 +183,8 @@ def box_img(im, x_pos, y_pos, radius=90):
         y-coordinate of the center of the cell of interest.
     radius : int
         lenght (in pixels) between the center of the image and each edge.
+    mark_center : bool
+        mark a black point ,defoult = False.
 
     Return
     ------
@@ -184,7 +194,8 @@ def box_img(im, x_pos, y_pos, radius=90):
     height = width = radius * 2
     im_shape = im.shape
     # Mark the center of the cell
-    im = _mark_center(im, x_pos, y_pos)
+    if mark_center:
+        im = _mark_center(im, x_pos, y_pos)
     # crop the region of the image containing the cell of interest
     im = _img_crop(im, x_pos, y_pos, radius, im_shape)
     iarray = np.zeros((height, width))
@@ -248,8 +259,8 @@ def array_img(data, path, channel="BF", n=16, criteria=None):
     if len(criteria) != 0:
         for c in criteria.keys():
             data_copy = data_copy[
-                (criteria[c][0] < data_copy[c]) &
-                (data_copy[c] < criteria[c][1])
+                (criteria[c][0] < data_copy[c])
+                & (data_copy[c] < criteria[c][1])
             ]
     # Checking if the number of cells satisfying the criteria matches the
     # number of cells to be shown
@@ -266,13 +277,9 @@ def array_img(data, path, channel="BF", n=16, criteria=None):
     select = data_copy[["ucid", "t_frame", "xpos", "ypos"]].sample(n)
     # Registers the name of each image in the series 'name'
     select["name"] = select.apply(
-        lambda row: img_name(
-            path,
-            row["ucid"],
-            channel,
-            row["t_frame"]),
-        axis=1
-        )
+        lambda row: img_name(path, row["ucid"], channel, row["t_frame"]),
+        axis=1,
+    )
     # Registers the individual image corresponding to each cell in the
     # series 'box_img'
     select["box_img"] = select.apply(
@@ -280,7 +287,7 @@ def array_img(data, path, channel="BF", n=16, criteria=None):
             plt.imread(row["name"], format="tif"),
             row["xpos"],
             row["ypos"],
-            diameter
+            diameter,
         ),
         axis=1,
     )

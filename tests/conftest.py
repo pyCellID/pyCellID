@@ -2,15 +2,10 @@ import io
 import os
 
 import numpy as np
-
 import pandas as pd
-
-import pycellid
-import pycellid.io as ld
-
-
 import pytest as pt
 
+import pycellid.io as ld
 
 # =============================================================================
 # Parameter & fixtures

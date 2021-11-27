@@ -5,15 +5,14 @@ import random
 from pathlib import Path
 
 import numpy as np
-
 import pandas as pd
+import pytest
 
 import pycellid
 
-import pytest
-
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 base = os.path.dirname(ROOT_DIR)
+
 
 def get_array_img(doc, n, criteria):
     file = os.path.join(base, "samples_cellid", "pydata", doc)
@@ -25,7 +24,7 @@ def get_array_img(doc, n, criteria):
         criteria=criteria,
     )
 
-    return iarray.shape
+    return iarray
 
 
 def get_size(shape, criteria):
@@ -38,90 +37,35 @@ def get_size(shape, criteria):
 @pytest.mark.parametrize(
     "ucid, channel, t_frame, expected",
     [
-        (
-            100000000020,
-            "BF",
-            np.int64(0),
-            "BF_Position01_time01.tif.out.tif"
-            ),
+        (100000000020, "BF", np.int64(0), "BF_Position01_time01.tif.out.tif"),
         (
             100000000020,
             "CFP",
             np.int64(1),
-            "CFP_Position01_time02.tif.out.tif"
-            ),
+            "CFP_Position01_time02.tif.out.tif",
+        ),
         (
             200000000020,
             "RFP",
             np.int64(2),
-            "RFP_Position02_time03.tif.out.tif"
-            ),
+            "RFP_Position02_time03.tif.out.tif",
+        ),
         (
             200000000020,
             "YFP",
             np.int64(3),
-            "YFP_Position02_time04.tif.out.tif"
-            ),
-        (
-            300000000020,
-            "BF",
-            np.int64(4),
-            "BF_Position03_time05.tif.out.tif"
-            ),
-        (
-            300000000020,
-            "BF",
-            np.int64(5),
-            "BF_Position03_time06.tif.out.tif"
-            ),
-        (
-            200000000020,
-            "BF",
-            np.int64(6),
-            "BF_Position02_time07.tif.out.tif"
-            ),
-        (
-            200000000020,
-            "BF",
-            np.int64(7),
-            "BF_Position02_time08.tif.out.tif"
-            ),
-        (
-            100000000020,
-            "BF",
-            np.int64(8),
-            "BF_Position01_time09.tif.out.tif"
-            ),
-        (
-            100000000020,
-            "BF",
-            np.int64(9),
-            "BF_Position01_time10.tif.out.tif"
-            ),
-        (
-            300000000020,
-            "BF",
-            np.int64(10),
-            "BF_Position03_time11.tif.out.tif"
-            ),
-        (
-            300000000020,
-            "BF",
-            np.int64(11),
-            "BF_Position03_time12.tif.out.tif"
-            ),
-        (
-            300000000020,
-            "BF",
-            np.int64(12),
-            "BF_Position03_time13.tif.out.tif"
-            ),
-        (
-            300000000020,
-            "BF",
-            None,
-            "BF_Position03.tif.out.tif"
-            ),
+            "YFP_Position02_time04.tif.out.tif",
+        ),
+        (300000000020, "BF", np.int64(4), "BF_Position03_time05.tif.out.tif"),
+        (300000000020, "BF", np.int64(5), "BF_Position03_time06.tif.out.tif"),
+        (200000000020, "BF", np.int64(6), "BF_Position02_time07.tif.out.tif"),
+        (200000000020, "BF", np.int64(7), "BF_Position02_time08.tif.out.tif"),
+        (100000000020, "BF", np.int64(8), "BF_Position01_time09.tif.out.tif"),
+        (100000000020, "BF", np.int64(9), "BF_Position01_time10.tif.out.tif"),
+        (300000000020, "BF", np.int64(10), "BF_Position03_time11.tif.out.tif"),
+        (300000000020, "BF", np.int64(11), "BF_Position03_time12.tif.out.tif"),
+        (300000000020, "BF", np.int64(12), "BF_Position03_time13.tif.out.tif"),
+        (300000000020, "BF", None, "BF_Position03.tif.out.tif"),
     ],
 )
 def test_img_name(ucid, channel, t_frame, expected):
@@ -139,75 +83,37 @@ def test_box_img():
     x_pos = radius + 1
     y_pos = radius + 1
     imresult = pycellid.box_img(imarray, x_pos, y_pos, radius)
-    centro = imresult[y_pos - 2:y_pos, x_pos - 2:x_pos]
+    centro = imresult[y_pos - 2:y_pos, x_pos - 2:x_pos] # noqa
     alto = imresult[:, -3:]
     largo = imresult[-3:, :]
     assert np.sum(centro) + np.sum(alto) + np.sum(largo) == 0
 
 
 def test_array_img():
-    file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
-    df = pd.read_csv(file)
-    n = 16
-    shape = (4, 4)
-    criteria = {"a_tot": [800.0, 1200.01]}
-    iarray = pycellid.array_img(
-        df,
-        os.path.join(base, "samples_cellid"),
-        n=n,
-        criteria=criteria,
-    )
-
-    diameter = int(2 * np.round(np.sqrt(criteria["a_tot"][0] / np.pi)))
-    unitary_size = 2 * diameter + 3
-    total_size = unitary_size * shape[0]
-
-    assert iarray.shape >= (total_size, total_size)
-
-# Refactory
-def test_array_img_refactory():
     iarray = get_array_img("df.csv", 16, {"a_tot": [800.0, 1200.01]})
     total_size = get_size((4, 4), {"a_tot": [800.0, 1200.01]})
     assert iarray.shape >= (total_size, total_size)
 
 
 def test_array_img_2():
-    file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
-    df = pd.read_csv(file)
-    n = 12
-    shape = (4, 3)
     ypos_lim = random.uniform(50.0, 60.0)
-    criteria = {"a_tot": [800.0, 1200.01], "ypos": [0.0, ypos_lim]}
-    iarray = pycellid.array_img(
-        df,
-        os.path.join(base, "samples_cellid"),
-        n=n,
-        criteria=criteria,
+    iarray = get_array_img(
+        "df.csv", 12, {"a_tot": [800.0, 1200.01], "ypos": [0.0, ypos_lim]}
     )
-    diameter = int(2 * np.round(np.sqrt(criteria["a_tot"][0] / np.pi)))
-    unitary_size = 2 * diameter + 3
-    total_size = unitary_size * shape[0]
-
+    total_size = get_size(
+        (4, 3), {"a_tot": [800.0, 1200.01], "ypos": [0.0, ypos_lim]}
+    )
     assert iarray.shape >= (total_size, total_size)
 
 
 def test_array_img_3():
-    file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
-    df = pd.read_csv(file)
-    n = 12
-    shape = (4, 3)
     xpos_lim = random.uniform(50.0, 60.0)
-    criteria = {"a_tot": [800.0, 1200.01], "xpos": [0.0, xpos_lim]}
-    iarray = pycellid.array_img(
-        df,
-        os.path.join(base, "samples_cellid"),
-        n=n,
-        criteria=criteria,
+    iarray = get_array_img(
+        "df.csv", 12, {"a_tot": [800.0, 1200.01], "xpos": [0.0, xpos_lim]}
     )
-    diameter = int(2 * np.round(np.sqrt(criteria["a_tot"][0] / np.pi)))
-    unitary_size = 2 * diameter + 3
-    total_size = unitary_size * shape[0]
-
+    total_size = get_size(
+        (4, 3), {"a_tot": [800.0, 1200.01], "xpos": [0.0, xpos_lim]}
+    )
     assert iarray.shape >= (total_size, total_size)
 
 

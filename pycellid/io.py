@@ -17,6 +17,11 @@
 
 """in-out implementations for pyCellID."""
 
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+
 import re
 from pathlib import Path
 
@@ -210,9 +215,9 @@ def merge_tables(path, n_data="out_all", n_mdata="*mapping"):
     path:
         global path from output ``cellID`` tables.
     n_data:
-        srt() name to finde each table data.
+        srt() file name to finde each table data.
     n_mdata:
-        srt() name to finde tables metadata/mapping_tags
+        srt() file name to finde tables metadata or mapping_tags.
     verbose:
         bool, True to print in realtime pipeline
 
@@ -237,6 +242,9 @@ def merge_tables(path, n_data="out_all", n_mdata="*mapping"):
 
 
     """
+    if not Path(path).exists():
+        raise FileExistsError(f"invalid path: {path}")
+
     # Initial tables
     data_tables = (f for f in Path(path).rglob(n_data))
     file_mapping = (f for f in Path(path).rglob(n_mdata))

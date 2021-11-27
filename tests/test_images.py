@@ -191,7 +191,7 @@ def test_array_img_warning_1():
     with pytest.warns(UserWarning, match=message):
         file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
         df = pd.read_csv(file)
-        n = n = random.randint(16, 100)
+        n = random.randint(16, 100)
         lim = random.uniform(100.0, 1000.0)
         criteria = {"a_tot": [lim, lim]}
         iarray = pycellid.array_img(

@@ -15,6 +15,25 @@ import pytest
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 base = os.path.dirname(ROOT_DIR)
 
+def get_array_img(doc, n, criteria):
+    file = os.path.join(base, "samples_cellid", "pydata", doc)
+    df = pd.read_csv(file)
+    iarray = pycellid.array_img(
+        df,
+        os.path.join(base, "samples_cellid"),
+        n=n,
+        criteria=criteria,
+    )
+
+    return iarray.shape
+
+
+def get_size(shape, criteria):
+    diameter = int(2 * np.round(np.sqrt(criteria["a_tot"][0] / np.pi)))
+    unitary_size = 2 * diameter + 3
+    total_size = unitary_size * shape[0]
+    return total_size
+
 
 @pytest.mark.parametrize(
     "ucid, channel, t_frame, expected",
@@ -143,6 +162,12 @@ def test_array_img():
     unitary_size = 2 * diameter + 3
     total_size = unitary_size * shape[0]
 
+    assert iarray.shape >= (total_size, total_size)
+
+# Refactory
+def test_array_img_refactory():
+    iarray = get_array_img("df.csv", 16, {"a_tot": [800.0, 1200.01]})
+    total_size = get_size((4, 4), {"a_tot": [800.0, 1200.01]})
     assert iarray.shape >= (total_size, total_size)
 
 

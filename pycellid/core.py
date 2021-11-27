@@ -25,6 +25,7 @@
 from pathlib import Path
 
 import attr
+
 import matplotlib.pyplot as plt
 
 from pycellid import images

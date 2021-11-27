@@ -5,10 +5,12 @@ import random
 from pathlib import Path
 
 import numpy as np
+
 import pandas as pd
-import pytest
 
 import pycellid
+
+import pytest
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 base = os.path.dirname(ROOT_DIR)

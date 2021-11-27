@@ -2,7 +2,9 @@ Get Started
 ===========
 
 The package `PyCellID <https://semantic-ui.com/>`_ está diseñado para navegar un path y rastrear tablas con
-data y metadata(mapping) para retornar un único objeto Dataframe.::
+data y metadata(mapping) para retornar un único objeto Dataframe.
+
+.. code-block::
 
     padre/
         hijo01/
@@ -16,10 +18,6 @@ data y metadata(mapping) para retornar un único objeto Dataframe.::
             mapping.ext
 
 Requiere librerias python standard:
-`os <https://docs.python.org/3/library/os.html>`_,
-`re <https://docs.python.org/3/library/re.html?highlight=re#module-re>`_
-`pandas <https://pandas.pydata.org/docs/>`_,
-`matplotlib <https://matplotlib.org/stable/index.html>`_.
 
 Este proyecto comienza como soporte al software Cell-ID
 Gordon, Colman‐Lerner et al. 2007
@@ -50,6 +48,37 @@ Salida: único DataFrame con los valores de cada tabla. Agregará las series:
 
 
 
+Dependecies for this project.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- `attrs <https://www.attrs.org/en/stable/>`_ For build the backend.
+- `numpy <https://numpy.org/>`_ for numerical computing management.
+- `pandas <https://pandas.pydata.org/docs/>`_ for panel and dashboard management.
+- `matplotlib <https://matplotlib.org/stable/index.html>`_ for plots management.
+
+
+
+Installation
+------------
+
+PyCellID can be installed using ``pip`` from `PyPI
+<http://pypi.python.org/pypi/PyCellID>`_. Using `virtualenv <http://www.virtualenv.org/en/latest/>`_ is recommended -- for no specific reason other than it being good practice.
+Installing is simple:
+
+.. code-block:: none
+
+    (venv) $> pip install pycellid
+
+For development, clone the `Github Repository <https://github.com/https://github.com/pyCellID/pyCellID>`_ instead and use:
+
+.. code-block:: none
+
+    (venv) $> python setup.py .
+
+
+Getting started
+---------------
+
 To get started, the first step is to import and load the extension
 
 .. code-block:: python
@@ -60,21 +89,6 @@ To get started, the first step is to import and load the extension
 
 After loading, new templates are available to derive from in your application.
 
-Installation
-------------
-
-PyCellID can be installed using ``pip`` from `PyPI
-<http://pypi.python.org/pypi/PyCellID>`_. Using `virtualenv <http://www.virtualenv.org/en/latest/>`_ is recommended -- for no specific reason other than it being good practice. Installing is simple::
-
-   pip install pycell
-
-For development, clone the `official github repository <https://github.com/darksideoftheshmoo/pycell>`_ instead and use::
-
-   python setup.py develop
-
-Getting started
----------------
-
 To get started, go ahead by reading :doc:`basic-usage`.
 
 Sample Application
@@ -82,11 +96,6 @@ Sample Application
 
 If you want to have a look at a small sample application, try `browsing it on
 github <https://github.com/darksideoftheshmoo/sample_app>`_.
-
-
-Examples
-~~~~~~~~
-
 
 
 Resources

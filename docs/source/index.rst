@@ -11,10 +11,9 @@ Welcome to PyCellID's documentation!
    :numbered:
    :caption: Contents:
 
-   basic-usage
-   changelog
-   sample
-   mis_notas
+   notes/basic-usage
+   notes/changelog
+   notes/sample
    
    modules/modules
 

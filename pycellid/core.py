@@ -22,20 +22,13 @@
 # IMPORTS
 # =============================================================================
 
-# from os import EX_CANTCREAT
 from pathlib import Path
 
 import attr
-
 import matplotlib.pyplot as plt
-# from numpy import exp
 
 from pycellid import images
 from pycellid.io import merge_tables
-
-
-# make tempdir _cache see librery tempdir
-# PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__))) / "_cache"
 
 
 @attr.s(repr=False)

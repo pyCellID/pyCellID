@@ -83,7 +83,7 @@ def test_box_img():
     x_pos = radius + 1
     y_pos = radius + 1
     imresult = pycellid.box_img(imarray, x_pos, y_pos, radius)
-    centro = imresult[y_pos - 2:y_pos, x_pos - 2:x_pos] # noqa
+    centro = imresult[y_pos - 2 : y_pos, x_pos - 2 : x_pos]  # noqa
     alto = imresult[:, -3:]
     largo = imresult[-3:, :]
     assert np.sum(centro) + np.sum(alto) + np.sum(largo) == 0

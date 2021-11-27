@@ -23,7 +23,6 @@ import warnings
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-
 import numpy as np
 
 
@@ -90,9 +89,8 @@ def _check_y_pos(im, y_pos, radius):
     """
     if y_pos - radius < 0:
         im = np.concatenate(
-            [np.zeros((np.abs(y_pos - radius), im.shape[1])), im],
-            0
-            )
+            [np.zeros((np.abs(y_pos - radius), im.shape[1])), im], 0
+        )
     return im
 
 
@@ -119,9 +117,8 @@ def _check_x_pos(im, x_pos, radius):
     """
     if x_pos - radius < 0:
         im = np.concatenate(
-            [np.zeros((im.shape[0], np.abs(x_pos - radius))), im],
-            1
-            )
+            [np.zeros((im.shape[0], np.abs(x_pos - radius))), im], 1
+        )
     return im
 
 
@@ -146,7 +143,7 @@ def _mark_center(im, x_pos, y_pos):
         a mark in the center of the individualised cell.
     """
     center = np.zeros((2, 2))
-    im[y_pos - 1:y_pos + 1, x_pos - 1:x_pos + 1] = center
+    im[y_pos - 1:y_pos + 1, x_pos - 1:x_pos + 1] = center # noqa
     return im
 
 
@@ -248,8 +245,8 @@ def array_img(data, path, channel="BF", n=16, criteria=None):
     if len(criteria) != 0:
         for c in criteria.keys():
             data_copy = data_copy[
-                (criteria[c][0] < data_copy[c]) &
-                (data_copy[c] < criteria[c][1])
+                (criteria[c][0] < data_copy[c])
+                & (data_copy[c] < criteria[c][1])
             ]
     # Checking if the number of cells satisfying the criteria matches the
     # number of cells to be shown
@@ -266,13 +263,9 @@ def array_img(data, path, channel="BF", n=16, criteria=None):
     select = data_copy[["ucid", "t_frame", "xpos", "ypos"]].sample(n)
     # Registers the name of each image in the series 'name'
     select["name"] = select.apply(
-        lambda row: img_name(
-            path,
-            row["ucid"],
-            channel,
-            row["t_frame"]),
-        axis=1
-        )
+        lambda row: img_name(path, row["ucid"], channel, row["t_frame"]),
+        axis=1,
+    )
     # Registers the individual image corresponding to each cell in the
     # series 'box_img'
     select["box_img"] = select.apply(
@@ -280,7 +273,7 @@ def array_img(data, path, channel="BF", n=16, criteria=None):
             plt.imread(row["name"], format="tif"),
             row["xpos"],
             row["ypos"],
-            diameter
+            diameter,
         ),
         axis=1,
     )

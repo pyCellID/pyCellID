@@ -10,5 +10,5 @@ file_path = os.path.join(base, 'samples_cellid')
 
 def test_cell_data():
     df = CellData(file_path)
-    df.path
+    df['pos']
     assert '_df' in vars(df)

@@ -29,11 +29,11 @@ jobs:
       - name: Test with tox
         run: tox -r
       - name: "Upload coverage to Codecov"
-      uses: codecov/codecov-action@v2
-      with:
-        files: ./coverage.xml
-        directory: ./coverage/reports/
-        env_vars: OS,PYTHON
-        name: codecov-umbrella
-        fail_ci_if_error: false
-        verbose: true
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage.xml
+          directory: ./coverage/reports/
+          env_vars: OS,PYTHON
+          name: codecov-umbrella
+          fail_ci_if_error: false
+          verbose: true

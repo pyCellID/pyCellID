@@ -29,15 +29,11 @@ jobs:
       - name: Test with tox
         run: tox -r
       - name: "Upload coverage to Codecov"
-        env:
-          CODECOV_TOKEN: '5bcd1416-8c81-4960-aa34-63f2557fc3a6'
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{secrets.CODECOV_TOKEN }}
-          files: ./coverage.xml
-          directory: ./coverage/reports/
-          env_vars: OS,PYTHON
-          name: codecov-umbrella
-          fail_ci_if_error: false
-          path_to_write_report: ./coverage/codecov_report.txt
-          verbose: true
+      uses: codecov/codecov-action@v2
+      with:
+        files: ./coverage.xml
+        directory: ./coverage/reports/
+        env_vars: OS,PYTHON
+        name: codecov-umbrella
+        fail_ci_if_error: false
+        verbose: true

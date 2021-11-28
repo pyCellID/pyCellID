@@ -143,7 +143,7 @@ class Data(object):
     def show(
         self,
         data,
-        ch="BF",
+        channel="BF",
         n=16,
         criteria={},
         figsize=(3, 3),
@@ -156,7 +156,7 @@ class Data(object):
         arr = images.array_img(
             data,
             path=self.path,
-            channel=ch,
+            channel=channel,
             n=n,
             criteria=criteria,
         )

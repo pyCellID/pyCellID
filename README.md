@@ -1,4 +1,4 @@
-![logo](https://raw.githubusercontent.com/pyCellID/pyCellID/clementejose/res/PycellID_logo.jpg)
+![logo](https://raw.githubusercontent.com/pyCellID/pyCellID/clementejose/docs/logo/PycellID_logo.jpg)
 
 # PyCell (building...)
 

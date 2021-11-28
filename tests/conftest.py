@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-=======
->>>>>>> main
 import io
 import os
 
@@ -13,14 +7,6 @@ import pandas as pd
 
 import pycellid.io as ld
 
-<<<<<<< HEAD
-
-import pytest as pt
-
-@pt.fixture
-def invalid_f_name_fail():
-    folder_n = ["osition", "p/osition", "Pos+"]
-=======
 import pytest as pt
 
 # =============================================================================
@@ -35,7 +21,6 @@ base = os.path.dirname(ROOT_DIR)
 @pt.fixture
 def invalid_f_name_fail():
     folder_n = ["osition", "p/osition", "Pos2e2+"]
->>>>>>> main
     file = ["out_all", "bf_vcellid", "fl_vcellid", "out_bf_fl_mapping"]
     f = np.random.choice(file)
     n = np.random.randint(1, 3)

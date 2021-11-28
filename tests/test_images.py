@@ -81,10 +81,10 @@ def test_box_img():
     radius = np.random.randint(15, 51)
     side = radius * 2 + 1
     imarray = np.random.randint(0, 255, (side, side), "uint8")
-
+    mark_center=True
     x_pos = radius + 1
     y_pos = radius + 1
-    imresult = pycellid.box_img(imarray, x_pos, y_pos, radius)
+    imresult = pycellid.box_img(imarray, x_pos, y_pos, radius, mark_center)
     centro = imresult[y_pos - 2 : y_pos, x_pos - 2 : x_pos]  # noqa
     alto = imresult[:, -3:]
     largo = imresult[-3:, :]

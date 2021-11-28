@@ -28,11 +28,6 @@ jobs:
         run: pip install tox tox-gh-actions
       - name: Test with tox
         run: tox -r
-      - name: Test with pytest
-        run: |
-          pip install pytest
-          pytest 
-          coverage run -m pytest --cov=pycellid/ --cov-report xml
       - name: "Upload coverage to Codecov"
         env:
           CODECOV_TOKEN: '5bcd1416-8c81-4960-aa34-63f2557fc3a6'

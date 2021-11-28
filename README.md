@@ -11,10 +11,10 @@ Functions to analyze Cell-ID single-cell cytometry data using python language.
 
 ## Dependecies for this project.
 
-- [attrs(>=21.1.0)](http://flask-admin.readthedocs.org/en/latest/) For build the backend.
-- [matplotlib(>=3.4.0)](http://elsdoerfer.name/docs/flask-assets/) for plots management
-- [pandas(>=1.3.0)](http://flask-debugtoolbar.readthedocs.org/) for panel and dashboard management.
-- [numpy(>=1.21.0)](http://pythonhosted.org/Flask-Markdown/) for numerical management.
+- [attrs(>=21.1.0)](https://www.attrs.org/en/stable/) for build the backend.
+- [matplotlib(>=3.4.0)](https://matplotlib.org/) for plots management
+- [pandas(>=1.3.0)](https://pandas.pydata.org/) for panel and dashboard management.
+- [numpy(>=1.21.0)](https://numpy.org/) for numerical management.
 
 ## Installation
 

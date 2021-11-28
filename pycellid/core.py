@@ -33,11 +33,6 @@ from pycellid import images as img
 from pycellid.io import merge_tables
 
 
-# =============================================================================
-# CellData Class
-# =============================================================================
-
-
 @attr.s(repr=False)
 class CellData(object):
     """Collapse your data into a single data frame.

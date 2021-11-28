@@ -154,7 +154,7 @@ def _mark_center(im, x_pos, y_pos):
         a mark in the center of the individualised cell.
     """
     center = np.zeros((2, 2))
-    im[y_pos - 1:y_pos + 1, x_pos - 1:x_pos + 1] = center
+    im[y_pos - 1:y_pos + 1, x_pos - 1:x_pos + 1] = center # noqa
     return im
 
 

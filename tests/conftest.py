@@ -2,12 +2,15 @@ import io
 import os
 
 import numpy as np
+from numpy.random.mtrand import randint
 
 import pandas as pd
 
 import pycellid.io as ld
 
 import pytest as pt
+
+import uuid
 
 # =============================================================================
 # Parameter & fixtures
@@ -114,3 +117,10 @@ def read_mapp_file():
 @pt.fixture(scope="session")
 def read_out_all_file(create_out_all_file):
     return pd.read_table(create_out_all_file)
+
+@pt.fixture(scope="session")
+def fake_filepath():
+    n = np.random.randint(1, 3)
+    folders = [str(uuid.uuid4()) for i in range(n)]
+    ph = os.path.join(*folders)
+    return ph

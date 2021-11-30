@@ -11,7 +11,6 @@
 # License: MIT
 #   Full Text: https://github.com/pyCellID/pyCellID/blob/main/LICENSE
 
-
 # =============================================================================
 # DOCS
 # =============================================================================
@@ -21,19 +20,28 @@
 # =============================================================================
 # IMPORTS
 # =============================================================================
-
 import warnings
 from pathlib import Path
 
 import attr
 
+import pandas as pd
 import matplotlib.pyplot as plt
 
 from pycellid import images as img
 from pycellid.io import merge_tables
 
 
-@attr.s(repr=False)
+# =============================================================================
+# CellData Class
+# =============================================================================
+
+def _check_path(self, attribute, value):
+        if not Path(value).exists():
+            raise FileNotFoundError(f"Path < {value} > not exist")
+
+
+@attr.s(cmp=False, repr=False)
 class CellData(object):
     """Collapse your data into a single data frame.
 
@@ -66,37 +74,22 @@ class CellData(object):
         bool, True to print in realtime pipeline
 
     """
+    _path = attr.ib(validator=_check_path)
+    _df = attr.ib()
+    
+    #_path = None
+    #_path = _df._path if hasattr(_df, "_path") else vars(_df)["_path"]=_path
 
-    path = attr.ib(validator=attr.validators.instance_of(str))
 
-    # : Starting with ``*`` will perform a recursive search on each string.
-    name_data = attr.ib(
-        validator=attr.validators.instance_of(str), default="out_all"
-    )
+    @classmethod
+    def from_csv(cls, path, **kwargs):        
+        return cls(path=path,df=merge_tables(path, **kwargs))
+    
+    
+    @classmethod
+    def from_excel(cls, path):
+        return cls(path=path,df=pd.read_excel(path))
 
-    # : Starting with ``*`` will perform a recursive search on each string.
-    name_meta_data = attr.ib(
-        validator=attr.validators.instance_of(str), default="*mapping"
-    )
-
-    @path.validator
-    def _check_path(self, attribute, value):
-        if not Path(value).exists():
-            raise FileNotFoundError(f"Path < {value} > not exist")
-
-    @property
-    def df(self):
-        """Return a copy of the underlying Dataframe.
-
-        This property cosntruct the data tables.
-        """
-        if "_df" not in vars(self):
-            self._df = merge_tables(
-                path=self.path,
-                n_data=self.name_data,
-                n_mdata=self.name_meta_data,
-            )
-        return self._df.copy()
 
     @property
     def plot(self):
@@ -106,54 +99,85 @@ class CellData(object):
         """
         return CellsPloter(self)
 
+    def __eq__(self, other):
+        return self._df == other
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __lt__(self, other):
+        return self._df < other
+    
+    def __le__(self, other):
+        return self._df <= other
+        
+    def __gt__(self, other):
+        return self._df > other
+        
+    def __ge__(self, other):
+        return self._df >= other
+    
+    def __lshift__(self, other):
+        return self._df.__lshift__(other)
+ 
+    def __rshift__(self, other):
+        return self._df.__rshift__(other)
+         
+    def __getitem__(self, slice):
+        sliced = self._df.__getitem__(slice)
+        return CellData(path=self._path,df=sliced)
+    
     def __getattr__(self, a):
-        """
-        Is called when the default attribute access fails (AttributeError).
-
-        getattr(x, y) <==> x.__getattr__(y) <==> getattr(x, y).
-        """
-        return getattr(self.df, a)
-
-    def __getitem__(self, k):
-        """
-        Call to implement evaluation of self[key].
-
-        x[k] <=> x.__getitem__(k).
-        """
-        return self.df.__getitem__(k)
-
+        return self._df.__getattr__(a)
+    
+    def __setitem__(self, idx, values):
+        """Call to implement assignment to self[key]."""
+        return values.__setitem__(idx, self._df)
+        
     def __iter__(self):
-        """
-        Call when an iterator is required for a container.
+        """Call when an iterator is required for a container.
 
         iter(x) <=> x.__iter__().
         """
-        return iter(self.df)
-
+        return iter(self._df)
+   
     def __len__(self):
-        """
-        Call to implement the built-in function len().
+        """Call to implement the built-in function len().
 
         len(x) <=> x.__len__().
         """
-        return len(self.df)
-
+        return len(self._df)
+    
     def __repr__(self):
-        """
-        Compute the “official” string representation of an object.
+        return repr(self._df)
 
-        repr(x) <=> x.__repr__().
-        """
-        return f"CellData(data={hex(id(self.df))})"
-
-    def __repr_html__(self):
+    def _repr_html_(self):
         """Print a rich HTML version of your object."""
-        return self.df._repr_html_()
+        ad_id = id(self)
 
-    def __setitem__(self, key, values):
-        """Call to implement assignment to self[key]."""
-        self._df[key] = values
+        if not isinstance(self._df, pd.Series):
+            with pd.option_context("display.show_dimensions", False):
+                df_html = self._df._repr_html_()
 
+            rows = f"{self._df.shape[0]} rows"
+            columns = f"{self._df.shape[1]} columns"
+
+            footer = f"PyCellID.core.CellData - {rows} x {columns}"
+
+            parts = [
+                f'<div class="PyCellID.core.CellData" id={ad_id}>',
+                df_html,
+                footer,
+                "</div>",
+            ]
+                        
+            html = "".join(parts)
+            return html
+        else:
+            self._df.__repr__()
+      
+    def get_dataframe(self):
+        return self._df.copy()    
 
 # =============================================================================
 # CellsPloter Class
@@ -183,23 +207,23 @@ class CellsPloter:
 
     cells = attr.ib()
 
-    def __repr__(self):
-        """
-        Compute the “official” string representation of an object.
-
-        repr(x) <=> x.__repr__().
-        """
-        return f"CellsPloter(cells={hex(id(self.cells))})"
-
     def __call__(self, kind="cells_image", **kwargs):
         """
         When the instance is “called” as a function.
 
-        type(x).__call__(x, arg1, ...).
+        ``plot() <==> plot.__call__()``.
         """
+        if kind.startswith("_"):
+            raise AttributeError(f"Invalid plot method '{kind}'")
+
         method = getattr(self, kind, None)
+
+        if not callable(method):
+            raise AttributeError(f"Invalid plot method '{kind}'")
+
         if method is None:
             method = getattr(self.cells._df.plot, kind)
+
         return method(**kwargs)
 
     def __getattr__(self, a):
@@ -209,6 +233,14 @@ class CellsPloter:
         getattr(x, y) <==> x.__getattr__(y) <==> getattr(x, y).
         """
         return getattr(self.cells._df.plot, a)
+
+    def __repr__(self):
+        """
+        Compute the “official” string representation of an object.
+
+        repr(x) <=> x.__repr__().
+        """
+        return f"CellsPloter(cells={hex(id(self.cells))})"
 
     def cells_image(self, array_img_kws=None, imshow_kws=None, ax=None):
         """Representation of a set of cells.
@@ -241,7 +273,7 @@ class CellsPloter:
 
         imshow_kws.setdefault("cmap", "Greys")
 
-        arr_c = img.array_img(data=data_c, path=data_c.path, **array_img_kws)
+        arr_c = img.array_img(data=data_c, path=data_c._path, **array_img_kws)
 
         ax.imshow(arr_c, **imshow_kws)
         ax.axis("off")
@@ -312,7 +344,7 @@ class CellsPloter:
                 message = "not match ucid and t_frame. See picture!"
                 warnings.warn(message)
 
-            idtfer = img.img_name(data_c.path, **idtfer)
+            idtfer = img.img_name(data_c._path, **idtfer)
 
         else:
             x, y, r = int(1392 / 2), int(1040 / 2), int(1040 / 2)
@@ -327,3 +359,17 @@ class CellsPloter:
         ax.imshow(arr_c, **imshow_kws)
         ax.axis("off")
         return ax
+
+
+# if __name__ == "__main__":
+#     dat = pd.read_csv(".//samples_cellid//pydata//df.csv")
+#     df = CellData(".//samples_cellid",dat)
+
+#     pp = CellsPloter(df)
+    
+#     pp.cells_image({'n':31})
+#     plt.show()
+    # plt.imshow(ar)
+    # ax = plt.gca()
+    # ax.axis("off")
+    # plt.show()

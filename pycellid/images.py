@@ -166,6 +166,14 @@ def _img_crop(im, x_pos, y_pos, diameter, im_shape):
     im = im[y_min:y_max, x_min:x_max]
     return im
 
+def _img_size(n):
+    sqrt_floor = int(np.floor(np.sqrt(n)))
+    sqrt_ceil = int(np.ceil(np.sqrt(n)))
+    if (sqrt_floor * sqrt_ceil >= n):
+        shape = (sqrt_floor, sqrt_ceil)
+    else:
+        shape = (sqrt_ceil, sqrt_ceil)
+    return shape
 
 def box_img(im, x_pos, y_pos, radius=90, mark_center=False):
     """Create a single image contatinig an individualised cell.
@@ -247,7 +255,7 @@ def array_img(data, path, channel="BF", n=16, criteria=None):
     # their area and assuming round-like cells
     diameter = int(2 * np.round(np.sqrt(data["a_tot"].max() / np.pi)))
 
-    shape = (int(np.floor(np.sqrt(n))), int(np.ceil(np.sqrt(n))))
+    shape = _img_size(n)
 
     s = (2 * diameter + 3, 2 * diameter + 3)  # Shape of unitary image
     # iarray np.ones, with size for contining all individual images
@@ -272,7 +280,7 @@ def array_img(data, path, channel="BF", n=16, criteria=None):
         message = f"The specified criteria are not satisfied by {n} cells"
         warnings.warn(message)
         n = data_copy.shape[0]
-        shape = (int(np.floor(np.sqrt(n))), int(np.ceil(np.sqrt(n))))
+        shape = _img_size(n)
         iarray = np.ones((s[0] * shape[0], s[1] * shape[1]), dtype=float)
     select = data_copy[["ucid", "t_frame", "xpos", "ypos"]].sample(n)
     # Registers the name of each image in the series 'name'

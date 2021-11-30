@@ -361,15 +361,9 @@ class CellsPloter:
         return ax
 
 
-# if __name__ == "__main__":
-#     dat = pd.read_csv(".//samples_cellid//pydata//df.csv")
-#     df = CellData(".//samples_cellid",dat)
-
-#     pp = CellsPloter(df)
+if __name__ == "__main__":
+    df = CellData.from_csv('.\\samples_cellid')
+    df = CellData(df._path,df.tail(3))
     
-#     pp.cells_image({'n':31})
-#     plt.show()
-    # plt.imshow(ar)
-    # ax = plt.gca()
-    # ax.axis("off")
-    # plt.show()
+    df_repr = df._repr_html_()
+    print(df_repr)

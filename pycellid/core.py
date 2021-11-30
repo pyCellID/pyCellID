@@ -36,6 +36,10 @@ from pycellid.io import merge_tables
 # CellData Class
 # =============================================================================
 
+def _check_path(self, attribute, value):
+        if not Path(value).exists():
+            raise FileNotFoundError(f"Path < {value} > not exist")
+
 
 @attr.s(cmp=False, repr=False)
 class CellData(object):
@@ -70,21 +74,15 @@ class CellData(object):
         bool, True to print in realtime pipeline
 
     """
+    _path = attr.ib(validator=_check_path)
     _df = attr.ib()
     
-    #_path = None
-    #_path = _df._path if hasattr(_df, "_path") else vars(_df)["_path"]=_path
 
 
     @classmethod
     def from_csv(cls, path, **kwargs):        
-        return cls(df=merge_tables(path, **kwargs))
+        return cls(path=path, df=merge_tables(path, **kwargs))
     
-    
-    @classmethod
-    def from_excel(cls, path):
-        return cls(df=pd.read_excel(path))
-
 
     @property
     def plot(self):
@@ -121,7 +119,7 @@ class CellData(object):
          
     def __getitem__(self, slice):
         sliced = self._df.__getitem__(slice)
-        return CellData(df=sliced)
+        return CellData(path=self._path ,df=sliced)
     
     def __getattr__(self, a):
         return self._df.__getattr__(a)
@@ -275,7 +273,7 @@ class CellsPloter:
         ax.axis("off")
         return ax
 
-    def cimage(self, idtfer, box_img_kws=None, imshow_kws=None, ax=None):
+    def cimage(self, identifier, box_img_kws=None, imshow_kws=None, ax=None):
         """Representation of a sigle cell or image.
 
         Identifier ``idtfer`` is required. Reference a valid image or position.
@@ -327,9 +325,9 @@ class CellsPloter:
 
         imshow_kws.setdefault("cmap", "Greys")
 
-        if isinstance(idtfer, dict):
-            ucid = idtfer["ucid"]
-            t_frame = idtfer["t_frame"]
+        if isinstance(identifier, dict):
+            ucid = identifier["ucid"]
+            t_frame = identifier["t_frame"]
             try:
                 [[x, y]] = data_c[
                     (data_c.ucid == ucid) & (data_c.t_frame == t_frame)
@@ -340,7 +338,7 @@ class CellsPloter:
                 message = "not match ucid and t_frame. See picture!"
                 warnings.warn(message)
 
-            idtfer = img.img_name(data_c._path, **idtfer)
+            identifier = img.img_name(data_c._path, **identifier)
 
         else:
             x, y, r = int(1392 / 2), int(1040 / 2), int(1040 / 2)
@@ -349,7 +347,7 @@ class CellsPloter:
         box_img_kws.setdefault("y_pos", y)
         box_img_kws.setdefault("radius", r)
 
-        arr = plt.imread(idtfer)
+        arr = plt.imread(identifier)
         arr_c = img.box_img(im=arr, **box_img_kws)
 
         ax.imshow(arr_c, **imshow_kws)

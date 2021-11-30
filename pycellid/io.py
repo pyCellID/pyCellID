@@ -259,4 +259,7 @@ def merge_tables(path, n_data="out_all", n_mdata="*mapping"):
         df_i = _make_cols_chan(df_i, pd.read_table(next(file_mapping)))
         df = pd.concat([df, df_i], ignore_index=True)
 
+    # Save path
+    vars(df)["_path"] = path
+
     return df

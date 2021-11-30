@@ -16,6 +16,26 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 base = os.path.dirname(ROOT_DIR)
 
 
+def get_array_img(doc, n, criteria):
+    file = os.path.join(base, "samples_cellid", "pydata", doc)
+    df = pd.read_csv(file)
+    iarray = pycellid.array_img(
+        df,
+        os.path.join(base, "samples_cellid"),
+        n=n,
+        criteria=criteria,
+    )
+
+    return iarray
+
+
+def get_size(shape, criteria):
+    diameter = int(2 * np.round(np.sqrt(criteria["a_tot"][0] / np.pi)))
+    unitary_size = 2 * diameter + 3
+    total_size = unitary_size * shape[0]
+    return total_size
+
+
 @pytest.mark.parametrize(
     "ucid, channel, t_frame, expected",
     [
@@ -61,75 +81,41 @@ def test_box_img():
     radius = np.random.randint(15, 51)
     side = radius * 2 + 1
     imarray = np.random.randint(0, 255, (side, side), "uint8")
-
+    mark_center=True
     x_pos = radius + 1
     y_pos = radius + 1
-    imresult = pycellid.box_img(
-        imarray, x_pos, y_pos, radius, mark_center=True
-    )
-    centro = imresult[y_pos - 2:y_pos, x_pos - 2:x_pos]
+    imresult = pycellid.box_img(imarray, x_pos, y_pos, radius, mark_center)
+    centro = imresult[y_pos - 2 : y_pos, x_pos - 2 : x_pos]  # noqa
     alto = imresult[:, -3:]
     largo = imresult[-3:, :]
     assert np.sum(centro) + np.sum(alto) + np.sum(largo) == 0
 
 
 def test_array_img():
-    file = os.path.join(base, "tests", "pydata", "df.csv")
-    df = pd.read_csv(file)
-    n = 16
-    shape = (4, 4)
-    criteria = {"a_tot": [800.0, 1200.01]}
-    iarray = pycellid.array_img(
-        df,
-        os.path.join(base, "samples_cellid"),
-        n=n,
-        criteria=criteria,
-    )
-
-    diameter = int(2 * np.round(np.sqrt(criteria["a_tot"][0] / np.pi)))
-    unitary_size = 2 * diameter + 3
-    total_size = unitary_size * shape[0]
-
+    iarray = get_array_img("df.csv", 16, {"a_tot": [800.0, 1200.01]})
+    total_size = get_size((4, 4), {"a_tot": [800.0, 1200.01]})
     assert iarray.shape >= (total_size, total_size)
 
 
 def test_array_img_2():
-    file = os.path.join(base, "tests", "pydata", "df.csv")
-    df = pd.read_csv(file)
-    n = 12
-    shape = (4, 3)
     ypos_lim = random.uniform(50.0, 60.0)
-    criteria = {"a_tot": [800.0, 1200.01], "ypos": [0.0, ypos_lim]}
-    iarray = pycellid.array_img(
-        df,
-        os.path.join(base, "samples_cellid"),
-        n=n,
-        criteria=criteria,
+    iarray = get_array_img(
+        "df.csv", 12, {"a_tot": [800.0, 1200.01], "ypos": [0.0, ypos_lim]}
     )
-    diameter = int(2 * np.round(np.sqrt(criteria["a_tot"][0] / np.pi)))
-    unitary_size = 2 * diameter + 3
-    total_size = unitary_size * shape[0]
-
+    total_size = get_size(
+        (4, 3), {"a_tot": [800.0, 1200.01], "ypos": [0.0, ypos_lim]}
+    )
     assert iarray.shape >= (total_size, total_size)
 
 
 def test_array_img_3():
-    file = os.path.join(base, "tests", "pydata", "df.csv")
-    df = pd.read_csv(file)
-    n = 12
-    shape = (4, 3)
     xpos_lim = random.uniform(50.0, 60.0)
-    criteria = {"a_tot": [800.0, 1200.01], "xpos": [0.0, xpos_lim]}
-    iarray = pycellid.array_img(
-        df,
-        os.path.join(base, "samples_cellid"),
-        n=n,
-        criteria=criteria,
+    iarray = get_array_img(
+        "df.csv", 12, {"a_tot": [800.0, 1200.01], "xpos": [0.0, xpos_lim]}
     )
-    diameter = int(2 * np.round(np.sqrt(criteria["a_tot"][0] / np.pi)))
-    unitary_size = 2 * diameter + 3
-    total_size = unitary_size * shape[0]
-
+    total_size = get_size(
+        (4, 3), {"a_tot": [800.0, 1200.01], "xpos": [0.0, xpos_lim]}
+    )
     assert iarray.shape >= (total_size, total_size)
 
 
@@ -138,7 +124,7 @@ def test_array_img_warning_1():
     with pytest.warns(UserWarning, match=message):
         file = os.path.join(base, "tests", "pydata", "df.csv")
         df = pd.read_csv(file)
-        n = n = random.randint(16, 100)
+        n = random.randint(16, 100)
         lim = random.uniform(100.0, 1000.0)
         criteria = {"a_tot": [lim, lim]}
         iarray = pycellid.array_img(

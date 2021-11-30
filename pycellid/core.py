@@ -36,9 +36,10 @@ from pycellid.io import merge_tables
 # CellData Class
 # =============================================================================
 
+
 def _check_path(self, attribute, value):
-        if not Path(value).exists():
-            raise FileNotFoundError(f"Path < {value} > not exist")
+    if not Path(value).exists():
+        raise FileNotFoundError(f"Path < {value} > not exist")
 
 
 @attr.s(cmp=False, repr=False)
@@ -74,15 +75,13 @@ class CellData(object):
         bool, True to print in realtime pipeline
 
     """
+
     _path = attr.ib(validator=_check_path)
     _df = attr.ib()
-    
-
 
     @classmethod
-    def from_csv(cls, path, **kwargs):        
+    def from_csv(cls, path, **kwargs):
         return cls(path=path, df=merge_tables(path, **kwargs))
-    
 
     @property
     def plot(self):
@@ -92,7 +91,6 @@ class CellData(object):
         """
         return CellsPloter(self)
 
-
     def __eq__(self, other):
         return self._df == other
 
@@ -101,47 +99,47 @@ class CellData(object):
 
     def __lt__(self, other):
         return self._df < other
-    
+
     def __le__(self, other):
         return self._df <= other
-        
+
     def __gt__(self, other):
         return self._df > other
-        
+
     def __ge__(self, other):
         return self._df >= other
-    
+
     def __lshift__(self, other):
         return self._df.__lshift__(other)
- 
+
     def __rshift__(self, other):
         return self._df.__rshift__(other)
-         
+
     def __getitem__(self, slice):
         sliced = self._df.__getitem__(slice)
-        return CellData(path=self._path ,df=sliced)
-    
+        return CellData(path=self._path, df=sliced)
+
     def __getattr__(self, a):
         return self._df.__getattr__(a)
-    
+
     def __setitem__(self, idx, values):
         """Call to implement assignment to self[key]."""
         return values.__setitem__(idx, self._df)
-        
+
     def __iter__(self):
         """Call when an iterator is required for a container.
 
         iter(x) <=> x.__iter__().
         """
         return iter(self._df)
-   
+
     def __len__(self):
         """Call to implement the built-in function len().
 
         len(x) <=> x.__len__().
         """
         return len(self._df)
-    
+
     def __repr__(self):
         return repr(self._df)
 
@@ -164,14 +162,15 @@ class CellData(object):
                 footer,
                 "</div>",
             ]
-                        
+
             html = "".join(parts)
             return html
         else:
             self._df.__repr__()
-      
+
     def get_dataframe(self):
-        return self._df.copy()    
+        return self._df.copy()
+
 
 # =============================================================================
 # CellsPloter Class
@@ -208,12 +207,12 @@ class CellsPloter:
         ``plot() <==> plot.__call__()``.
         """
         if kind.startswith("_"):
-            raise AttributeError(f"Ivalid plot method '{kind}'")
+            raise AttributeError(f"Invalid plot method '{kind}'")
 
         method = getattr(self, kind, None)
 
         if not callable(method):
-            raise AttributeError(f"Ivalid plot method '{kind}'")
+            raise AttributeError(f"Invalid plot method '{kind}'")
 
         if method is None:
             method = getattr(self.cells._df.plot, kind)
@@ -353,3 +352,11 @@ class CellsPloter:
         ax.imshow(arr_c, **imshow_kws)
         ax.axis("off")
         return ax
+
+
+if __name__ == "__main__":
+    df = CellData.from_csv(".\\samples_cellid")
+    df = CellData(df._path, df.tail(3))
+
+    df_repr = df._repr_html_()
+    print(df_repr)

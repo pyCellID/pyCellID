@@ -327,13 +327,13 @@ class CellsPloter:
 
         Params
         ------
-        idtfer : path or dict.
+        identifier : path or dict.
             path to an image file
             dict = {
                 "channel":str,
                 "UCID":int,
                 "t_frame":int,
-            }
+                }
 
         Returns
         -------

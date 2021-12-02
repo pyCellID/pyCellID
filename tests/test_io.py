@@ -34,6 +34,12 @@ def test_make_df_file_path_fails(invalid_f_name_fail):
 
 
 @pt.mark.xfail(raises=FileNotFoundError)
+def test_make_df_pos_file_path_fails():
+    valid_f = os.path.join(base, "tests", "pydata", "lugar01", "out_all")
+    ld.make_df(valid_f)
+
+
+@pt.mark.xfail(raises=FileNotFoundError)
 def test_make_df_file_pos_fails(invalid_pos_fail):
     ld.make_df(invalid_pos_fail)
 

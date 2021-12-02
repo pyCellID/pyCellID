@@ -282,7 +282,7 @@ class CellsPloter:
         return f"CellsPloter(cells={hex(id(self.cells))})"
 
     def cells_image(self, array_img_kws=None, imshow_kws=None, ax=None):
-        """Representation of a set of cells.
+        """Display a random selection of cells on a square grid.
 
         By default it represents a 4 X 4 matrix chosen at random.
 
@@ -319,9 +319,9 @@ class CellsPloter:
         return ax
 
     def cimage(self, identifier, box_img_kws=None, imshow_kws=None, ax=None):
-        """Representation of a sigle cell or image.
+        """Show a sigle cell or complete image.
 
-        Identifier ``idtfer`` is required. Reference a valid image or position.
+        ``Identifier`` param is required. Reference a valid image or position.
         By default, an image with a size of (1392 X 1040)px will be rendered.
         Use the arguments of box_img_kws to choose as you like.
 

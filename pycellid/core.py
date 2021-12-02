@@ -25,8 +25,9 @@ from pathlib import Path
 
 import attr
 
-import pandas as pd
 import matplotlib.pyplot as plt
+
+import pandas as pd
 
 from pycellid import images as img
 from pycellid.io import merge_tables
@@ -81,6 +82,10 @@ class CellData(object):
 
     @classmethod
     def from_csv(cls, path, **kwargs):
+        """Build a data frame from the tables contained in path.
+
+        A CellData class will be instantiated.
+        """
         return cls(path=path, df=merge_tables(path, **kwargs))
 
     @property
@@ -92,34 +97,72 @@ class CellData(object):
         return CellsPloter(self)
 
     def __eq__(self, other):
+        """
+        Call to perform equality comparison.
+
+        x == a <=> x.__eq(a) => bool.
+        """
         return self._df == other
 
     def __ne__(self, other):
+        """Call to perform inequality comparison.
+
+        x != a <=> x.__ne(a) => bool.
+        """
         return not self == other
 
     def __lt__(self, other):
+        """Call for comparison less than.
+
+        x < a <=> x.__lt(a) => bool.
+        """
         return self._df < other
 
     def __le__(self, other):
+        """Call to compare less than or equal to.
+
+        x <= a <=> x.__lt(a) => bool.
+        """
         return self._df <= other
 
     def __gt__(self, other):
+        """Call for comparison, greater than.
+
+        x > a <=> x.__lt(a) => bool.
+        """
         return self._df > other
 
     def __ge__(self, other):
+        """Call for comparison, greater than or equal to.
+
+        x >= a <=> x.__lt(a) => bool.
+        """
         return self._df >= other
 
     def __lshift__(self, other):
+        """Return a shifted left by b.
+
+        operator.__lshift__(a, b).
+        """
         return self._df.__lshift__(other)
 
     def __rshift__(self, other):
+        """Return a shifted right by b.}.
+
+        operator.__rshift__(a, b).
+        """
         return self._df.__rshift__(other)
 
-    def __getitem__(self, slice):
-        sliced = self._df.__getitem__(slice)
+    def __getitem__(self, slices):
+        """Return the value of x at index k.
+
+        x[k] <=> x.__getitem__(k).
+        """
+        sliced = self._df.__getitem__(slices)
         return CellData(path=self._path, df=sliced)
 
     def __getattr__(self, a):
+        """getattr(x, y) <==> x.__getattr__(y) <==> getattr(x, y)."""
         return self._df.__getattr__(a)
 
     def __setitem__(self, idx, values):
@@ -141,13 +184,15 @@ class CellData(object):
         return len(self._df)
 
     def __repr__(self):
+        """Print a representation of your object."""
         return repr(self._df)
 
     def _repr_html_(self):
         """Print a rich HTML version of your object."""
         ad_id = id(self)
 
-        if not isinstance(self._df, pd.Series):
+        if isinstance(self._df, pd.DataFrame) or \
+           isinstance(self._df, self.__class__):
             with pd.option_context("display.show_dimensions", False):
                 df_html = self._df._repr_html_()
 
@@ -169,6 +214,7 @@ class CellData(object):
             self._df.__repr__()
 
     def get_dataframe(self):
+        """To return a copy of the internal _df."""
         return self._df.copy()
 
 
@@ -352,11 +398,3 @@ class CellsPloter:
         ax.imshow(arr_c, **imshow_kws)
         ax.axis("off")
         return ax
-
-
-if __name__ == "__main__":
-    df = CellData.from_csv(".\\samples_cellid")
-    df = CellData(df._path, df.tail(3))
-
-    df_repr = df._repr_html_()
-    print(df_repr)

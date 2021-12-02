@@ -17,7 +17,7 @@ def test_get_dataframe():
     df_test = df.get_dataframe()
     assert isinstance(df_test, pd.DataFrame)
 
-"""
+
 def test_repr(create_test_object_minimum):
     df_repr = repr(create_test_object_minimum)
     repr_result = (
@@ -28,7 +28,7 @@ def test_repr(create_test_object_minimum):
         )
     assert df_repr == repr_result
 
-
+"""
 def test_repr_html(create_test_object_minimum):
     df_repr = create_test_object_minimum._repr_html_()
     df_repr = df_repr.split("\n", 1)[1]

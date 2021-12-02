@@ -1,6 +1,7 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
 import os
 import random
 
@@ -10,7 +11,9 @@ import pandas as pd
 
 import pycellid.io as ld
 
+
 import pytest as pt
+
 
 # =============================================================================
 # Parameter & fixtures
@@ -19,7 +22,6 @@ import pytest as pt
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 base = os.path.dirname(ROOT_DIR)
-
 
 # =============================================================================
 # Test read, parse: Folders, File names
@@ -32,13 +34,19 @@ def test_make_df_file_path_fails(invalid_f_name_fail):
 
 
 @pt.mark.xfail(raises=FileNotFoundError)
+def test_make_df_pos_file_path_fails():
+    valid_f = os.path.join(base, "tests", "pydata", "lugar01", "out_all")
+    ld.make_df(valid_f)
+
+
+@pt.mark.xfail(raises=FileNotFoundError)
 def test_make_df_file_pos_fails(invalid_pos_fail):
     ld.make_df(invalid_pos_fail)
 
 
 def test_make_df_file():
     file = os.path.join(
-        base, "samples_cellid", "pydata", "Position2e2+2", "out_all"
+        base, "tests", "pydata", "Position2e2+2", "out_all"
     )
     df = ld.make_df(file)
     assert df["pos"].unique() == 202
@@ -48,7 +56,7 @@ def test_merge_tables_fnd():
     f = np.random.choice(["P", "p", "Pos", "Position", "Posicion"])
     n = np.random.randint(5, 200)
     fnd = os.path.join(base, "samples_cellid", f"{f}{n}")
-    with pt.raises(StopIteration):
+    with pt.raises(FileExistsError):
         ld.merge_tables(fnd)
 
 
@@ -59,7 +67,7 @@ def test_merge_tables_fnd_file():
         ["out", "out_alll", "Pos", "tablas", "datos.txt"]
     )
     m_data = random.choice(["map", "mapeo", "m", "seguimiento"])
-    with pt.raises(StopIteration):
+    with pt.raises(FileExistsError):
         ld.merge_tables(path=folder, n_data=data_table, n_mdata=m_data)
 
 
@@ -227,7 +235,7 @@ def test_make_cols_cahnnels(create_out_all_file_min, create_mapping_file_min):
 
 def test_merge_tables():
     # these are synthetic values ​​for test
-    path = os.path.join(base, "samples_cellid", "pydata", "test")
+    path = os.path.join(base, "tests", "pydata", "test")
     synthetic = ld.merge_tables(path=path).copy()
 
     ch_crtl = [
@@ -278,7 +286,7 @@ def test_merge_tables():
 
 # rs = np.random.RandomState(np.random.MT19937(np.random.SeedSequence(1234)))
 
-# folder_test = os.path.join(base, "samples_cellid", "pydata", "test")
+# folder_test = os.path.join(base, "tests", "pydata", "test")
 # folder = ["Pos0011", "Position02e1+2", "p33"]
 # ch = ["YFP", "CFP", "TFP"]
 # m = []

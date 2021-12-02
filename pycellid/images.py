@@ -16,7 +16,17 @@
 # DOCS
 # =============================================================================
 
-"""Images for PyCellID."""
+"""Images for PyCellID.
+
+Attention! This module will not provide images.
+This module provides matrix representations for your analysis or to work with
+your favorite framework.
+"""
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
 
 import re
 import warnings
@@ -57,11 +67,11 @@ def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
     pos = re.search(r"\d+(?=\d{11})", str(ucid)).group(0)
     pos = pos.zfill(2)
     # Check if 't_frame' is provided and onstruct the name of the image
-    if isinstance(t_frame, np.int64):
-        s = str(t_frame + 1).zfill(2)
-        name = f"{channel.upper()}_Position{pos}_time{s}{fmt}"
-    elif t_frame is None:
+    if t_frame is None:
         name = f"{channel.upper()}_Position{pos}{fmt}"
+    else:
+        s = str(int(t_frame) + 1).zfill(2)
+        name = f"{channel.upper()}_Position{pos}_time{s}{fmt}"
     # Join base directory to name
     name = base_dir.joinpath(name)
     return name
@@ -157,7 +167,17 @@ def _img_crop(im, x_pos, y_pos, diameter, im_shape):
     return im
 
 
-def box_img(im, x_pos, y_pos, radius=90):
+def _img_size(n):
+    sqrt_floor = int(np.floor(np.sqrt(n)))
+    sqrt_ceil = int(np.ceil(np.sqrt(n)))
+    if (sqrt_floor * sqrt_ceil >= n):
+        shape = (sqrt_floor, sqrt_ceil)
+    else:
+        shape = (sqrt_ceil, sqrt_ceil)
+    return shape
+
+
+def box_img(im, x_pos, y_pos, radius=90, mark_center=False):
     """Create a single image contatinig an individualised cell.
 
     The resulting image posses a mark in the center of the individualised
@@ -173,6 +193,8 @@ def box_img(im, x_pos, y_pos, radius=90):
         y-coordinate of the center of the cell of interest.
     radius : int
         lenght (in pixels) between the center of the image and each edge.
+    mark_center : bool
+        mark a black point ,defoult = False.
 
     Return
     ------
@@ -182,7 +204,8 @@ def box_img(im, x_pos, y_pos, radius=90):
     height = width = radius * 2
     im_shape = im.shape
     # Mark the center of the cell
-    im = _mark_center(im, x_pos, y_pos)
+    if mark_center:
+        im = _mark_center(im, x_pos, y_pos)
     # crop the region of the image containing the cell of interest
     im = _img_crop(im, x_pos, y_pos, radius, im_shape)
     iarray = np.zeros((height, width))
@@ -234,7 +257,7 @@ def array_img(data, path, channel="BF", n=16, criteria=None):
     # their area and assuming round-like cells
     diameter = int(2 * np.round(np.sqrt(data["a_tot"].max() / np.pi)))
 
-    shape = (int(np.floor(np.sqrt(n))), int(np.ceil(np.sqrt(n))))
+    shape = _img_size(n)
 
     s = (2 * diameter + 3, 2 * diameter + 3)  # Shape of unitary image
     # iarray np.ones, with size for contining all individual images
@@ -259,7 +282,7 @@ def array_img(data, path, channel="BF", n=16, criteria=None):
         message = f"The specified criteria are not satisfied by {n} cells"
         warnings.warn(message)
         n = data_copy.shape[0]
-        shape = (int(np.floor(np.sqrt(n))), int(np.ceil(np.sqrt(n))))
+        shape = _img_size(n)
         iarray = np.ones((s[0] * shape[0], s[1] * shape[1]), dtype=float)
     select = data_copy[["ucid", "t_frame", "xpos", "ypos"]].sample(n)
     # Registers the name of each image in the series 'name'

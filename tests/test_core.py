@@ -3,17 +3,16 @@ import random
 import re
 
 import matplotlib
-<<<<<<< HEAD
-=======
 
 import numpy as np
 from numpy.testing import assert_allclose
 
->>>>>>> main
 import pandas as pd
-import pytest
 
 from pycellid.core import CellData, CellsPloter
+
+import pytest
+
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 base = os.path.dirname(ROOT_DIR)
@@ -46,7 +45,7 @@ def test_repr(create_test_object_minimum):
 
         assert_allclose(n_parts, n_spect, rtol=1e-3, verbose=True)
 
-"""
+
 def test_repr_html(create_test_object_minimum):
     num_rex = re.compile(r"\\-?\d+\.?\d*")
     idx_html_rex = re.compile(r"<th>\d+</th>")
@@ -70,48 +69,6 @@ def test_repr_html(create_test_object_minimum):
         '<table border="1" class="dataframe">\n'
         "  <thead>\n"
         '    <tr style="text-align: right;">\n'
-<<<<<<< HEAD
-        '      <th></th>\n'
-        '      <th>pos</th>\n'
-        '      <th>t_frame</th>\n'
-        '      <th>cellID</th>\n'
-        '      <th>f_local2_bg_rfp</th>\n'
-        '      <th>f_local2_bg_tfp</th>\n'
-        '    </tr>\n'
-        '  </thead>\n'
-        '  <tbody>\n'
-        '    <tr>\n'
-        '      <th>0</th>\n'
-        '      <td>1</td>\n'
-        '      <td>0</td>\n'
-        '      <td>0</td>\n'
-        '      <td>241.2194</td>\n'
-        '      <td>12523.05</td>\n'
-        '    </tr>\n'
-        '    <tr>\n'
-        '      <th>1</th>\n'
-        '      <td>1</td>\n'
-        '      <td>1</td>\n'
-        '      <td>0</td>\n'
-        '      <td>240.1235</td>\n'
-        '      <td>12138.30</td>\n'
-        '    </tr>\n'
-        '    <tr>\n'
-        '      <th>2</th>\n'
-        '      <td>1</td>\n'
-        '      <td>2</td>\n'
-        '      <td>0</td>\n'
-        '      <td>242.0784</td>\n'
-        '      <td>11993.09</td>\n'
-        '    </tr>\n'
-        '  </tbody>\n'
-        '</table>\n'
-        '</div>PyCellID.core.CellData - 3 rows x 5 columns'
-        '</div>PyCellID.core.CellData - 3 rows x 5 columns</div>'
-        )
-    assert df_repr == repr_result
-"""
-=======
         "      <th></th>\n"
         "      <th>pos</th>\n"
         "      <th>t_frame</th>\n"
@@ -175,7 +132,6 @@ def test_repr_html(create_test_object_minimum):
         spect_repr = num_rex.split(spect_part[i + 1])[0].split(" ")[1:]
         assert set(test) == set(spect_repr)
 
->>>>>>> main
 
 def test_celldata_slicing():
     df = CellData.from_csv(file_path)

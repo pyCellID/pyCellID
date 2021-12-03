@@ -1,7 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 import os
 import random
 
@@ -11,9 +10,7 @@ import pandas as pd
 
 import pycellid.io as ld
 
-
 import pytest as pt
-
 
 # =============================================================================
 # Parameter & fixtures
@@ -45,9 +42,7 @@ def test_make_df_file_pos_fails(invalid_pos_fail):
 
 
 def test_make_df_file():
-    file = os.path.join(
-        base, "tests", "pydata", "Position2e2+2", "out_all"
-    )
+    file = os.path.join(base, "tests", "pydata", "Position2e2+2", "out_all")
     df = ld.make_df(file)
     assert df["pos"].unique() == 202
 

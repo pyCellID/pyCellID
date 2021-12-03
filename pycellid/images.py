@@ -154,10 +154,11 @@ def _mark_center(im, x_pos, y_pos):
         a mark in the center of the individualised cell.
     """
     center = np.zeros((2, 2))
-    im[y_pos - 1:y_pos + 1, x_pos - 1:x_pos + 1] = center # noqa
+    im[y_pos - 1 : y_pos + 1, x_pos - 1 : x_pos + 1] = center  # noqa
     return im
 
 
+# docstr-coverage:excused `this do the image crop`
 def _img_crop(im, x_pos, y_pos, diameter, im_shape):
     y_min = max([y_pos - diameter, 0])
     y_max = min([y_pos + diameter, im_shape[0]])
@@ -167,10 +168,11 @@ def _img_crop(im, x_pos, y_pos, diameter, im_shape):
     return im
 
 
+# docstr-coverage:excused `this compute the image size`
 def _img_size(n):
     sqrt_floor = int(np.floor(np.sqrt(n)))
     sqrt_ceil = int(np.ceil(np.sqrt(n)))
-    if (sqrt_floor * sqrt_ceil >= n):
+    if sqrt_floor * sqrt_ceil >= n:
         shape = (sqrt_floor, sqrt_ceil)
     else:
         shape = (sqrt_ceil, sqrt_ceil)
@@ -211,7 +213,7 @@ def box_img(im, x_pos, y_pos, radius=90, mark_center=False):
     iarray = np.zeros((height, width))
     im = _check_y_pos(im, y_pos, radius)
     im = _check_x_pos(im, x_pos, radius)
-    iarray[0:im.shape[0], 0:im.shape[1]] = im
+    iarray[0 : im.shape[0], 0 : im.shape[1]] = im  # noqa: E203
     # Adding delimiters
     rule_height = np.zeros((height, 3))
     rule_width = np.zeros((3, (width + 3)))

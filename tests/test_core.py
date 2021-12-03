@@ -263,6 +263,12 @@ def test_cellploter_call():
     assert assertiony & assertionx
 
 
+def test_cellploter_call_fail():
+    df = CellData.from_csv(file_path)
+    with pt.raises(AttributeError):
+        df.plot(kind="_cimage")
+
+
 def test_celldata_gt(create_test_object_minimum):
     assertion = (create_test_object_minimum > -1).all(axis=None)
     assert assertion
@@ -309,6 +315,19 @@ def test_not_callable(create_test_object_minimum):
     with pt.raises(AttributeError):
         pp = CellsPloter(create_test_object_minimum)
         pp(create_test_object_minimum)
+
+
+def test___ne__(create_test_object_minimum):
+    df = create_test_object_minimum
+    col = list(df[df.t_frame != 1]["t_frame"])
+    assert col == [0, 2]
+
+
+def test___setitem__(create_test_object_minimum):
+    df = create_test_object_minimum
+    df["test"] = [1, 2.0, "3_test"]
+    col = list(df.test)
+    assert col == [1, 2.0, "3_test"]
 
 
 def test_repr_html_2(create_test_object_minimum):

@@ -32,12 +32,12 @@ import pandas as pd
 from pycellid import images as img
 from pycellid.io import merge_tables
 
+
 # =============================================================================
 # CellData Class
 # =============================================================================
 
 
-# docstr-coverage:excused `this check if path exists`
 def _check_path(self, attribute, value):
     if not Path(value).exists():
         raise FileNotFoundError(f"Path < {value} > not exist")
@@ -167,7 +167,7 @@ class CellData(object):
 
     def __setitem__(self, idx, values):
         """Call to implement assignment to self[key]."""
-        return values.__setitem__(idx, self._df)
+        return self._df.__setitem__(idx, values)
 
     def __iter__(self):
         """Call when an iterator is required for a container.
@@ -191,9 +191,8 @@ class CellData(object):
         """Print a rich HTML version of your object."""
         ad_id = id(self)
 
-        if isinstance(self._df, pd.DataFrame) or isinstance(
-            self._df, self.__class__
-        ):
+        if isinstance(self._df, pd.DataFrame) or \
+           isinstance(self._df, self.__class__):
             with pd.option_context("display.show_dimensions", False):
                 df_html = self._df._repr_html_()
 
@@ -237,8 +236,8 @@ class CellsPloter:
     -------
     axes to plot
 
-    Methods
-    -------
+    Attributes
+    ----------
     cells_image:
         Matrix of cells
     cimage:
@@ -295,10 +294,8 @@ class CellsPloter:
         ----------------
         array_img_kws : dict.
             Set the pycellid.images.img_array parameters.
-
-            ``n`` : number of cells.
-
-            ``channles`` : "TFP" or another that you have encoded.
+            n : number of cells.
+            channles : "TFP" or another that you have encoded.
 
         imshow_kws : dict
             If you use matplotlib set equal to plt.imshow.
@@ -328,11 +325,15 @@ class CellsPloter:
         By default, an image with a size of (1392 X 1040)px will be rendered.
         Use the arguments of box_img_kws to choose as you like.
 
-        Parameters
-        ----------
-        idtfer : path or dict.
-                 path to an image file
-                 ``dict = { "channel":str, "UCID":int, t_frame":int }``
+        Params
+        ------
+        identifier : path or dict.
+            path to an image file
+            dict = {
+                "channel":str,
+                "UCID":int,
+                "t_frame":int,
+                }
 
         Returns
         -------
@@ -342,25 +343,21 @@ class CellsPloter:
         ----------------
         box_img_kws : dict.
             Set the pycellid.images.box_img parameters.
-
-            ``im`` : numpy.array.
-                 A full fluorescence microscopy image.
-
-            ``x_pos`` : int.
-                    x-coordinate of the center of the cell of interest.
-
-            ``y_pos`` : int.
-                    x-coordinate of the center of the cell of interest.
-
-            ``radius`` : int.
-                     lenght (in px) between the center of the image and
-                     each edge. Default = 90.
-
-            ``mark_center`` : bool
-                          mark a black point. Default = False.
+            im : numpy.array.
+                A full fluorescence microscopy image.
+            x_pos : int.
+                x-coordinate of the center of the cell of interest.
+            y_pos : int.
+                x-coordinate of the center of the cell of interest.
+            radius : int.
+                lenght (in px) between the center of the image and each edge.
+                defoult = 90.
+            mark_center: bool
+                mark a black point.
+                defoult = False.
 
         imshow_kws : dict
-                     If you use matplotlib set equal to plt.imshow.
+            If you use matplotlib set equal to plt.imshow.
         ax:
             Use your axes to plot.
         """

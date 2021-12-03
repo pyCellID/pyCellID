@@ -11,12 +11,18 @@ import pandas as pd
 
 from pycellid.core import CellData, CellsPloter
 
-import pytest
+import pytest as pt
 
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 base = os.path.dirname(ROOT_DIR)
 file_path = os.path.join(base, "samples_cellid")
+
+
+@pt.mark.xfail(raises=FileNotFoundError)
+def test__check_path(invalid_pos_fail, create_test_object_minimum):
+    valid_df = create_test_object_minimum
+    CellData(path=invalid_pos_fail, df=valid_df)
 
 
 def test_get_dataframe():
@@ -179,7 +185,7 @@ def test_cellsploter_cimage_2(valid_picture):
 
 def test_cellsploter_cimage_warning():
     message = "not match ucid and t_frame. See picture!"
-    with pytest.warns(UserWarning, match=message):
+    with pt.warns(UserWarning, match=message):
         df = CellData.from_csv(file_path)
         pp = CellsPloter(df)
 
@@ -237,7 +243,7 @@ def test_celldata_le(create_test_object_minimum):
 
 
 def test_check_path(fake_filepath):
-    with pytest.raises(FileNotFoundError):
+    with pt.raises(FileNotFoundError):
         file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
         df = pd.read_csv(file)
         cell_test = CellData(path=fake_filepath, df=df)
@@ -253,13 +259,13 @@ def test_call_plot(fake_filepath):
 
 
 def test_invalid_plot_method(create_test_object_minimum):
-    with pytest.raises(AttributeError):
+    with pt.raises(AttributeError):
         pp = CellsPloter(create_test_object_minimum)
         pp("something")
 
 
 def test_not_callable(create_test_object_minimum):
-    with pytest.raises(AttributeError):
+    with pt.raises(AttributeError):
         pp = CellsPloter(create_test_object_minimum)
         pp(create_test_object_minimum)
 

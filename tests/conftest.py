@@ -132,10 +132,10 @@ def fake_filepath():
 def create_test_object_minimum():
     ucid = 100000000000
     df = CellData.from_csv(file_path)
-    df = CellData(df._path, df[df.ucid==ucid].head(3))
+    df = CellData(df._path, df[df.ucid==ucid].head(3)).copy()
     df = df[['pos', 't_frame', 'cellID', 'f_local2_bg_rfp', 'f_local2_bg_tfp']]
     df = CellData(df._path, df)
-    return df
+    return df.copy()
 
 
 figs = ['BF_Position01_time01.tif.out.tif',

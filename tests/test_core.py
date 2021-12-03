@@ -43,7 +43,7 @@ def test_repr(create_test_object_minimum):
             [n for n in num.findall(spected[i + 1])][1:], dtype=float
         )
 
-        assert_allclose(n_parts, n_spect, verbose=True)
+        assert_allclose(n_parts, n_spect, rtol=1e-3, verbose=True)
 
 
 def test_repr_html(create_test_object_minimum):

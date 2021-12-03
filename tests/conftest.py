@@ -130,8 +130,9 @@ def fake_filepath():
 
 @pt.fixture(scope="session")
 def create_test_object_minimum():
+    ucid = 100000000000
     df = CellData.from_csv(file_path)
-    df = CellData(df._path, df.head(3))
+    df = CellData(df._path, df[df.ucid==ucid].head(3))
     df = df[['pos', 't_frame', 'cellID', 'f_local2_bg_rfp', 'f_local2_bg_tfp']]
     df = CellData(df._path, df)
     return df

@@ -22,14 +22,14 @@ def test_get_dataframe():
 
 
 def test_repr(create_test_object_minimum):
-    df_repr = repr(create_test_object_minimum)
+    #df_repr = 
     repr_result = (
         '   pos  t_frame  cellID  f_local2_bg_rfp  f_local2_bg_tfp\n'
         '0    1        0       0         241.2194         12523.05\n'
         '1    1        1       0         240.1235         12138.30\n'
         '2    1        2       0         242.0784         11993.09'
         )
-    assert df_repr == repr_result
+    assert repr(create_test_object_minimum) == repr_result
 
 
 def test_repr_html(create_test_object_minimum):

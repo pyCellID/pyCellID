@@ -342,3 +342,5 @@ figs = [
 def valid_picture():
     path_image = os.path.join(file_path, random.choice(figs))
     return path_image
+
+# %%

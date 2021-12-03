@@ -25,6 +25,47 @@ def test__check_path(invalid_pos_fail, create_test_object_minimum):
     CellData(path=invalid_pos_fail, df=valid_df)
 
 
+def test_from_csv():
+    synthetic_path_file = os.path.join(base, "tests", "pydata", "test")
+    synthetic = CellData.from_csv(
+        path=synthetic_path_file,
+    )
+
+    ch_crtl = [
+        "f_tot_yfp",
+        "f_tot_cfp",
+        "f_tot_tfp",
+        "f_local_bg_yfp",
+        "f_local_bg_cfp",
+        "f_local_bg_tfp",
+        "f_nucl_yfp",
+        "f_nucl_cfp",
+        "f_nucl_tfp",
+    ]
+
+    ucid_crtl = {
+        1100000000001,
+        1100000000002,
+        2200000000001,
+        2200000000002,
+        3300000000001,
+        3300000000002,
+    }
+
+    ch_var = []
+
+    for name in synthetic.columns:
+        assert "." not in name
+        assert " " not in name[0]
+        assert " " not in name[-1]
+        if name.startswith("f_"):
+            ch_var.append(name)
+
+    assert ch_var == ch_crtl
+    assert set(synthetic["pos"]) == {11, 22, 33}
+    assert set(synthetic["ucid"]) == ucid_crtl
+
+
 def test_get_dataframe():
     df = CellData.from_csv(file_path)
     df_test = df.get_dataframe()

@@ -5,10 +5,12 @@ import os
 import random
 
 import numpy as np
+
 import pandas as pd
-import pytest as pt
 
 import pycellid.io as ld
+
+import pytest as pt
 
 # =============================================================================
 # Parameter & fixtures

@@ -33,6 +33,7 @@ import warnings
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+
 import numpy as np
 
 
@@ -156,6 +157,7 @@ def _mark_center(im, x_pos, y_pos):
     im[y_pos - 1 : y_pos + 1, x_pos - 1 : x_pos + 1] = center  # noqa
     return im
 
+
 # docstr-coverage:excused `this do the image crop`
 def _img_crop(im, x_pos, y_pos, diameter, im_shape):
     y_min = max([y_pos - diameter, 0])
@@ -164,6 +166,7 @@ def _img_crop(im, x_pos, y_pos, diameter, im_shape):
     x_max = min([x_pos + diameter, im_shape[1]])
     im = im[y_min:y_max, x_min:x_max]
     return im
+
 
 # docstr-coverage:excused `this compute the image size`
 def _img_size(n):

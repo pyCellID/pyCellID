@@ -4,11 +4,13 @@ import random
 import uuid
 
 import numpy as np
+
 import pandas as pd
-import pytest as pt
 
 import pycellid.io as ld
 from pycellid.core import CellData
+
+import pytest as pt
 
 # =============================================================================
 # Parameter & fixtures

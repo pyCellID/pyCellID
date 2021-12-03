@@ -32,7 +32,7 @@ def get_array_img(doc, n, criteria):
 def get_size(shape, criteria):
     diameter = int(2 * np.round(np.sqrt(criteria["a_tot"][0] / np.pi)))
     unitary_size = 2 * diameter + 3
-    total_size = unitary_size * shape[0]
+    total_size = unitary_size * shape
     return total_size
 
 
@@ -94,7 +94,7 @@ def test_box_img():
 def test_array_img():
     iarray = get_array_img("df.csv", 16, {"a_tot": [800.0, 1200.01]})
     total_size = get_size((4, 4), {"a_tot": [800.0, 1200.01]})
-    assert iarray.shape >= (total_size, total_size)
+    assert iarray.shape >= total_size
 
 
 def test_array_img_2():
@@ -105,7 +105,7 @@ def test_array_img_2():
     total_size = get_size(
         (4, 3), {"a_tot": [800.0, 1200.01], "ypos": [0.0, ypos_lim]}
     )
-    assert iarray.shape >= (total_size, total_size)
+    assert iarray.shape >= total_size
 
 
 def test_array_img_3():
@@ -116,7 +116,7 @@ def test_array_img_3():
     total_size = get_size(
         (4, 3), {"a_tot": [800.0, 1200.01], "xpos": [0.0, xpos_lim]}
     )
-    assert iarray.shape >= (total_size, total_size)
+    assert iarray.shape >= total_size
 
 
 def test_array_img_warning_1():

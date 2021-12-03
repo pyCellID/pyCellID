@@ -189,3 +189,11 @@ def test_cellploter_call():
     assertiony = isinstance(pp_ax.get_yaxis(), matplotlib.axis.YAxis)
     assertionx = isinstance(pp_ax.get_xaxis(), matplotlib.axis.XAxis)
     assert assertiony & assertionx
+
+def test_celldata_gt(create_test_object_minimum):
+    assertion = (create_test_object_minimum>-1).all(axis=None)
+    assert assertion == True
+
+def test_celldata_ge(create_test_object_minimum):
+    assertion = (create_test_object_minimum>=-1).all(axis=None)
+    assert assertion == True

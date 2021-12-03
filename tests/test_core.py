@@ -222,3 +222,9 @@ def test_cellploter_call():
 # def test_celldata_ge(create_test_object_minimum):
 #     assertion = (create_test_object_minimum>=-1).all(axis=None)
 #     assert assertion == True
+
+def test_check_path(fake_filepath):
+    with pytest.raises(FileNotFoundError):
+        file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
+        df = pd.read_csv(file)
+        cell_test = CellData(path = fake_filepath, df = df)

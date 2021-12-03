@@ -122,7 +122,7 @@ def test_array_img_3():
 def test_array_img_warning_1():
     message = "The specified criteria is not satisfied by any cell"
     with pytest.warns(UserWarning, match=message):
-        file = os.path.join(base, "tests", "pydata", "df.csv")
+        file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
         df = pd.read_csv(file)
         n = random.randint(16, 100)
         lim = random.uniform(100.0, 1000.0)
@@ -140,7 +140,7 @@ def test_array_img_warning_2():
     n = random.randint(16, 100)
     message = f"The specified criteria are not satisfied by {n} cells"
     with pytest.warns(UserWarning, match=message):
-        file = os.path.join(base, "tests", "pydata", "df.csv")
+        file = os.path.join(base, "samples_cellid", "pydata", "df.csv")
         df = pd.read_csv(file)
         criteria = {"a_tot": [700.0, 702.00]}
         iarray = pycellid.array_img(

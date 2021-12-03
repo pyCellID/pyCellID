@@ -326,23 +326,11 @@ class CellsPloter:
         By default, an image with a size of (1392 X 1040)px will be rendered.
         Use the arguments of box_img_kws to choose as you like.
 
-<<<<<<< HEAD
         Parameters
         ----------
         idtfer : path or dict.
                  path to an image file
                  ``dict = { "channel":str, "UCID":int, t_frame":int }``
-=======
-        Params
-        ------
-        identifier : path or dict.
-            path to an image file
-            dict = {
-                "channel":str,
-                "UCID":int,
-                "t_frame":int,
-                }
->>>>>>> main
 
         Returns
         -------

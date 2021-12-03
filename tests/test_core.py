@@ -30,7 +30,8 @@ def test_repr(create_test_object_minimum):
         '1    1        1       0         240.1235         12138.30',
         '2    1        2       0         242.0784         11993.09'
     ]
-    assert parts == spected
+    assert len(parts) == len(spected)
+    assert parts[0] == spected[0]
 
 
 # def test_repr_html(create_test_object_minimum):

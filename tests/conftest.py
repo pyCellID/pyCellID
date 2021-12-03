@@ -136,6 +136,7 @@ def create_test_object_minimum():
     df = CellData(df._path, df[df.ucid==ucid].iloc[:3]).copy()
     df = df[['pos', 't_frame', 'cellID', 'f_local2_bg_rfp', 'f_local2_bg_tfp']]
     df = CellData(path, df).copy()
+    df.reset_index()
     return df.copy()
 
 

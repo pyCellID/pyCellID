@@ -37,10 +37,10 @@ def test_repr(create_test_object_minimum):
     ]
     assert len(parts) == len(spected)
 
-    for i, val in enumerate(parts[2:]):
-        n_parts = np.array([n for n in num.findall(val)], dtype=float)
+    for i, val in enumerate(parts[1:]):
+        n_parts = np.array([n for n in num.findall(val)][1:], dtype=float)
         n_spect = np.array(
-            [n for n in num.findall(spected[i + 2])], dtype=float
+            [n for n in num.findall(spected[i + 1])][1:], dtype=float
         )
 
         assert_allclose(n_parts, n_spect, rtol=1e-01, verbose=True)

@@ -41,7 +41,7 @@ def test_repr(create_test_object_minimum):
         n_parts = np.array([n for n in num.findall(val)], dtype=float)
         n_spect = np.array([n for n in num.findall(spected[i+1])], dtype=float)
         
-        assert_allclose(n_parts, n_spect, rtol = 1e-01) 
+        assert_allclose(n_parts, n_spect, rtol = 1e-01, verbose=True) 
 
 # def test_repr_html(create_test_object_minimum):
 #     data = re.compile(r"[\w]")

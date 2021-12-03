@@ -3,6 +3,8 @@ import random
 
 import matplotlib
 
+import numpy as np
+
 import pandas as pd
 
 from pycellid.core import CellData, CellsPloter
@@ -31,7 +33,8 @@ def test_repr(create_test_object_minimum):
         '2    1        2       0         242.0784         11993.09'
     ]
     assert len(parts) == len(spected)
-    assert parts[0] == spected[0]
+    assert np.all((np.array(parts[1:]) == np.array(spected[1:])))
+    
 
 
 # def test_repr_html(create_test_object_minimum):

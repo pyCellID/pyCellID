@@ -16,7 +16,7 @@ import pytest
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 base = os.path.dirname(ROOT_DIR)
-file_path = os.path.join(base, 'samples_cellid')
+file_path = os.path.join(base, "samples_cellid")
 
 
 def test_get_dataframe():
@@ -26,22 +26,25 @@ def test_get_dataframe():
 
 
 def test_repr(create_test_object_minimum):
-    num = re.compile(r'-?\d+\.?\d*')
+    num = re.compile(r"-?\d+\.?\d*")
     df_repr = repr(create_test_object_minimum)
-    parts = df_repr.split('\n')
+    parts = df_repr.split("\n")
     spected = [
-        '   pos  t_frame  cellID  f_local2_bg_rfp  f_local2_bg_tfp',
-        '0    1        0       0         241.2194         12523.05',
-        '1    1        1       0         240.1235         12138.30',
-        '2    1        2       0         242.0784         11993.09'
+        "   pos  t_frame  cellID  f_local2_bg_rfp  f_local2_bg_tfp",
+        "0    1        0       0         241.2194         12523.05",
+        "1    1        1       0         240.1235         12138.30",
+        "2    1        2       0         242.0784         11993.09",
     ]
     assert len(parts) == len(spected)
 
-    for i, val in enumerate(parts[1:]):
+    for i, val in enumerate(parts[2:]):
         n_parts = np.array([n for n in num.findall(val)], dtype=float)
-        n_spect = np.array([n for n in num.findall(spected[i+1])], dtype=float)
-        
-        assert_allclose(n_parts, n_spect, rtol = 1e-01, verbose=True) 
+        n_spect = np.array(
+            [n for n in num.findall(spected[i + 2])], dtype=float
+        )
+
+        assert_allclose(n_parts, n_spect, rtol=1e-01, verbose=True)
+
 
 # def test_repr_html(create_test_object_minimum):
 #     data = re.compile(r"[\w]")
@@ -124,16 +127,16 @@ def test_cellsploter_cells_image():
 def test_cellsploter_cimage():
     df = CellData.from_csv(file_path)
     pp = CellsPloter(df)
-    channel = random.choice(['BF', 'CFP', 'RFP', 'YFP'])
-    ucids = list(df['ucid'])
+    channel = random.choice(["BF", "CFP", "RFP", "YFP"])
+    ucids = list(df["ucid"])
     ucid = random.choice(ucids)
-    t_frames = list(df[df['ucid'] == ucid]['t_frame'])
+    t_frames = list(df[df["ucid"] == ucid]["t_frame"])
     t_frame = random.choice(t_frames)
     dict_cimage = {
-            "channel": channel,
-            "ucid": ucid,
-            "t_frame": t_frame,
-            }
+        "channel": channel,
+        "ucid": ucid,
+        "t_frame": t_frame,
+    }
     pp_ax = pp.cimage(dict_cimage)
     assertiony = isinstance(pp_ax.get_yaxis(), matplotlib.axis.YAxis)
     assertionx = isinstance(pp_ax.get_xaxis(), matplotlib.axis.XAxis)
@@ -155,26 +158,26 @@ def test_cellsploter_cimage_warning():
         df = CellData.from_csv(file_path)
         pp = CellsPloter(df)
 
-        ucids = df['ucid'].unique()
+        ucids = df["ucid"].unique()
         ucid = random.choice(ucids)
 
-        channel = random.choice(['BF', 'CFP', 'RFP', 'YFP'])
+        channel = random.choice(["BF", "CFP", "RFP", "YFP"])
 
         tframe_complete = set(range(13))
-        tframe_sample = set(df[df['ucid'] == ucid]['t_frame'].unique())
+        tframe_sample = set(df[df["ucid"] == ucid]["t_frame"].unique())
 
         empty_tframe = tframe_complete - tframe_sample
         while not empty_tframe:
             ucid = random.choice(ucids)
-            tframe_sample = set(df[df['ucid'] == ucid]['t_frame'].unique())
+            tframe_sample = set(df[df["ucid"] == ucid]["t_frame"].unique())
             empty_tframe = tframe_complete - tframe_sample
         t_frame = random.choice(list(empty_tframe))
 
         dict_cimage = {
-                "channel": channel,
-                "ucid": ucid,
-                "t_frame": t_frame,
-                }
+            "channel": channel,
+            "ucid": ucid,
+            "t_frame": t_frame,
+        }
         pp_ax = pp.cimage(dict_cimage)
         pp_ax
 

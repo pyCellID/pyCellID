@@ -1,5 +1,6 @@
 import os
 import random
+import re
 
 import matplotlib
 
@@ -22,17 +23,19 @@ def test_get_dataframe():
 
 
 def test_repr(create_test_object_minimum):
-    #df_repr = 
+    data = re.compile(r"[\w]")
+    df_repr = repr(create_test_object_minimum)
     repr_result = (
         '   pos  t_frame  cellID  f_local2_bg_rfp  f_local2_bg_tfp\n'
         '0    1        0       0         241.2194         12523.05\n'
         '1    1        1       0         240.1235         12138.30\n'
         '2    1        2       0         242.0784         11993.09'
         )
-    assert repr(create_test_object_minimum) == repr_result
+    assert data.findall(df_repr) == data.findall(repr_result)
 
 
 def test_repr_html(create_test_object_minimum):
+    data = re.compile(r"[\w]")
     df_repr = create_test_object_minimum._repr_html_()
     df_repr = df_repr.split("\n", 1)[1]
     repr_result = (
@@ -90,7 +93,7 @@ def test_repr_html(create_test_object_minimum):
         '</div>PyCellID.core.CellData - 3 rows x 5 columns'
         '</div>PyCellID.core.CellData - 3 rows x 5 columns</div>'
         )
-    assert df_repr == repr_result
+    assert data.findall(df_repr) == data.findall(repr_result)
 
 
 def test_celldata_slicing():

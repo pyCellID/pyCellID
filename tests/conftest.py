@@ -135,8 +135,8 @@ def create_test_object_minimum():
     path = df._path
     df = CellData(df._path, df[df.ucid == ucid].iloc[:3]).copy()
     df = df[['pos', 't_frame', 'cellID', 'f_local2_bg_rfp', 'f_local2_bg_tfp']]
-    df = CellData(path, df).copy()
-    return df.copy()
+    df = CellData(path, df)
+    return df
 
 
 figs = [

@@ -43,69 +43,94 @@ def test_repr(create_test_object_minimum):
             [n for n in num.findall(spected[i + 1])][1:], dtype=float
         )
 
-        assert_allclose(n_parts, n_spect, rtol=1e-01, verbose=True)
+        assert_allclose(n_parts, n_spect, rtol=1e-3, verbose=True)
 
 
-# def test_repr_html(create_test_object_minimum):
-#     data = re.compile(r"[\w]")
-#     df_repr = create_test_object_minimum._repr_html_()
-#     df_repr = df_repr.split("\n", 1)[1]
-#     repr_result = (
-#         '<style scoped>\n'
-#         '    .dataframe tbody tr th:only-of-type {\n'
-#         '        vertical-align: middle;\n'
-#         '    }\n'
-#         '\n'
-#         '    .dataframe tbody tr th {\n'
-#         '        vertical-align: top;\n'
-#         '    }\n'
-#         '\n'
-#         '    .dataframe thead th {\n'
-#         '        text-align: right;\n'
-#         '    }\n'
-#         '</style>\n'
-#         '<table border="1" class="dataframe">\n'
-#         '  <thead>\n'
-#         '    <tr style="text-align: right;">\n'
-#         '      <th></th>\n'
-#         '      <th>pos</th>\n'
-#         '      <th>t_frame</th>\n'
-#         '      <th>cellID</th>\n'
-#         '      <th>f_local2_bg_rfp</th>\n'
-#         '      <th>f_local2_bg_tfp</th>\n'
-#         '    </tr>\n'
-#         '  </thead>\n'
-#         '  <tbody>\n'
-#         '    <tr>\n'
-#         '      <th>0</th>\n'
-#         '      <td>1</td>\n'
-#         '      <td>0</td>\n'
-#         '      <td>0</td>\n'
-#         '      <td>241.2194</td>\n'
-#         '      <td>12523.05</td>\n'
-#         '    </tr>\n'
-#         '    <tr>\n'
-#         '      <th>1</th>\n'
-#         '      <td>1</td>\n'
-#         '      <td>1</td>\n'
-#         '      <td>0</td>\n'
-#         '      <td>240.1235</td>\n'
-#         '      <td>12138.30</td>\n'
-#         '    </tr>\n'
-#         '    <tr>\n'
-#         '      <th>2</th>\n'
-#         '      <td>1</td>\n'
-#         '      <td>2</td>\n'
-#         '      <td>0</td>\n'
-#         '      <td>242.0784</td>\n'
-#         '      <td>11993.09</td>\n'
-#         '    </tr>\n'
-#         '  </tbody>\n'
-#         '</table>\n'
-#         '</div>PyCellID.core.CellData - 3 rows x 5 columns'
-#         '</div>PyCellID.core.CellData - 3 rows x 5 columns</div>'
-#         )
-#     assert data.findall(df_repr) == data.findall(repr_result)
+def test_repr_html(create_test_object_minimum):
+    num_rex = re.compile(r"\\-?\d+\.?\d*")
+    idx_html_rex = re.compile(r"<th>\d+</th>")
+
+    spected = (
+        '<div class="PyCellID.core.CellData" id=140120093808240>'
+        '<div class="PyCellID.core.CellData" id=140121229801216><div>\n'
+        "<style scoped>\n"
+        "    .dataframe tbody tr th:only-of-type {\n"
+        "        vertical-align: middle;\n"
+        "    }\n\n"
+        ""
+        "    .dataframe tbody tr th {\n"
+        "        vertical-align: top;\n"
+        "    }\n\n"
+        ""
+        "    .dataframe thead th {\n"
+        "        text-align: right;\n"
+        "    }\n"
+        "</style>\n"
+        '<table border="1" class="dataframe">\n'
+        "  <thead>\n"
+        '    <tr style="text-align: right;">\n'
+        "      <th></th>\n"
+        "      <th>pos</th>\n"
+        "      <th>t_frame</th>\n"
+        "      <th>cellID</th>\n"
+        "      <th>f_local2_bg_rfp</th>\n"
+        "      <th>f_local2_bg_tfp</th>\n"
+        "    </tr>\n"
+        "  </thead>\n"
+        "  <tbody>\n"
+        "    <tr>\n"
+        "      <th>0</th>\n"
+        "      <td>1</td>\n"
+        "      <td>0</td>\n"
+        "      <td>0</td>\n"
+        "      <td>241.2194</td>\n"
+        "      <td>12523.05</td>\n"
+        "    </tr>\n"
+        "    <tr>\n"
+        "      <th>1</th>\n"
+        "      <td>1</td>\n"
+        "      <td>1</td>\n"
+        "      <td>0</td>\n"
+        "      <td>240.1235</td>\n"
+        "      <td>12138.30</td>\n"
+        "    </tr>\n"
+        "    <tr>\n"
+        "      <th>2</th>\n"
+        "      <td>1</td>\n"
+        "      <td>2</td>\n"
+        "      <td>0</td>\n"
+        "      <td>242.0784</td>\n"
+        "      <td>11993.09</td>\n"
+        "    </tr>\n"
+        "  </tbody>\n"
+        "</table>\n"
+        "</div>PyCellID.core.CellData - 3 rows x 5 columns"
+        "</div>PyCellID.core.CellData - 3 rows x 5 columns</div>"
+    )
+
+    repr_test = create_test_object_minimum._repr_html_()
+
+    parts = idx_html_rex.split(repr_test)
+    spect_part = idx_html_rex.split(spected)
+
+    head = num_rex.split(parts[0])[0].split(" ")
+    headers = [
+        "<th>pos</th>\n",
+        "<th>t_frame</th>\n",
+        "<th>cellID</th>\n",
+        "<th>f_local2_bg_rfp</th>\n",
+        "<th>f_local2_bg_tfp</th>\n",
+    ]
+
+    assert len(parts) == len(spect_part)
+
+    for h in headers:
+        assert h in head
+
+    for i, body in enumerate(parts[1:2]):
+        test = num_rex.split(body)[0].split(" ")[1:]
+        spect_repr = num_rex.split(spect_part[i + 1])[0].split(" ")[1:]
+        assert set(test) == set(spect_repr)
 
 
 def test_celldata_slicing():

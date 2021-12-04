@@ -7,13 +7,9 @@
 name: docstr-cov
 
 on:
-  push:
-    branches:
-    - main
+  - push
+  - pull_request
 
-  pull_request:
-    branches:
-    - main
 
 env:
   RANGE: 50..75

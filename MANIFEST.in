@@ -4,7 +4,6 @@ include CHANGELOG.rst
 recursive-include pycellid *.py
 
 exclude tox.ini
-exclude .docstr.yaml
 exclude pyproject.toml
 recursive-exclude tests *
 recursive-exclude docs *

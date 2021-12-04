@@ -236,8 +236,8 @@ class CellsPloter:
     -------
     axes to plot
 
-    Attributes
-    ----------
+    Methods
+    -------
     cells_image:
         Matrix of cells
     cimage:

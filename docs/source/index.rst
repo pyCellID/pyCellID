@@ -14,6 +14,7 @@ Welcome to PyCellID's documentation!
    notes/basic-usage
    notes/changelog
    notes/sample
+   notes/examples.ipynb
    
    modules/modules
 

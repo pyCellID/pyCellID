@@ -21,6 +21,7 @@ PYCELLID_PATH = CURRENT_PATH.parent.parent
 
 sys.path.insert(0, str(PYCELLID_PATH))
 
+import pycellid
 
 # -- Project information -----------------------------------------------------
 
@@ -29,7 +30,7 @@ copyright = f'{datetime.date.today().year}, PyCellID'
 author = 'Clemente, Jose'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = pycellid.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -45,7 +46,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
-
+    'nbsphinx',
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',

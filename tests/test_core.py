@@ -319,7 +319,7 @@ def test_not_callable(create_test_object_minimum):
 
 def test___ne__(create_test_object_minimum):
     df = create_test_object_minimum
-    col = list(df[df.t_frame != 1]["t_frame"])
+    col = list(df[df.t_frame.__ne__(1)]["t_frame"])
     assert col == [0, 2]
 
 

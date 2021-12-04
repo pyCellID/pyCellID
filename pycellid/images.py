@@ -54,7 +54,7 @@ def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
     t_frame : int
         Time tag of the image.
     fmt : str
-        Format of the image to be readen.
+        Format of the ima   ge to be readen.
 
     Returns
     -------

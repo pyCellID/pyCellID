@@ -5,6 +5,7 @@ recursive-include pycellid *.py
 
 exclude tox.ini
 exclude pyproject.toml
+exclude .readthedocs.yaml
 recursive-exclude tests *
 recursive-exclude docs *
 recursive-exclude samples_cellid *

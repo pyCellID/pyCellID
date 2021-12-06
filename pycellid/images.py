@@ -46,21 +46,21 @@ def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
 
     Parameters
     ----------
-    path : ``str``
+    path : str
         Path to the directory containing images asociated to 'data'.
-    ucid : ``int``
+    ucid : int
         Unique traking number.
-    channel : ``str``
+    channel : str
         Fluorescence channel of the image.
         The allowed values are ``'BF'``, ``'CFP'``, ``'RFP'`` or ``'YFP'``.
-    t_frame : ``int``
+    t_frame : int
         Time tag of the image.
-    fmt : ``str``
+    fmt : str
         Format of the image to be read.
 
     Returns
     -------
-    name : ``str``
+    name : str
         Name and path of an image according to the output format of ``CellID``.
     """
     base_dir = Path(path)
@@ -88,16 +88,16 @@ def _check_y_pos(im, y_pos, radius):
 
     Parameters
     ----------
-    im : ``numpy.array``
+    im : numpy.array
         Fluorescence microscopy image.
-    y_pos : ``int``
+    y_pos : int
         :math:`y`-coordinate of the center of the cell of interest.
-    radius : ``int``
+    radius : int
         lenght (in pixels) between the center of the image and each edge.
 
     Returns
     -------
-    im : ``numpy.array``
+    im : numpy.array
         An array (image) containing an individualised cell, corrected in case
         that the cell is close to the upper edge of the original image.
     """
@@ -117,16 +117,16 @@ def _check_x_pos(im, x_pos, radius):
 
     Parameters
     ----------
-    im : ``numpy.array``
+    im : numpy.array
         Fluorescence microscopy image.
-    x_pos : ``int``
+    x_pos : int
         :math:`x`-coordinate of the center of the cell of interest.
-    radius : ``int``
+    radius : int
         lenght (in pixels) between the center of the image and each edge.
 
     Returns
     -------
-    im : ``numpy.array``
+    im : numpy.array
         An array (image) containing an individualised cell, corrected in case
         that the cell is close to the left edge of the original image.
     """
@@ -145,16 +145,16 @@ def _mark_center(im, x_pos, y_pos):
 
     Parameters
     ----------
-    im : ``numpy.array``
+    im : numpy.array
         Fluorescence microscopy image.
-    x_pos : ``int``
+    x_pos : int
         :math:`x`-coordinate of the center of the cell of interest.
-    y_pos : ``int``
+    y_pos : int
         :math:`y`-coordinate of the center of the cell of interest.
 
     Returns
     -------
-    im : ``numpy.array``
+    im : numpy.array
         An array (image) of the same size as the original image with
         a mark in the center of the individualised cell.
     """
@@ -171,18 +171,18 @@ def _img_crop(im, x_pos, y_pos, radius, im_shape):
 
     Parameters
     ----------
-    im : ``numpy.array``
+    im : numpy.array
         Fluorescence microscopy image.
-    x_pos : ``int``
+    x_pos : int
         :math:`x`-coordinate of the center of the cell of interest.
-    y_pos : ``int``
+    y_pos : int
         :math:`y`-coordinate of the center of the cell of interest.
-    radius : ``int``
+    radius : int
         lenght (in pixels) between the center of the image and each edge.
 
     Returns
     -------
-    im : ``numpy.array``
+    im : numpy.array
         An array (image) containing an individualised cell.
     """
     y_min = max([y_pos - radius, 0])
@@ -202,7 +202,7 @@ def _img_shape(n):
 
     Parameters
     ----------
-    n : ``int``
+    n : int
         Number of cells required to be displayed.
 
     Returns
@@ -228,20 +228,20 @@ def box_img(im, x_pos, y_pos, radius=90, mark_center=False):
 
     Parameters
     ----------
-    im : ``numpy.array``
+    im : numpy.array
         A full fluorescence microscopy image.
-    x_pos : ``int``
+    x_pos : int
         :math:`x`-coordinate of the center of the cell of interest.
-    y_pos : ``int``
+    y_pos : int
         :math:`y`-coordinate of the center of the cell of interest.
-    radius : ``int``
+    radius : int
         lenght (in pixels) between the center of the image and each edge.
     mark_center : ``bool``
         mark a black point, defoult = ``False``.
 
     Return
     ------
-    iarray : ``numpy.array``
+    iarray : numpy.array
         An array (image) containing an individualised, center-pinned, cell.
     """
     height = width = radius * 2
@@ -276,19 +276,19 @@ def array_img(data, path, channel="BF", n=16, criteria=None):
     data : ``pandas.DataFrame``
         Dataframe (output of ``CellID``) containing all the measured
         parameters of each cell.
-    path : ``str``
+    path : str
         Path to the directory containing the images asociated to ``data``.
-    channel : ``str``
+    channel : str
         Fluorescence channel of the image.
         The allowed values are ``'BF'``, ``'CFP'``, ``'RFP'`` or ``'YFP'``.
-    n : ``int``
+    n : int
         Number of instances composing the grid.
-    criteria : ``dict``
+    criteria : dict
         Dictionay containing the criteria of selection of cells.
 
     Return
     ------
-    iarray : ``numpy.array``
+    iarray : numpy.array
         A grid of ``n`` images of cells satisfying given criteria.
 
     Raises

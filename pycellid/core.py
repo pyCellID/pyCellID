@@ -58,7 +58,7 @@ class CellData(object):
 
     Parameters
     ----------
-    _path: ``str``
+    _path: str
         global path to output ``CellID`` tables.
     _df : ``pandas.DataFrame``
         Dataframe (output of ``CellID``) containing all the measured
@@ -245,24 +245,13 @@ class CellsPloter:
 
     Create a representation of each cell within a grid, inspect an entire
     image or create a snippet of a single cell.
-    Provide a wrapper of pandas methods for plotting.
+    Provide a wrapper of pandas methods for plotting. Return axes to plot.
 
-    Parameters
+    Attributes
     ----------
-    cells : ``CellData``
+    cells : CellData
         An instance of ``CellData`` containing all the information of
         microscopy experiment.
-
-    Returns
-    -------
-    axes to plot
-
-    Methods
-    -------
-    cells_image :
-        Array of cells
-    cimage :
-        Single cell representation.
     """
 
     cells = attr.ib()
@@ -313,14 +302,14 @@ class CellsPloter:
 
         Other Parameters
         ----------------
-        array_img_kws : ``dict``
+        array_img_kws : dict
             Set the ``pycellid.images.img_array`` parameters.
 
             ``n`` : number of cells.
 
             ``channels`` : "``TFP``" or another that you have encoded.
 
-        imshow_kws : ``dict``
+        imshow_kws : dict
             If you use matplotlib set equal to ``plt.imshow``.
 
         ax:
@@ -350,7 +339,7 @@ class CellsPloter:
 
         Parameters
         ----------
-        identifier : ``path`` or ``dict``
+        identifier : path or dict
             path to an image file
             ``dict = { "channel":str, "UCID":int, t_frame":int }``.
 
@@ -360,27 +349,27 @@ class CellsPloter:
 
         Other Parameters
         ----------------
-        box_img_kws : ``dict``
+        box_img_kws : dict
             Set the ``pycellid.images.box_img`` parameters.
 
-            ``im`` : ``numpy.array``
+            ``im`` : numpy.array
                  A full fluorescence microscopy image.
 
-            ``x_pos`` : ``int``
+            ``x_pos`` : int
                         :math:`x`-coordinate of the center of the cell of
                         interest.
 
-            ``y_pos`` : ``int``
+            ``y_pos`` : int
                     :math:`y`-coordinate of the center of the cell of interest.
 
-            ``radius`` : ``int``
+            ``radius`` : int
                      lenght (in px) between the center of the image and
                      each edge. Default = ``90``.
 
             ``mark_center`` : ``bool``
                           mark a black point. Default = ``False``.
 
-        imshow_kws : ``dict``
+        imshow_kws : dict
                      If you use matplotlib set equal to ``plt.imshow``.
         ax:
             Use your axes to plot.

@@ -42,7 +42,7 @@ def _check_path(self, attribute, value):
     """
     Check the existence of a path.
 
-    If the path provided does not exist, it returns a FileNotFoundError.
+    If the path provided does not exist, it returns a ``FileNotFoundError``.
     """
     if not Path(value).exists():
         raise FileNotFoundError(f"Path < {value} > not exist")
@@ -58,16 +58,16 @@ class CellData(object):
 
     Parameters
     ----------
-    _path: str
-        global path to output ``cellID`` tables.
-    _df : pandas dataframe
-        Dataframe (output of CellID) containing all the measured parameters
-        of each cell.
+    _path: ``str``
+        global path to output ``CellID`` tables.
+    _df : ``pandas.DataFrame``
+        Dataframe (output of ``CellID``) containing all the measured
+        parameters of each cell.
 
     Return
     ------
-        An instance of CellData containing all the information of microscopy
-        experiment.
+        An instance of ``CellData`` containing all the information of
+        microscopy experiment.
 
     Examples
     --------
@@ -86,7 +86,7 @@ class CellData(object):
         """
         Build a data frame from csv files contained in path.
 
-        A CellData class will be instantiated.
+        A ``CellData`` class will be instantiated.
         """
         return cls(path=path, df=merge_tables(path, **kwargs))
 
@@ -95,13 +95,13 @@ class CellData(object):
         """
         Represent set of ``cells_image`` or numerical data.
 
-        For ``cimage`` method you must specify an identifier id={}.
+        For ``cimage`` method you must specify an identifier ``id={}``.
         """
         return CellsPloter(self)
 
     def __eq__(self, other):
         """
-        Implement '==' operator.
+        Implement '``==``' operator.
 
         x == a <=> x.__eq(a) => bool.
         """
@@ -109,7 +109,7 @@ class CellData(object):
 
     def __ne__(self, other):
         """
-        Implement '!=' operator.
+        Implement '``!=``' operator.
 
         x != a <=> x.__ne(a) => bool.
         """
@@ -117,7 +117,7 @@ class CellData(object):
 
     def __lt__(self, other):
         """
-        Implement '<' operator.
+        Implement '``<``' operator.
 
         x < a <=> x.__lt(a) => bool.
         """
@@ -125,7 +125,7 @@ class CellData(object):
 
     def __le__(self, other):
         """
-        Implement '<=' operator.
+        Implement '``<=``' operator.
 
         x <= a <=> x.__lt(a) => bool.
         """
@@ -133,7 +133,7 @@ class CellData(object):
 
     def __gt__(self, other):
         """
-        Implement '>' operator.
+        Implement '``>``' operator.
 
         x > a <=> x.__lt(a) => bool.
         """
@@ -141,7 +141,7 @@ class CellData(object):
 
     def __ge__(self, other):
         """
-        Implement '>=' operator.
+        Implement '``>=``' operator.
 
         x >= a <=> x.__lt(a) => bool.
         """
@@ -165,7 +165,7 @@ class CellData(object):
 
     def __getitem__(self, slices):
         """
-        Return the item of the object at index k.
+        Return the item of the object at index ``k``.
 
         x[k] <=> x.__getitem__(k).
         """
@@ -174,14 +174,14 @@ class CellData(object):
 
     def __getattr__(self, a):
         """
-        Call when the default attribute access fails (AttributeError).
+        Call when the default attribute access fails (``AttributeError``).
 
         getattr(x, y) <==> x.__getattr__(y) <==> getattr(x, y).
         """
         return self._df.__getattr__(a)
 
     def __setitem__(self, idx, values):
-        """Call to implement assignment to self[key]."""
+        """Call to implement assignment to ``self[key]``."""
         return self._df.__setitem__(idx, values)
 
     def __iter__(self):
@@ -192,7 +192,7 @@ class CellData(object):
         return iter(self._df)
 
     def __len__(self):
-        """Implement the built-in function len().
+        """Implement the built-in function ``len()``.
 
         len(x) <=> x.__len__().
         """
@@ -229,7 +229,7 @@ class CellData(object):
             self._df.__repr__()
 
     def get_dataframe(self):
-        """Return a copy of the internal _df."""
+        """Return a copy of the internal ``_df``."""
         return self._df.copy()
 
 
@@ -249,9 +249,9 @@ class CellsPloter:
 
     Parameters
     ----------
-    cells : CellData
-        An instance of CellData containing all the information of microscopy
-        experiment.
+    cells : ``CellData``
+        An instance of ``CellData`` containing all the information of
+        microscopy experiment.
 
     Returns
     -------
@@ -288,7 +288,7 @@ class CellsPloter:
 
     def __getattr__(self, a):
         """
-        Call when the default attribute access fails (AttributeError).
+        Call when the default attribute access fails (``AttributeError``).
 
         getattr(x, y) <==> x.__getattr__(y) <==> getattr(x, y).
         """
@@ -296,16 +296,16 @@ class CellsPloter:
 
     def __repr__(self):
         """
-        Compute the “official” string representation of an object.
+        Compute the "official" string representation of an object.
 
         repr(x) <=> x.__repr__().
         """
         return f"CellsPloter(cells={hex(id(self.cells))})"
 
     def cells_image(self, array_img_kws=None, imshow_kws=None, ax=None):
-        """Display a random selection of cells on a square grid.
+        r"""Display a random selection of cells on a square grid.
 
-        By default it represents a 4 X 4 matrix chosen at random.
+        By default it represents a :math:`4\times 4` matrix chosen at random.
 
         Returns
         -------
@@ -313,15 +313,15 @@ class CellsPloter:
 
         Other Parameters
         ----------------
-        array_img_kws : dict.
-            Set the pycellid.images.img_array parameters.
+        array_img_kws : ``dict``
+            Set the ``pycellid.images.img_array`` parameters.
 
             ``n`` : number of cells.
 
-            ``channels`` : "TFP" or another that you have encoded.
+            ``channels`` : "``TFP``" or another that you have encoded.
 
-        imshow_kws : dict
-            If you use matplotlib set equal to plt.imshow.
+        imshow_kws : ``dict``
+            If you use matplotlib set equal to ``plt.imshow``.
 
         ax:
             Use your axes to plot.
@@ -344,14 +344,15 @@ class CellsPloter:
     def cimage(self, identifier, box_img_kws=None, imshow_kws=None, ax=None):
         """Show a sigle cell or complete image.
 
-        'Identifier' param is required. Reference to a valid image or position.
-        By default, an image with a size of (1392 X 1040)px will be rendered.
+        '``identifier``' param is required. Reference to a valid image
+        or position. By default, an image with a size of ``(1392 X 1040)px``
+        will be rendered.
 
         Parameters
         ----------
-        Identifier : path or dict.
+        identifier : ``path`` or ``dict``
             path to an image file
-            ``dict = { "channel":str, "UCID":int, t_frame":int }``
+            ``dict = { "channel":str, "UCID":int, t_frame":int }``.
 
         Returns
         -------
@@ -359,27 +360,28 @@ class CellsPloter:
 
         Other Parameters
         ----------------
-        box_img_kws : dict.
-            Set the pycellid.images.box_img parameters.
+        box_img_kws : ``dict``
+            Set the ``pycellid.images.box_img`` parameters.
 
-            ``im`` : numpy.array.
+            ``im`` : ``numpy.array``
                  A full fluorescence microscopy image.
 
-            ``x_pos`` : int.
-                    x-coordinate of the center of the cell of interest.
+            ``x_pos`` : ``int``
+                        :math:`x`-coordinate of the center of the cell of
+                        interest.
 
-            ``y_pos`` : int.
-                    x-coordinate of the center of the cell of interest.
+            ``y_pos`` : ``int``
+                    :math:`y`-coordinate of the center of the cell of interest.
 
-            ``radius`` : int.
+            ``radius`` : ``int``
                      lenght (in px) between the center of the image and
-                     each edge. Default = 90.
+                     each edge. Default = ``90``.
 
-            ``mark_center`` : bool
-                          mark a black point. Default = False.
+            ``mark_center`` : ``bool``
+                          mark a black point. Default = ``False``.
 
-        imshow_kws : dict
-                     If you use matplotlib set equal to plt.imshow.
+        imshow_kws : ``dict``
+                     If you use matplotlib set equal to ``plt.imshow``.
         ax:
             Use your axes to plot.
         """

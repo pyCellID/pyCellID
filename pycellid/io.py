@@ -57,12 +57,12 @@ def read_df(path_file):
 
     Parameters
     ----------
-    path_file : str
+    path_file : ``str``
         Path to files to be read.
 
     Return
     ------
-    df : pandas dataframe.
+    df : ``pandas.DataFrame``
         Dataframe with data of fluorescence microscopy experiments.
     """
     df = pd.read_table(path_file)
@@ -76,20 +76,20 @@ def read_df(path_file):
 def _create_ucid(df, pos):
     """Match the data with the numbered position from the microscopy image.
 
-    CellID param: cellID = cell identifier into df.
-    ``df['ucid']`` Positional series pycellid.
+    CellID param: cellID = cell identifier into ``df``.
+    ``df['ucid']`` Positional series ``pycellid``.
     ucid = unique cell identifier.
 
     Parameters
     ----------
-    df : pandas dataframe.
-        dataframe from 'cellID' whith serie 'df['cellID']'.
-    pos : int
-        positional image number.
+    df : ``pandas.DataFrame``
+        Dataframe from ``CellID`` whith serie ``df['CellID']``.
+    pos : ``int``
+        Positional image number.
 
     Return
     ------
-    df : pandas dataframe.
+    df : ``pandas.DataFrame``
         Dataframe with 'ucid' series.
 
     """
@@ -100,19 +100,19 @@ def _create_ucid(df, pos):
 
 def _decod_chanel(df_mapping, flag):
     """
-    Join the fluorescence reference and numeric 'flag' in a string.
+    Join the fluorescence reference and numeric ``flag`` in a string.
 
     Parameters
     ----------
-    df_mapping : pandas dataframe.
+    df_mapping : ``pandas.DataFrame``
         Table with metadata. Must contain column e.g.
-        '['flag']=int()' '['fluor']=str('xFP_Position')'
-    flag: int
+        ``['flag']=int()`` ``['fluor']=str('xFP_Position')``
+    flag: ``int``
         Numeric reference.
 
     Return
     ------
-        'str(channel)' from 'int(flag)'.
+        A ``str(channel)`` from ``int(flag)``.
     """
     # Fluorescent proteins and Position xFP_Position
     # CellID encodes in column 'fluor'(path_file whit str('channel'))
@@ -134,16 +134,16 @@ def _make_cols_chan(df, df_map):
 
     Parameters
     ----------
-    df : pandas dataframe
-        Data Table 'cellID.out.all'.
-    df_map : pandas dataframe
+    df : ``pandas.DataFrame``
+        Data Table ``cellID.out.all``.
+    df_map : ``pandas.DataFrame``
         Mapping Table 'cellID' ('out_bf_fl_mapping').
 
     Return
     ------
-    df : pandas dataframe
+    df : ``pandas.DataFrame``
         Create morphological series per channel.
-             'df['f_tot_yfp',...,'f_nuc_bfp',...]'.
+            ``df['f_tot_yfp',...,'f_nuc_bfp',...]``.
     """
     # Fluorescence variables
     fluor = [f_var for f_var in df.columns if f_var.startswith("f_")]
@@ -179,12 +179,12 @@ def make_df(path_file):
     Parameters
     ----------
     path_file:
-        Path to CellID's 'outall' data files.
+        Path to CellID's ``outall`` data files.
 
     Return
     ------
-    df : pandas dataframe
-        Dataframe with 'df['ucid']' unique cell identifier.
+    df : ``pandas.DataFrame``
+        Dataframe with ``df['ucid']`` unique cell identifier.
     """
     df = read_df(path_file)
 
@@ -222,16 +222,16 @@ def merge_tables(path, n_data="out_all", n_mdata="*mapping"):
 
     Parameters
     ----------
-    path : str
-        global path to output 'cellID' tables.
-    n_data : srt
-        file name to find each data table.
+    path : ``str``
+        Global path to output 'cellID' tables.
+    n_data : ``srt``
+        File name to find each data table.
     n_mdata : srt
-        file name to find metadata tables or mapping_tags.
+        File name to find metadata tables or mapping_tags.
 
     Return
     ------
-    df : pandas dataframe
+    df : ``pandas.DataFrame``
         Dataframe containing 'cellID' data.
 
     Examples

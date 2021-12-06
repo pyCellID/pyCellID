@@ -303,7 +303,7 @@ class CellsPloter:
         return f"CellsPloter(cells={hex(id(self.cells))})"
 
     def cells_image(self, array_img_kws=None, imshow_kws=None, ax=None):
-        """Display a random selection of cells on a square grid.
+        r"""Display a random selection of cells on a square grid.
 
         By default it represents a :math:`4\times 4` matrix chosen at random.
 

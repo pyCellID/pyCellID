@@ -50,16 +50,20 @@ POSITION_REX = re.compile(fr"{POS}({SC_NOTATION}|\d+)")
 
 # Processing of tables
 def read_df(path_file):
-    """Read a df in the path and remove the delimitations by space headers.
+    """
+    Read files with data of fluorescence microscopy experiments.
+
+    Create a dataframe with the data and rewrite headers format.
 
     Parameters
     ----------
-    path_file: ``str``
-        String containing the path files.
+    path_file : str
+        Path to files to be read.
 
     Return
     ------
-        A dataframe.
+    df : pandas dataframe.
+        Dataframe with data of fluorescence microscopy experiments.
     """
     df = pd.read_table(path_file)
     # Remove spaces in headers ' x.pos ' produced from cellid
@@ -72,19 +76,21 @@ def read_df(path_file):
 def _create_ucid(df, pos):
     """Match the data with the numbered position from the microscopy image.
 
-    CellID param: cellID = cell identifier into df ``df['ucid']``
-    Positional series pycellid ucid = unique cell identifier
+    CellID param: cellID = cell identifier into df.
+    ``df['ucid']`` Positional series pycellid.
+    ucid = unique cell identifier.
 
     Parameters
     ----------
-    df:
-        dataframe from ``cellID`` whith serie ``df['cellID']``.
-    pos:
-        ``int(positional image number)``.
+    df : pandas dataframe.
+        dataframe from 'cellID' whith serie 'df['cellID']'.
+    pos : int
+        positional image number.
 
     Return
     ------
-        Same df with the ``ucid`` series.
+    df : pandas dataframe.
+        Dataframe with 'ucid' series.
 
     """
     calc = int(pos * 1e11)
@@ -93,19 +99,20 @@ def _create_ucid(df, pos):
 
 
 def _decod_chanel(df_mapping, flag):
-    """Join the fluorescence reference and numeric ``flag`` in a string.
+    """
+    Join the fluorescence reference and numeric 'flag' in a string.
 
     Parameters
     ----------
-    df_mapping:
+    df_mapping : pandas dataframe.
         Table with metadata. Must contain column e.g.
-        ``['flag']=int()`` ``['fluor']=str('xFP_Position')``
-    flag:
-        A numeric reference.
+        '['flag']=int()' '['fluor']=str('xFP_Position')'
+    flag: int
+        Numeric reference.
 
     Return
     ------
-        ``str(channel)`` from ``int(flag)``.
+        'str(channel)' from 'int(flag)'.
     """
     # Fluorescent proteins and Position xFP_Position
     # CellID encodes in column 'fluor'(path_file whit str('channel'))
@@ -119,22 +126,24 @@ def _decod_chanel(df_mapping, flag):
 
 
 def _make_cols_chan(df, df_map):
-    """Dataframe df will be restructured.
+    """
+    Dataframe df is restructured.
 
     Split morphological series by fluorescence channels.
-    Remove ``flag`` serie and redundant values ​​from CellID.
+    Remove 'flag' serie and redundant values ​​from CellID.
 
     Parameters
     ----------
-    df:
-        Data Table ``cellID.out.all``.
-    df_map:
-        Mapping Table ``cellID`` (``out_bf_fl_mapping``).
+    df : pandas dataframe
+        Data Table 'cellID.out.all'.
+    df_map : pandas dataframe
+        Mapping Table 'cellID' ('out_bf_fl_mapping').
 
     Return
     ------
+    df : pandas dataframe
         Create morphological series per channel.
-             ``df['f_tot_yfp',...,'f_nuc_bfp',...]``.
+             'df['f_tot_yfp',...,'f_nuc_bfp',...]'.
     """
     # Fluorescence variables
     fluor = [f_var for f_var in df.columns if f_var.startswith("f_")]
@@ -165,16 +174,17 @@ def _make_cols_chan(df, df_map):
 
 
 def make_df(path_file):
-    """Make a dataframe with number tracking ``ucid`` and ``position``.
+    """Make a dataframe with number tracking 'ucid' and 'position'.
 
     Parameters
     ----------
     path_file:
-        path to data table, CellID's ``outall``.
+        Path to CellID's 'outall' data files.
 
     Return
     ------
-        A dataframe with ``df['ucid']`` unique cell identifier.
+    df : pandas dataframe
+        Dataframe with 'df['ucid']' unique cell identifier.
     """
     df = read_df(path_file)
 
@@ -202,7 +212,7 @@ def make_df(path_file):
 
 # Final pipeline
 def merge_tables(path, n_data="out_all", n_mdata="*mapping"):
-    """Concatenate the tables in the path with the pandas method.
+    """Concatenate tables in the path with pandas method.
 
     Transforms the identifying index of each cell from each data
     table into a temporal index UCID (Unique Cell Identifier)
@@ -212,35 +222,26 @@ def merge_tables(path, n_data="out_all", n_mdata="*mapping"):
 
     Parameters
     ----------
-    path:
-        global path from output ``cellID`` tables.
-    n_data:
-        srt() file name to finde each table data.
-    n_mdata:
-        srt() file name to finde tables metadata or mapping_tags.
-    verbose:
-        bool, True to print in realtime pipeline
+    path : str
+        global path to output 'cellID' tables.
+    n_data : srt
+        file name to find each data table.
+    n_mdata : srt
+        file name to find metadata tables or mapping_tags.
 
     Return
     ------
-        A dataframe ``cellID``.
+    df : pandas dataframe
+        Dataframe containing 'cellID' data.
 
-    * to use:
-
+    Examples
+    --------
     >>> import pycellid.io as ld
     >>> df=ld.cellid_table(
         path = '../my_experiment',
         n_data ='out_all',
-        n_mdata ='mapping',
-        v=False
+        n_mdata ='mapping'
     )
-
-    Other Parameters
-    ----------------
-    exp_data:
-    srt() name to finde each table data.
-
-
     """
     if not Path(path).exists():
         raise FileExistsError(f"invalid path: {path}")

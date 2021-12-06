@@ -39,42 +39,43 @@ from pycellid.io import merge_tables
 
 
 def _check_path(self, attribute, value):
+    """
+    Check the existence of a path.
+
+    If the path provided does not exist, it returns a FileNotFoundError.
+    """
     if not Path(value).exists():
         raise FileNotFoundError(f"Path < {value} > not exist")
 
 
 @attr.s(cmp=False, repr=False)
 class CellData(object):
-    """Collapse your data into a single data frame.
+    """
+    Collapse your data into a single data frame.
 
     Recursively inspect the path, create a unique identifier per cell,
     and inspect related images.
 
     Parameters
     ----------
-    path:
-        global path from output ``cellID`` tables.
+    _path: str
+        global path to output ``cellID`` tables.
+    _df : pandas dataframe
+        Dataframe (output of CellID) containing all the measured parameters
+        of each cell.
 
     Return
     ------
-        A dataframe ``cellID``.
+        An instance of CellData containing all the information of microscopy
+        experiment.
 
-    * to use:
-
+    Examples
+    --------
     >>> from pycellid.core import CellData
     >>> df = CellData(
-        path = '../my_experiment'
+        path = '../my_experiment',
+        df = my_dataframe
     )
-
-    Other Parameters
-    ----------------
-    name_data:
-        srt() file name to finde each table data.
-    name_meta_data:
-        srt() file name to finde tables metadata or mapping_tags
-    verbose:
-        bool, True to print in realtime pipeline
-
     """
 
     _path = attr.ib(validator=_check_path)
@@ -82,7 +83,8 @@ class CellData(object):
 
     @classmethod
     def from_csv(cls, path, **kwargs):
-        """Build a data frame from the tables contained in path.
+        """
+        Build a data frame from csv files contained in path.
 
         A CellData class will be instantiated.
         """
@@ -90,7 +92,8 @@ class CellData(object):
 
     @property
     def plot(self):
-        """Represent set of ``cells_image`` or numerical data.
+        """
+        Represent set of ``cells_image`` or numerical data.
 
         For ``cimage`` method you must specify an identifier id={}.
         """
@@ -98,63 +101,71 @@ class CellData(object):
 
     def __eq__(self, other):
         """
-        Call to perform equality comparison.
+        Implement '==' operator.
 
         x == a <=> x.__eq(a) => bool.
         """
         return self._df == other
 
     def __ne__(self, other):
-        """Call to perform inequality comparison.
+        """
+        Implement '!=' operator.
 
         x != a <=> x.__ne(a) => bool.
         """
         return not self == other
 
     def __lt__(self, other):
-        """Call for comparison less than.
+        """
+        Implement '<' operator.
 
         x < a <=> x.__lt(a) => bool.
         """
         return self._df < other
 
     def __le__(self, other):
-        """Call to compare less than or equal to.
+        """
+        Implement '<=' operator.
 
         x <= a <=> x.__lt(a) => bool.
         """
         return self._df <= other
 
     def __gt__(self, other):
-        """Call for comparison, greater than.
+        """
+        Implement '>' operator.
 
         x > a <=> x.__lt(a) => bool.
         """
         return self._df > other
 
     def __ge__(self, other):
-        """Call for comparison, greater than or equal to.
+        """
+        Implement '>=' operator.
 
         x >= a <=> x.__lt(a) => bool.
         """
         return self._df >= other
 
     def __lshift__(self, other):
-        """Return a shifted left by b.
+        """
+        Return a shifted left by b.
 
         operator.__lshift__(a, b).
         """
         return self._df.__lshift__(other)
 
     def __rshift__(self, other):
-        """Return a shifted right by b.}.
+        """
+        Return a shifted right by b.
 
         operator.__rshift__(a, b).
         """
         return self._df.__rshift__(other)
 
     def __getitem__(self, slices):
-        """Return the value of x at index k.
+        """
+        Return the item of the object at index k.
 
         x[k] <=> x.__getitem__(k).
         """
@@ -162,7 +173,11 @@ class CellData(object):
         return CellData(path=self._path, df=sliced)
 
     def __getattr__(self, a):
-        """getattr(x, y) <==> x.__getattr__(y) <==> getattr(x, y)."""
+        """
+        Call when the default attribute access fails (AttributeError).
+
+        getattr(x, y) <==> x.__getattr__(y) <==> getattr(x, y).
+        """
         return self._df.__getattr__(a)
 
     def __setitem__(self, idx, values):
@@ -177,7 +192,7 @@ class CellData(object):
         return iter(self._df)
 
     def __len__(self):
-        """Call to implement the built-in function len().
+        """Implement the built-in function len().
 
         len(x) <=> x.__len__().
         """
@@ -214,7 +229,7 @@ class CellData(object):
             self._df.__repr__()
 
     def get_dataframe(self):
-        """To return a copy of the internal _df."""
+        """Return a copy of the internal _df."""
         return self._df.copy()
 
 
@@ -230,7 +245,13 @@ class CellsPloter:
 
     Create a representation of each cell within a grid, inspect an entire
     image or create a snippet of a single cell.
-    We provide a wrapper of the same pandas methods for plotting.
+    Provide a wrapper of pandas methods for plotting.
+
+    Parameters
+    ----------
+    cells : CellData
+        An instance of CellData containing all the information of microscopy
+        experiment.
 
     Returns
     -------
@@ -238,17 +259,17 @@ class CellsPloter:
 
     Methods
     -------
-    cells_image:
-        Matrix of cells
-    cimage:
-        single cell representation.
+    cells_image :
+        Array of cells
+    cimage :
+        Single cell representation.
     """
 
     cells = attr.ib()
 
     def __call__(self, kind="cells_image", **kwargs):
         """
-        When the instance is “called” as a function.
+        Call instance as a function.
 
         ``plot() <==> plot.__call__()``.
         """
@@ -267,7 +288,7 @@ class CellsPloter:
 
     def __getattr__(self, a):
         """
-        Is called when the default attribute access fails (AttributeError).
+        Call when the default attribute access fails (AttributeError).
 
         getattr(x, y) <==> x.__getattr__(y) <==> getattr(x, y).
         """
@@ -297,7 +318,7 @@ class CellsPloter:
 
             ``n`` : number of cells.
 
-            ``channles`` : "TFP" or another that you have encoded.
+            ``channels`` : "TFP" or another that you have encoded.
 
         imshow_kws : dict
             If you use matplotlib set equal to plt.imshow.
@@ -323,15 +344,14 @@ class CellsPloter:
     def cimage(self, identifier, box_img_kws=None, imshow_kws=None, ax=None):
         """Show a sigle cell or complete image.
 
-        ``Identifier`` param is required. Reference a valid image or position.
+        'Identifier' param is required. Reference to a valid image or position.
         By default, an image with a size of (1392 X 1040)px will be rendered.
-        Use the arguments of box_img_kws to choose as you like.
 
         Parameters
         ----------
-        idtfer : path or dict.
-                 path to an image file
-                 ``dict = { "channel":str, "UCID":int, t_frame":int }``
+        Identifier : path or dict.
+            path to an image file
+            ``dict = { "channel":str, "UCID":int, t_frame":int }``
 
         Returns
         -------

@@ -12,9 +12,9 @@ Welcome to PyCellID's documentation!
    :caption: Contents:
 
    notes/basic-usage
-   notes/changelog
-   notes/sample
    notes/examples.ipynb
+   notes/sample
+   notes/changelog
    
    modules/modules
 

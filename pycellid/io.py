@@ -57,12 +57,12 @@ def read_df(path_file):
 
     Parameters
     ----------
-    path_file : ``str``
+    path_file : str
         Path to files to be read.
 
     Return
     ------
-    df : ``pandas.DataFrame``
+    df : pandas.DataFrame
         Dataframe with data of fluorescence microscopy experiments.
     """
     df = pd.read_table(path_file)
@@ -82,14 +82,14 @@ def _create_ucid(df, pos):
 
     Parameters
     ----------
-    df : ``pandas.DataFrame``
+    df : pandas.DataFrame
         Dataframe from ``CellID`` whith serie ``df['CellID']``.
-    pos : ``int``
+    pos : int
         Positional image number.
 
     Return
     ------
-    df : ``pandas.DataFrame``
+    df : pandas.DataFrame
         Dataframe with 'ucid' series.
 
     """
@@ -104,10 +104,10 @@ def _decod_chanel(df_mapping, flag):
 
     Parameters
     ----------
-    df_mapping : ``pandas.DataFrame``
+    df_mapping : pandas.DataFrame
         Table with metadata. Must contain column e.g.
         ``['flag']=int()`` ``['fluor']=str('xFP_Position')``
-    flag: ``int``
+    flag: int
         Numeric reference.
 
     Return
@@ -134,14 +134,14 @@ def _make_cols_chan(df, df_map):
 
     Parameters
     ----------
-    df : ``pandas.DataFrame``
+    df : pandas.DataFrame
         Data Table ``cellID.out.all``.
-    df_map : ``pandas.DataFrame``
+    df_map : pandas.DataFrame
         Mapping Table 'cellID' ('out_bf_fl_mapping').
 
     Return
     ------
-    df : ``pandas.DataFrame``
+    df : pandas.DataFrame
         Create morphological series per channel.
             ``df['f_tot_yfp',...,'f_nuc_bfp',...]``.
     """
@@ -178,12 +178,12 @@ def make_df(path_file):
 
     Parameters
     ----------
-    path_file:
+    path_file : str
         Path to CellID's ``outall`` data files.
 
     Return
     ------
-    df : ``pandas.DataFrame``
+    df : pandas.DataFrame
         Dataframe with ``df['ucid']`` unique cell identifier.
     """
     df = read_df(path_file)
@@ -222,16 +222,16 @@ def merge_tables(path, n_data="out_all", n_mdata="*mapping"):
 
     Parameters
     ----------
-    path : ``str``
+    path : str
         Global path to output 'cellID' tables.
-    n_data : ``srt``
+    n_data : str
         File name to find each data table.
-    n_mdata : srt
+    n_mdata : str
         File name to find metadata tables or mapping_tags.
 
     Return
     ------
-    df : ``pandas.DataFrame``
+    df : pandas.DataFrame
         Dataframe containing 'cellID' data.
 
     Examples

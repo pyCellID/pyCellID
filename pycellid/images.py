@@ -40,8 +40,7 @@ import numpy as np
 
 def img_name(path, ucid, channel, t_frame=None, fmt=".tif.out.tif"):
     """
-    Construct the name of an image according to the output format of
-    ``CellID``.
+    Construct the name of an image according to output format of CellID.
 
     The returned string contains the path and name of the image.
 

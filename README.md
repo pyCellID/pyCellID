@@ -46,9 +46,9 @@ the [issue tracker](https://github.com/pyCellID/pyCellID/issues).
 ## Links
 
 - [Documentation](https://pycellid.readthedocs.io)
-- [Example Application](https://github.com/pyCellID/pyCellID/blob/juniors90/docs/source/notes/examples.ipynb)
+- [Example Application](https://github.com/pyCellID/pyCellID/blob/main/docs/source/notes/examples.ipynb)
 - [PyPI Releases](https://pypi.org/project/PyCellID/)
-- [Changelog](https://github.com/pyCellID/pyCellID/blob/juniors90/CHANGELOG.rst)
+- [Changelog](https://github.com/pyCellID/pyCellID/blob/main/CHANGELOG.rst)
 
 
 ## License

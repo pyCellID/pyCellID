@@ -1,5 +1,6 @@
 ipykernel==6.6.0
 ipython==7.30.1
+matplotlib==3.4.3
 nbsphinx==0.8.7
 Sphinx==3.5.4
 sphinx-rtd-theme==0.5.2

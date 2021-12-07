@@ -6,7 +6,7 @@
 #     https://github.com/pyCellID,
 #     https://github.com/darksideoftheshmoo
 # ).
-# Copyright (c) 2021. Clemente Jose A, Ferreira Juan David, San Martín Victor
+# Copyright (c) 2021. Clemente, Jose A.; Ferreira, Juan D.; San Martín, Victor.
 # License: MIT
 #   Full Text: https://github.com/pyCellID/pyCellID/blob/main/LICENSE
 

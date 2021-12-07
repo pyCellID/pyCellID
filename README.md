@@ -34,4 +34,24 @@ For development, clone the [official github repository](https://github.com/https
     $> python setup.py .
 ```
 
-   
+## Contact
+
+You can contact us via [email](clemente.jac@gmail.com).
+
+## Issues
+
+Please submit bug reports, suggestions for improvements and patches via
+the [issue tracker](https://github.com/pyCellID/pyCellID/issues).
+
+## Links
+
+- [Documentation](https://pycellid.readthedocs.io)
+- [Example Application](https://github.com/pyCellID/pyCellID/blob/main/docs/source/notes/examples.ipynb)
+- [PyPI Releases](https://pypi.org/project/PyCellID/)
+- [Changelog](https://github.com/pyCellID/pyCellID/blob/main/CHANGELOG.rst)
+
+
+## License
+
+This project is licensed under the MIT License (see the
+[LICENSE](https://github.com/pyCellID/pyCellID/blob/main/LICENSE) file for details).

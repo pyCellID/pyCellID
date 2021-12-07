@@ -75,3 +75,6 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 master_doc = 'index'
+
+html_logo = '../logo/Pycell_logo_version_positiva_3.png'
+

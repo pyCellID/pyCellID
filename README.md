@@ -65,6 +65,20 @@ the [issue tracker](https://github.com/pyCellID/pyCellID/issues).
 - [Changelog](https://github.com/pyCellID/pyCellID/blob/main/CHANGELOG.rst)
 
 
+## Credits
+
+We propose to use the open source software Cell-ID for the image segmentation task. And in the future to be able to integrate it.
+
+The cellID developers ([1](https://www.nature.com/articles/nmeth1008))([2](http://dx.doi.org/10.1002/0471142727.mb1418s100)).
+
+The original source can be found at sourceforge ([link](https://sourceforge.net/projects/cell-id/)) and in the original publication ([link](https://www.nature.com/articles/nmeth1008#supplementary-information)).
+
+Or you can visit the official repository [ACL's Yeast Systems Biology Lab](https://github.com/darksideoftheshmoo/cellID-linux) 
+for more detail.
+
+We have got inspiration from [rcell and rcell2](https://github.com/darksideoftheshmoo/rcell2).
+
+
 ## License
 
 This project is licensed under the MIT License (see the

@@ -21,6 +21,10 @@ Here, we present a set of tools that facilitate inspection and analysis of fluor
  
 We hope to integrate tools for image segmentation in future releases. In that way we would be able to contribute to completing the routine from data sampling to already analyzed samples.
 
+## Requirements
+
+Python 3.8+
+
 ## Dependecies for this project.
 
 - [attrs(>=21.1.0)](https://www.attrs.org/en/stable/) for build the backend.

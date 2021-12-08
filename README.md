@@ -1,6 +1,6 @@
 ![logo](https://raw.githubusercontent.com/pyCellID/pyCellID/clementejose/docs/logo/PycellID_logo.jpg)
 
-# PyCellID (building...)
+# PyCellID
 
 [![Build status](https://github.com/pyCellID/pyCellID/actions/workflows/CI.yml/badge.svg)](https://github.com/pyCellID/pyCellID/actions)
 [![codecov](https://codecov.io/gh/pyCellID/pyCellID/branch/main/graph/badge.svg?token=SXFRA6KCLV)](https://codecov.io/gh/pyCellID/pyCellID)
@@ -11,6 +11,15 @@
 [![stars](https://img.shields.io/github/stars/pyCellID/pyCellID)](https://github.com/pyCellID/pyCellID/)
 
 Functions to analyze Cell-ID single-cell cytometry data using python language.
+
+## Motivation
+
+Microscopy-based cytometry provides a powerful means to study cells with high throughput. Single cell measurements can reveal information hidden in the population.  
+Some commercial software packages, as well as some open source projects, provide tools for working with microscopy images. However, either they do not fit the problem posed by cell-to-cell analysis, or they do not deliver a complete pipeline. 
+ 
+Here, we present a set of tools that facilitate inspection and analysis of fluorescence microscopy images based on their segmentation data. 
+ 
+We hope to integrate tools for image segmentation in future releases. In that way we would be able to contribute to completing the routine from data sampling to already analyzed samples.
 
 ## Dependecies for this project.
 

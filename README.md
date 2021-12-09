@@ -14,11 +14,8 @@ Functions to analyze Cell-ID single-cell cytometry data using python language.
 
 ## Motivation
 
-Microscopy-based cytometry provides a powerful means to study cells with high throughput. Single cell measurements can reveal information hidden in the population.  
-Some commercial software packages, as well as some open source projects, provide tools for working with microscopy images. However, either they do not fit the problem posed by cell-to-cell analysis, or they do not deliver a complete pipeline. 
- 
+Microscopy-based cytometry provides a powerful means to study cells with high throughput. Single cell measurements can reveal information hidden in the population. Some commercial software packages, as well as some open source projects, provide tools for working with microscopy images. However, either they do not fit the problem posed by cell-to-cell analysis, or they do not deliver a complete pipeline. 
 Here, we present a set of tools that facilitate inspection and analysis of fluorescence microscopy images based on their segmentation data. 
- 
 We hope to integrate tools for image segmentation in future releases. In that way we would be able to contribute to completing the routine from data sampling to already analyzed samples.
 
 ## Requirements
@@ -74,7 +71,7 @@ The cellID developers ([1](https://www.nature.com/articles/nmeth1008))([2](http:
 The original source can be found at sourceforge ([link](https://sourceforge.net/projects/cell-id/)) and in the original publication ([link](https://www.nature.com/articles/nmeth1008#supplementary-information)).
 
 Or you can visit the official repository [ACL's Yeast Systems Biology Lab](https://github.com/darksideoftheshmoo/cellID-linux) 
-for more detail.
+for more details.
 
 We have got inspiration from [rcell and rcell2](https://github.com/darksideoftheshmoo/rcell2).
 

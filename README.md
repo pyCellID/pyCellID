@@ -26,7 +26,7 @@ Python 3.8+
 
 ## Dependecies for this project.
 
-- [attrs(>=21.1.0)](https://www.attrs.org/en/stable/) for build the backend.
+- [attrs(>=21.1.0)](https://www.attrs.org/en/stable/) for building the backend.
 - [matplotlib(>=3.4.0)](https://matplotlib.org/) for plots management
 - [pandas(>=1.3.0)](https://pandas.pydata.org/) for panel and dashboard management.
 - [numpy(>=1.21.0)](https://numpy.org/) for numerical management.
@@ -66,14 +66,14 @@ the [issue tracker](https://github.com/pyCellID/pyCellID/issues).
 
 ## Credits
 
-We propose to use the open source software Cell-ID for the image segmentation task. And in the future to be able to integrate it.
+We propose using the open source software Cell-ID for the image segmentation task. We plan to integrate it into our code in the future.
 
 The cellID developers ([1](https://www.nature.com/articles/nmeth1008))([2](http://dx.doi.org/10.1002/0471142727.mb1418s100)).
 
-The original source can be found at sourceforge ([link](https://sourceforge.net/projects/cell-id/)) and in the original publication ([link](https://www.nature.com/articles/nmeth1008#supplementary-information)).
+Original source can be found at sourceforge ([link](https://sourceforge.net/projects/cell-id/)) and in the original publication ([link](https://www.nature.com/articles/nmeth1008#supplementary-information)).
 
-Or you can visit the official repository [ACL's Yeast Systems Biology Lab](https://github.com/darksideoftheshmoo/cellID-linux) 
-for more details.
+You can also visit the official repository [ACL's Yeast Systems Biology Lab](https://github.com/darksideoftheshmoo/cellID-linux) 
+for further details.
 
 We have got inspiration from [rcell and rcell2](https://github.com/darksideoftheshmoo/rcell2).
 

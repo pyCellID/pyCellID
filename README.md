@@ -49,7 +49,7 @@ For development, clone the [official github repository](https://github.com/pyCel
 
 ## Contact
 
-You can contact us via [email](clemente.jac@gmail.com).
+You can contact us via [email](mailto:clemente.jac@gmail.com).
 
 ## Issues
 

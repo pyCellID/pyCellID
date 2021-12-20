@@ -11,9 +11,9 @@ Welcome to PyCellID's documentation!
    :numbered:
    :caption: Contents:
 
-   notes/basic-usage
+   notes/quickstart
    notes/examples.ipynb
-   notes/sample
+   notes/license
    notes/changelog
    
    modules/modules

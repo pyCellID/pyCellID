@@ -89,7 +89,7 @@ To get started, the first step is to import and load the extension
 
 After loading, new templates are available to derive from in your application.
 
-To get started, go ahead by reading :doc:`basic-usage`.
+To get started, go ahead by reading :doc:`quickstart`.
 
 Sample Application
 ------------------

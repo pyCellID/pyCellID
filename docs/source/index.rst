@@ -13,6 +13,7 @@ Welcome to PyCellID's documentation!
 
    notes/quickstart
    notes/examples.ipynb
+   notes/example.ipynb
    notes/license
    notes/changelog
    

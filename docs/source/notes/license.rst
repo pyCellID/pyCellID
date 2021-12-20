@@ -1,3 +1,6 @@
+License
+=======
+
 MIT License
 
 Copyright (c) 2021 The PyCellID Python Package

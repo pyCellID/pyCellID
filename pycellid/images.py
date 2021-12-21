@@ -299,7 +299,10 @@ def array_img(data, path, channel="BF", n=16, criteria=None):
     """
     # Estimate the maximum of the diameters of the cells in data based on
     # their area and assuming round-like cells
-    diameter = int(2 * np.round(np.sqrt(data["a_tot"].max() / np.pi)))
+    if data["a_tot"]:
+        diameter = int(2 * np.round(np.sqrt(data["a_tot"].max() / np.pi)))
+    else:
+        diameter = 0
 
     shape = _img_shape(n)
 

@@ -99,6 +99,15 @@ class CellData(object):
         """
         return CellsPloter(self)
 
+    def __call__(self, *args, **kwds):
+        """
+        Call instance as a function.
+
+        ``fun() <==> fun.__call__()``.
+        """
+        method = self._df.__call__(*args, **kwds)
+        return CellData(path=self._path, df=method)
+
     def __eq__(self, other):
         """
         Implement '``==``' operator.
@@ -178,7 +187,11 @@ class CellData(object):
 
         getattr(x, y) <==> x.__getattr__(y) <==> getattr(x, y).
         """
+        if a == "merge":
+            method = self._df.__getattr__(a)
+            return CellData(path=self._path, df=method)            
         return self._df.__getattr__(a)
+        
 
     def __setitem__(self, idx, values):
         """Call to implement assignment to ``self[key]``."""
@@ -213,11 +226,11 @@ class CellData(object):
 
             rows = f"{self._df.shape[0]} rows"
             columns = f"{self._df.shape[1]} columns"
-
-            footer = f"PyCellID.core.CellData - {rows} x {columns}"
-
+            # log
+            footer = f"CellData - {rows} x {columns}"
+            # log
             parts = [
-                f'<div class="PyCellID.core.CellData" id={ad_id}>',
+                f'<div class="CellData" id={ad_id}>',
                 df_html,
                 footer,
                 "</div>",
@@ -292,7 +305,7 @@ class CellsPloter:
         return f"CellsPloter(cells={hex(id(self.cells))})"
 
     def cells_image(self, array_img_kws=None, imshow_kws=None, ax=None):
-        r"""Display a random selection of cells on a square grid.
+        """Display a random selection of cells on a square grid.
 
         By default it represents a :math:`4\times 4` matrix chosen at random.
 

@@ -198,11 +198,11 @@ def make_df(path_file):
     if not pos:
         raise FileNotFoundError(f"{path_file} does not encode valid position")
 
-    if "+" in pos[0]:
-        sc_num, num = pos[0].split("+")
+    if "+" in pos[-1]:
+        sc_num, num = pos[-1].split("+")
         pos = int(float(sc_num)) + int(float(num))
     else:
-        pos = int(float(pos[0]))
+        pos = int(float(pos[-1]))
 
     df = _create_ucid(df, pos)
     df["pos"] = np.linspace(pos, pos, len(df), dtype=int)

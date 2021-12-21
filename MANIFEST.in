@@ -7,5 +7,6 @@ exclude tox.ini
 exclude pyproject.toml
 exclude .readthedocs.yaml
 recursive-exclude tests *
+recursive-exclude requirements *
 recursive-exclude docs *
 recursive-exclude samples_cellid *

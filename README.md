@@ -43,8 +43,25 @@ PyCellID can be installed using ``pip`` from [PyPI](http://pypi.python.org/pypi/
 
 For development, clone the [official github repository](https://github.com/pyCellID/pyCellID) instead and use:
 
-```cmd
-    $> python setup.py .
+```
+    $ git clone git@github.com:pyCellID/pyCellID.git
+    $ cd pyCellID
+    $ python3 -m venv venv
+    $ source venv/bin/activate
+    $ pip install -e .
+    $ pip install -r requirements/dev.txt
+```
+
+Run the tests with pytest:
+
+```
+    $ pytest -v tests/
+```
+
+Or run the full checks with tox:
+
+```
+    $ tox -r
 ```
 
 ## Contact

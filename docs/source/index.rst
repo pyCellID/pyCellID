@@ -11,12 +11,17 @@ Welcome to PyCellID's documentation!
    :numbered:
    :caption: Contents:
 
-   notes/quickstart
-   notes/examples.ipynb
+   notes/install.rst
+   notes/quickstart.ipynb
    notes/example.ipynb
    notes/license
    notes/changelog
-   
+
+.. toctree::
+   :maxdepth: 3
+   :numbered:
+   :caption: API Reference:
+
    modules/modules
 
 

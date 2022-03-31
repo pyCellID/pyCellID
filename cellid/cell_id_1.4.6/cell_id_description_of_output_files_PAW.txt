@@ -1,0 +1,128 @@
+File of published version 1 of CellID
+-----
+Each of the output files are text files containing information about each cell
+found in each time point. A brief desription of each column in these files
+is contained here. The names of the files are
+[basename]_all
+[basename]_all_part1,
+[basename]_all_part2,
+[basename]_all_part3,
+[basename]_all_part4,
+[basename]_all_part5,
+[basename]_all_part6
+
+where [basename] is the determined by the user when cell was run. Here we
+assume that [basename] is given by the word "output"
+
+For each of the files, each row contains the information for a given cell
+at a given time point and a given fluorescence type (as determined by the
+"flag" variable). The columns of each file are described below:
+
+output_all:  This file contains 20 columns where 
+  column 1 is the cell ID number
+  column 2 is the time frame of the cell (0 through n-1 where n=number of
+           points in the time course). Not every cell is necessarily found
+           in every time point.
+  column 3 is the time of that time frame in seconds. The time unit is an
+           absolute number of seconds from some time in the distance past,
+           but the time elapsed between time frames is more meaningful.
+  column 4 and 5 are the x- and y- position, respectively, of the centroid
+           of the cell,
+  column 6 is the sum of the fluorescence image for all the pixels found in
+           that cell
+  column 7 is the area of the cell in pixels
+  column 8 is the number of pixels associated with the cell (column 7 and 8
+           are identical but were not originally identical as column 7
+           in an earlier version of the code tried to correct for the pixelated
+           cell boundaries)
+  column 9 is "FFT_stat" This statistic is derived from the one dimensional
+           fast-fourier-transform of the function radius vs angle, where
+           radius is the distance from the cell centroid to the boundary at
+           a given angle. FFT_stat is 1 minus the ratio of the magnitude
+           squared of the 0th order component to the sum of the magnitude
+           squared of all other components. For a perfect circle FFT_stat is
+           0, and we interpret this statistic as a measure of circularity.
+ column 10 is the circumference of the cell in pixel units,
+ column 11 and 12 are the length of the major and minor axes, respectively, 
+           in pixel units
+ column 13 and 14 are the total fluorescence and area of any found nucleus
+           (these columns are only meaningful if there was a nuclear tagged
+           image)
+ column 15 is "flag" This indicates the "image type." Thus if there are
+           for example YFP and CFP images, all YFP images would be flag 0 and
+           all CFP would be flag 1, assuming that the YFP image was
+           taken earliest in time.
+ column 16 is the volume of rotation of the cell around its major axis
+ column 17 is the volume of the cell as determined by the "conical volume"
+           method
+ column 18, 19 are the vacuole area and fluorescence, respectively (these
+           are calculated by looking for darker regions of fluorescence within
+           the cell and should be ignored if that information would not be
+           meaningful for a given experiment)
+ column 20 is the fluorescence background level. This quantity is the mode
+           of the distribution of all fluorescence pixels that are not
+           associated with any cell.
+
+file 2: output_all_part2
+ This file does not contain ID, time, flag information--however, it should
+ be considered as if the columns simply lay next to all the columns of
+ file 1. Thus, for example, the 5th row of this file contains the information
+ for the ID and time point and flag of the 5th row of the first file.
+
+ columns 1, 2 are the fluorescence and area of all the pixels that are
+           interior to the boundary that is one pixel wider than the cell
+           boundary. These numbers thus include the original cell plus 
+           an annular region one pixel around the outside of the cell,
+ columns 3, 4 are the fluorescence and area of all pixels that are interior
+           to the boundary that is one pixel smaller than the cell boundary.
+ columns 5, 6 are the fluorescence and area of all pixels that are interior
+           to the boundary that is two pixels smaller than the cell boundary.
+ columns 7, 8 are the fluorescence and area of all pixels that are interior
+           to the boundary that is three pixels smaller than the cell boundary.
+
+file 3: output_all_part3
+ This file contains information assuming that there is a third image type
+ that is used to find the nucleus. As above, the columns should be considered
+ as simple extensions of the columns of file 1. This file summarizes
+ information from 6 ways to identify the nucleus. Columns 1-3 contain
+ the fluorescence in the nuclear region from the fluorescence image, the
+ fluorescence in the nucleuar region from the image that contained the 
+ nuclear tag, and the area of the nuclear region, respectively, for method 1.
+ The remaining columns contain the same information for methods 2 through 6
+ respectively. 
+ The last 6 columns where used for methods not currently implemented. There 
+ value is defined to 0 for back compatibility. 
+
+file 4: output_all_part4
+ Contains the X and Y position of the found nucleus.
+
+file 5: output_all_part5
+ This file is basically more background information
+ Columns 1-3 are ID number, time frame index, and flag. These should be
+           identical to the same columns from file 1.
+
+ Columns 4 is a measure of the background level at pixels located 5 radial
+           pixels further out than the cell boundary. It is thus a measure
+           of the local fluorescence background level. The background level
+           is the average fluorescence per pixel. For this calculation only
+           pixels along the annuluar boundary that are not associated with any
+           cell are included. The background level here is the mean of the
+           pixels.
+ column 5  is the number of pixels used in the background calculation in
+           column 4
+ column 6  is the total number of pixels along the annular region, including
+           all pixels (which means pixels associated with a cell and pixels
+           not associated with any cell).
+ column 7-9 contain the same information as 4-6 respectively, but instead of
+           going out 5 pixels for the calculation, the number pixels outwards
+           is given by half of the minor axis of the cell.
+
+file 6: output_all_part6
+ Columns 1-3 contain ID number, time, and flag
+ column 4 contains a measure of surface area,
+ column 5 contains the volume as measured by the "conical" volume calculation
+ column 6 contains the volume as measured b the "union of spheres" method
+ column 7-12 contain deprecated values.
+ 
+ 
+

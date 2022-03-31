@@ -1,0 +1,135 @@
+File of version 1.2a of CellID
+-----
+The output files are text files containing information about each cell
+found in each time point. A brief desription of each column in these files
+is contained here. The names of the files are
+[basename]_all
+[basename]_img
+
+
+where [basename] is the determined by the user when cell was run. Here we
+assume that [basename] is given by the word "output"
+
+For output_all, each row contains the information for a given cell
+at a given time point and a given fluorescence type (as determined by the
+"flag" variable). The columns of the file are described below:
+
+output_all:  This file contains 61 columns where 
+
+  cellID   is the cell ID number
+
+  t.frame  is the time frame of the cell (0 through n-1 where n=number of
+           points in the time course). Not every cell is necessarily found
+           in every time point.
+
+  time     is the time of that time frame in seconds. The time unit is an
+           absolute number of seconds from some time in the distance past,
+           but the time elapsed between time frames is more meaningful.
+
+  xpos     is the x- position, of the centroid of the cell,
+  ypos     is the y- position, of the centroid of the cell,
+
+  f.tot    is the sum of the fluorescence image for all the pixels found in
+           that cell
+  a.tot    is the area of the cell in pixels
+
+  num.pix  is the number of pixels associated with the cell (column 7 and 8
+           are identical but were not originally identical as column 7
+           in an earlier version of the code tried to correct for the pixelated
+           cell boundaries)
+
+  fft.stat is "FFT_stat" This statistic is derived from the one dimensional
+           fast-fourier-transform of the function radius vs angle, where
+           radius is the distance from the cell centroid to the boundary at
+           a given angle. FFT_stat is 1 minus the ratio of the magnitude
+           squared of the 0th order component to the sum of the magnitude
+           squared of all other components. For a perfect circle FFT_stat is
+           0, and we interpret this statistic as a measure of circularity.
+
+ perim     is the circumference of the cell in pixel units,
+
+ maj.axis  is the length of the major axe, in pixel units
+ min.axis  is the length of the minor axe, in pixel units
+
+ f.nucl    the total fluorescence of any found nucleus
+ a.nucl    the total area (in pixel units) of any found nucleus
+           (these last two columns are only meaningful if there was a nuclear 
+	   tagged image)
+
+ flag      is "flag" This indicates the "image type." Thus if there are
+           for example YFP and CFP images, all YFP images would be flag 0 and
+           all CFP would be flag 1, assuming that the YFP image was
+           taken earliest in time.
+
+ rot.vol   is the volume of rotation of the cell around its major axis
+ con.vol   is the volume of the cell as determined by the "conical volume"
+           method
+
+ a.vacuole is the vacuole area (in pixel units)
+ f.vacuole is the vacuole fluorescence
+	   (these are calculated by looking for darker regions of fluorescence 
+	   within the cell and should be ignored if that information would not be
+           meaningful for a given experiment)
+
+ f.bg      is the fluorescence background level. This quantity is the mode
+           of the distribution of all fluorescence pixels that are not
+           associated with any cell.
+
+ f.tot.p1  are the fluorescence and area of all the pixels that are
+ a.tot.p1  interior to the boundary that is one pixel wider than the cell
+           boundary. These numbers thus include the original cell plus 
+           an annular region one pixel around the outside of the cell,
+
+ f.tot.m1  are the fluorescence and area of all pixels that are interior
+ a.tot.m1  to the boundary that is one pixel smaller than the cell boundary.
+ 
+ f.tot.m2  are the fluorescence and area of all pixels that are interior
+ a.tot.m2  to the boundary that is two pixels smaller than the cell boundary.
+ 
+ f.tot.m3  are the fluorescence and area of all pixels that are interior
+ a.tot.m3  to the boundary that is three pixels smaller than the cell boundary.
+
+ The next 20 columns contain information of the nucleus fluorescence. The nucleus
+ is found by maximizing the fluorescence in a disc of defined radius (nucleus_radius_1,
+ default to 2px). The fluorescence in concentric discs of defined radius (nucleaus_radius_1
+ to nucleus_radius_6) is calculated. The nucleus is searched in each channel and this value
+ is kept in f.nucl1 to f.nucl6 
+ If a channel is specified as "nuclear tag" when executing Cell-ID, it is used
+ to find the nucleus. The other channels nuclear fluorescence is calculated 
+ from the nuclear areas defined by the nuclear tag channel. This information is
+ kept in f.nucl.tag1 to f.nucl.tag6. If no "nuclear tag" channel is specified, f.nucl.tag
+ is equivalent to f.nucl
+	
+ xpos.nucl	the x position of the found nucleus
+ ypos.nucl	the y position of the found nucleus
+ f.nucl1 	the fluorescence in the nuclear region from the fluorescence image.
+ f.nucl.tag1  	the fluorescence in the nucleuar region found in the nuclear tag image.
+ a.nucl1  	the area of the nuclear region.
+
+ The remaining 21 columns contain the same information for methods 2 through 8 
+ respectively.
+
+ local.bg  	is a measure of the background level at pixels located 5 radial
+           	pixels further out than the cell boundary. It is thus a measure
+           	of the local fluorescence background level. The background level
+           	is the average fluorescence per pixel. For this calculation only
+           	pixels along the annuluar boundary that are not associated with any
+           	cell are included. The background level here is the mean of the
+           	pixels.
+ local.bg.num 	is the number of pixels used in the background calculation in
+           	column 4
+ local.num   	is the total number of pixels along the annular region, including
+           	all pixels (which means pixels associated with a cell and pixels
+           	not associated with any cell).
+ 
+ local2.bg 	contain the same information as the 3 previous columns, but instead 
+ local2.bg.num  of going out 5 pixels for the calculation, the number pixels outwards
+ local2.num     is given by half of the minor axis of the cell.
+
+ a.surf 	contains a measure of surface area,
+ con.vol 	contains the volume as measured by the "conical" volume calculation
+ sphere.vol	contains the volume as measured b the "union of spheres" method
+
+ 
+ 
+

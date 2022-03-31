@@ -130,7 +130,7 @@ def _make_cols_chan(df, df_map):
     Dataframe df is restructured.
 
     Split morphological series by fluorescence channels.
-    Remove 'flag' serie and redundant values ​​from CellID.
+    Remove 'flag' serie and redundant values from CellID.
 
     Parameters
     ----------
@@ -147,7 +147,7 @@ def _make_cols_chan(df, df_map):
     """
     # Fluorescence variables
     fluor = [f_var for f_var in df.columns if f_var.startswith("f_")]
-    # Save the series with fluorescence values ​​in df_flag
+    # Save the series with fluorescence values in df_flag
     # idx = ['ucid', 't_frame'] if 't_frame' in df else idx = ['ucid']
     df_flag = df.pivot(index=["ucid", "t_frame"], columns="flag", values=fluor)
 
@@ -159,7 +159,7 @@ def _make_cols_chan(df, df_map):
     # List of morphological variables
     morf = [name for name in df.columns if not name.startswith("f_")]
 
-    # Remove redundant values ​​from CellID.
+    # Remove redundant values from CellID
     df_morf = df[df.flag == 0][morf]
     df_morf.set_index(["ucid", "t_frame"], inplace=True)
     # Merge df_flag y df_morf

@@ -1,0 +1,139 @@
+## Sample parameters.txt file.
+## Any line beginning with a # sign is ignored
+## (do not, however, put pound signs in the middle of a line)
+
+## Cell splitting parameters. If the cells perimeter divided the minimum
+## distance between any two point of the cell boundary (waist) is more 
+## than max_dist_over_waist then Cell ID will try splitting them. The split 
+## will be done only if the waist (of the original cell) divided the minor
+## axe of both new cells is less than max_split_over_minor. 
+ max_split_over_minor 0.5
+ max_dist_over_waist 8
+
+## If you want to set different values for the first time point use
+# max_split_over_minor_t0 0.5
+# max_dist_over_waist_t0 8
+ 
+ max_pixels_per_cell 3000
+ min_pixels_per_cell 70
+
+## The code makes an initial decision about the graylevels of the
+## boundary pixels. To do this it takes the mean position of all the
+## graylevels in the images and subtracts Z standard deviations. It then
+## starts by considering all gray levels below this value as being
+## parts of the cell borders. This value Z is the parameter
+## background_reject_factor. Brightfield images taken slightly out of
+## focus may do better with higher values (ie, higher values will
+## better avoid spurious cells), but if the cell boundaries in the image
+## are too narrow, a smaller value may be necessary--which might increase
+## the level of background.
+ background_reject_factor 1
+
+## To track cells over time the program overlaps the pixel corresponding 
+## to a given cell in the new time point with the found cells in the 
+## previous time point. If the overlapping is higher than 
+## tracking_comparison, the program assigns the same ID the cells in both
+## time points.
+# tracking_comparison 0.2
+
+
+## To find the cell nucleus the program maximizes the fluorescence in
+## a disc within the cell boundary. The radius in pixels of this disc 
+## is specified by nucleus_radius_1. Cell-ID quantifies the fluorecence
+## in concentric disc, which radius are defined by nucleus_radius_1 to
+## nucleus_radius_6 (integer value in px units)
+# nucleus_radius_1 2
+# nucleus_radius_2 4
+# nucleus_radius_3 5
+# nucleus_radius_4 6
+# nucleus_radius_5 7
+# nucleus_radius_6 8
+
+
+## Calculate all the fluorescence images variables on the bright field
+## image as if it were a fluorescence image. This is potentially a good
+## idea since it allows a good way to reject spurious cells. For example,
+## the average value of the boundary pixels in good cells will be lower
+## than the background level, but not so for spurious cells, etc.
+## (Do not use when mapping by list order.)
+# treat_brightfield_as_fluorescence_also
+
+
+## Image type of the image that is used to find the cells
+## Options are brightfield(default), metamorph_decon, hex_array
+## or confocal_transmission
+# image_type brightfield
+
+
+## V1.2a Mapping of the fluorescence and bright field image can be based on 
+## nearest times ("time" option) or  on the input lists, in which case both 
+## list should have the same number of elements ("list" option). 
+## Only use when file_type bf_fl_list is selected and 
+## don't use treat_brightfield_as_fluorescence_also .
+# bf_fl_mapping time
+ bf_fl_mapping list
+
+## If we have a "fret" image or not (a "fret" image here means that
+## the image is split into an upper and lower half, each with its own
+## excitation filter in front of it).
+## The three arguments (bf_top_only, bf_bottom_only, bf_bottom_and_top)
+## indicate where in the bright field image to look for the cells--since
+## it's assumed that the bright field image also had its output sent
+## throught the two excitation filters.
+# fret bf_top_only
+# fret bf_bottom_only
+# fret bf_bottom_and_top
+
+## More for the fret images. One of the fluorescence images will be
+## used to identify the nucleus. Should it be the top or bottom image.
+# fret nuclear_top
+# fret nuclear_bottom
+
+## If there is a third image type included, then this describes how
+## to use it (nuclear_label means its a fluorescence tagged nucleus
+## channel, vacuole_label means vacuole label)
+# third_image vacuole_label
+# third_image nuclear_label
+
+##V1.2a TODO expand description
+## Asumes nucleous in geometrical center of cell. Otherwise uses fluorescent 
+## image to find nucleous. 
+# force_nucleus_in_center
+
+# output_individual_cells
+
+## "do_recombination" to try to connect cells using cuts on fluorescence
+## "recombination_fl_per_a_nucleus F CUT" is cut below which we consider the
+## cell has no nucleus. "F" is the "flag" given to the fluorescence type we're
+## going to use for the cut.
+## "recombination_is_a_cell_fl_per_a F CUT" is minimum fluorescence/area to
+## consider the cell a real cell (a way to get rid of junk). This is only
+## used for recombining cells. Ie, for recombining cells we only consider
+## cells above CUT but we don't throw away those that fail. "F" is the flag
+## for the fluorescence type to use.
+## "recombination_all_new_cells": All cells produced after i_t 0 will be 
+## recombined.
+# do_recombination
+# recombination_fl_per_a_nucleus 1 2500.0
+# recombination_is_a_cell_fl_per_a 3 500.0
+# recombination_all_new_cells
+
+## allow wiggling between the brightfield and fluorescence images
+ align_individual_cells
+
+## if you want to wiggle within a boundary use 
+## align_individual_cells_boundary insted of align_individual_cells
+
+##Cell ID allows to correct for bad repositioning of the field between frames
+##adding an offset to when required.
+##If we want to use the first fluorescence image to align all the others
+##then use the option align_fl_to_first
+##If you want to align the fluorescent images to the bright field image use
+##the align_fl_to_bf option
+
+
+## append_output means that when we write out the output files
+## we're going to _add_ to the end of the files instead of making
+## new ones.
+## the argument is the offset to add to the id numbers
+# append_output 1000

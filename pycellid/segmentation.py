@@ -1,5 +1,4 @@
 # %%
-
 # !/usr/bin/env python
 
 # -*- coding: utf-8 -*-
@@ -37,6 +36,7 @@ import subprocess
 
 from pycellid.io import CHANNEL_REX, POS, SC_NOTATION
 import pycellid.io as ld
+from regex import cache_all
 
 # %%
 # =============================================================================
@@ -48,22 +48,26 @@ POSITION_REX = re.compile(fr"({POS})({SC_NOTATION}|\d+)")
 # Agrego un grupo más al pos(n) => (pos)(n) ver de cambiar en io.py e importar
 
 # %%
-# #############################################################################
+# =============================================================================
 # Functions
-# #############################################################################
-
+# =============================================================================
 
 def _make_folder(path, name):
     """Meke folder
     """
-    return os.mkdir(os.path.join(path, name))
+    folder = Path(path) / name
+    folder.mkdir(parents=True, exist_ok=True)
+    return folder
 
-
-def _crate_param(param, l):
-    """To create .txt with the params
+def _crate_param(params, l, buffer = False):
+    """To create strams with the params
     """
-    param = io.StringIO(l) 
-    return param
+    if not buffer:
+    #    with open(path, 'w') as params:
+            params.write(l)
+    else:
+        params = io.StringIO(l) 
+    return params
 
 
 def run_cellid(bf_params, fl_params, output_params, segement_params, mask=True,
@@ -71,8 +75,8 @@ def run_cellid(bf_params, fl_params, output_params, segement_params, mask=True,
     """Run CellID
     """
 
-    if "shell" in args:
-        raise SystemExit("Do not use shell command")
+    # if "shell" in args:
+        # raise SystemExit("Do not use shell command")
     if mask:
        process = subprocess.run(
             [
@@ -105,16 +109,25 @@ def CellID(path, *args):
     """Complete the pipeline
     """
     #Here complete the loop to create the folders.
-    
+    # New
+
+    # for positions in path:
+    #     creo una carpeta por posición
+    #     creo los archivos de parámetros
+    #     Corro Cellid
+    #     ¿registro cada salida para hacer un log?
+    # Retorno un log
+
+    # End New
     log = run_cellid(*args)
     return log.stdout
 
 # %%
-# #############################################################################
+# =============================================================================
 # Pruebas de funciones
-# #############################################################################
-
+# =============================================================================
 # Parámetros golbales
+
 b = "/home/jc/Escritorio/cellid_console_test/bf_path_completo_yo.txt"
 f = "/home/jc/Escritorio/cellid_console_test/fl_path_completo_yo.txt"
 o = "/home/jc/Escritorio/cellid_console_test/samples_cellid/min_samples/out"
@@ -127,68 +140,92 @@ p = run_cellid(
     output_params= o,
     segement_params= p,
 )
+# %%
+# =============================================================================
+# Pruebas cortas
+# =============================================================================
+# Globals
+# Path to minimal experiment
+path_min = "/home/jc/Escritorio/cellid_console_test/samples_cellid/min_samples"
+# Path observable, minimo para poder contar los archivos creados
+path = "/home/jc/Escritorio/cellid_console_test/samples_cellid/min_min_samples"
 
 # %%
-# #############################################################################
-# Pruebas cortas
-# #############################################################################
-
 p1= subprocess.run([
     "cell",
     "-b", "/home/jc/Escritorio/cellid_console_test/bf_path_completo_yo.txt",
     "-f", "/home/jc/Escritorio/cellid_console_test/fl_path_completo_yo.txt",
     "-o", "/home/jc/Escritorio/cellid_console_test/samples_cellid/min_samples/out",
-    "-p", "/home/jc/Escritorio/cellid_console_test/parameters_yo.txt", "-t"
+    "-p", "/home/jc/Escritorio/cellid_console_test/parameters_yo.txt",
+    "-t"
     ], capture_output=True
 )
+
+# Que quede un archivin con los parámetros que se usaron al correr el paquete 
+# Gracias Hele y Nico!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11111
+# Peeeeeeeerrrroo que sea opcional para quien tenga ganas de usar más memoria.
 # %%
+p = Path(path).rglob('*.tif')
+channels = set([CHANNEL_REX.findall(str(f))[0][0] for f in p])
 
-path = "/home/jc/Escritorio/cellid_console_test/samples_cellid/min_samples"
-
-# Position encoding.
-# If the position > 1e20 it may fail
-# ('position', 'number')
-position = set([POSITION_REX.findall(pos)[0] for pos in os.listdir(path)])
-# Crea las carpetas para guardar archivos.
-for pos_num in position:
-    fold_pos = os.path.join(path, "".join(pos_num))
-    os.mkdir(fold_pos)
-    p = run_cellid(
-        bf_params= b,
-        fl_params= f,
-        output_params= o,
-        segement_params= p,
-    )
+# files = []
+# channels = set()
+# positions = set()
+# for file in Path(path).glob('*.tif'):
+#     channels.add(CHANNEL_REX.findall(str(file))[0][0])
+#     positions.add(POSITION_REX.findall(str(file))[0])
+#     files.append(file)
 
 # %%
+# positions = set([POSITION_REX.findall(pos)[0] for pos in os.listdir(path)])
+# La ventaja de pathlib es que estoy mirando solo las extenciones .tif
 
-CHANNEL_REX.findall(path)[0][0].lower()
-
-# %%
-# Necesito escribir un archivo con los parámetros. Voy a usar param = io.StringIO(l)
-
-#param = io.StringIO(l)
-positions = set([POSITION_REX.findall(pos)[0] for pos in os.listdir(path)])
-channels = set([CHANNEL_REX.findall(str(f))[0][0] for f in Path(path).rglob("*.tif")])
-
-# %%
-#with open("bf_path", "w") as bf:
-# Creo los parámetros para que se corran en cada archivo.
-# Necesito que bf_param tenga repetida la ruta a de bf_pos_n_time para cada chanel
-
-bf_params = io.StringIO()
-fl_params = io.StringIO()
+positions = set([POSITION_REX.findall(str(f))[0] for f in Path(path).glob("*.tif")])
 
 for pos in positions:
-    for i, ch in enumerate(channels):
-        if ch.lower() == "bf":
-            pass
-        else:
-            bf_params.write("some text")
-            fl_params.write("some text")
+    # Construt the output folder
+    folder = Path(path) / ''.join(pos)
+    folder.mkdir(parents=True, exist_ok=True)
+    # Data path
+    bf_params = io.StringIO()
+    fl_params = io.StringIO()
 
-# %%
-bf_params.close()
-fl_params.close()
+    for img_path in Path(path).glob("*.tif"):
+        # [('Position', '01')] POSITION_REX
+        pos_path = POSITION_REX.findall(str(img_path))[0][1]
+        fl_channel = CHANNEL_REX.findall(str(img_path))[0][0]
 
-# %%
+        if pos[1] == pos_path and not "BF" in fl_channel:
+            # Built bf_path
+            new_path = img_path.name.replace(fl_channel, 'BF',)
+            base = os.path.dirname(img_path)
+            file_path = os.path.join(base, new_path)
+            # Build memory data
+            bf_params.writelines([file_path, '\n'])
+            fl_params.writelines([str(img_path), '\n'])
+
+#            if save_params:
+            # Pathlib open/close
+            bf = folder / "bf_params.txt"
+            bf.write_text(bf_params.getvalue())
+
+            fl = folder / "fl_params.txt"
+            fl.write_text(fl_params.getvalue())
+
+    out = os.path.join(folder, "out")
+
+    p1= subprocess.run([
+        "cell",
+        "-b", str(bf),
+        "-f", str(fl),
+        "-o", out,
+        "-p", "/home/jc/Escritorio/cellid_console_test/parameters_yo.txt",
+        #"-t"
+        ], capture_output=True
+    )
+
+    bf_params.close()
+    fl_params.close()
+
+# p1.returncode == 1 todo corrió sin acusar error. Manejo de errores.
+# p1.stdout ver para el retorno del proceso

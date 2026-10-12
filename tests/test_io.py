@@ -109,6 +109,15 @@ def test_make_df_c_names(rand_make_df):
         assert " " not in name[-1]
 
 
+def test_make_df_c_names_dots_to_underscores(tmp_path):
+    # Regression test: with pandas>=2, ``str.replace(".", "_", regex=True)``
+    # replaced *every* character, so column names became "______".
+    table = tmp_path / "out_all"
+    table.write_text("cellID \tt.frame\t f.tot \n1\t0\t2.5\n")
+    df = ld.read_df(table)
+    assert list(df.columns) == ["cellID", "t_frame", "f_tot"]
+
+
 def test_fluor_col(create_out_all_file, create_mapping_file):
     ch = ["BF", "YFP", "CFP", "RFP"]
     var = ["f_nuc", "f_tot", "f_vac"]

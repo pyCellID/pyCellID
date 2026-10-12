@@ -69,7 +69,7 @@ def read_df(path_file):
     # Remove spaces in headers ' x.pos ' produced from cellid
     df.columns = df.columns.str.strip()
     # Change name delimiter "."" to "_"
-    df.columns = df.columns.str.replace(".", "_", regex=True)
+    df.columns = df.columns.str.replace(".", "_", regex=False)
     return df
 
 

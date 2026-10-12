@@ -182,7 +182,7 @@ class CellData(object):
 
     def __setitem__(self, idx, values):
         """Call to implement assignment to ``self[key]``."""
-        return self._df.__setitem__(idx, values)
+        self._df[idx] = values
 
     def __iter__(self):
         """Call when an iterator is required for a container.

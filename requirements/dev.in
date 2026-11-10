@@ -1,8 +1,0 @@
--r check-manifest.in
--r coverage.in
--r docs.in
--r docstyle.in
--r style.in
--r tests.in
-pip-tools
-tox

@@ -161,7 +161,7 @@ def _make_cols_chan(df, df_map):
 
     # Remove redundant values ​​from CellID.
     df_morf = df[df.flag == 0][morf]
-    df_morf.set_index(["ucid", "t_frame"], inplace=True)
+    df_morf = df_morf.set_index(["ucid", "t_frame"])
     # Merge df_flag y df_morf
     df = pd.merge(df_morf, df_flag, on=["ucid", "t_frame"], how="outer")
 

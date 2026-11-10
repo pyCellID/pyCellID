@@ -1,6 +1,18 @@
 PyCellID Changelog
 ===================
 
+
+Unreleased (0.2.0)
+------------------
+
+- Packaging configuration moved to ``pyproject.toml`` (PEP 621);
+  ``setup.py`` and ``requirements/`` removed. Development dependencies
+  are now dependency groups (PEP 735): ``pip install -e . --group dev``.
+- Supported Python versions: 3.11 to 3.15 (3.8, 3.9 and 3.10 dropped).
+- Minimum dependencies: attrs 22.2, matplotlib 3.7, numpy 1.24, pandas 2.0.
+- ``make_df``: avoid ``inplace=True`` in ``set_index`` (deprecated in
+  pandas 3.1, to be removed in pandas 4).
+
 Version 0.1.1
 -------------
 

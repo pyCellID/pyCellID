@@ -22,14 +22,14 @@ We hope to integrate tools for image segmentation in future releases. In that wa
 
 ## Requirements
 
-Python 3.8+
+Python 3.11+
 
 ## Dependecies for this project.
 
-- [attrs(>=21.1.0)](https://www.attrs.org/en/stable/) for building the backend.
-- [matplotlib(>=3.4.0)](https://matplotlib.org/) for plots management
-- [pandas(>=1.3.0)](https://pandas.pydata.org/) for panel and dashboard management.
-- [numpy(>=1.21.0)](https://numpy.org/) for numerical management.
+- [attrs(>=22.2)](https://www.attrs.org/en/stable/) for building the backend.
+- [matplotlib(>=3.7)](https://matplotlib.org/) for plots management
+- [pandas(>=2.0)](https://pandas.pydata.org/) for panel and dashboard management.
+- [numpy(>=1.24)](https://numpy.org/) for numerical management.
 
 ## Installation
 
@@ -48,8 +48,8 @@ For development, clone the [official github repository](https://github.com/pyCel
     $ cd pyCellID
     $ python3 -m venv venv
     $ source venv/bin/activate
-    $ pip install -e .
-    $ pip install -r requirements/dev.txt
+    $ pip install --upgrade pip
+    $ pip install -e . --group dev
 ```
 
 Run the tests with pytest:

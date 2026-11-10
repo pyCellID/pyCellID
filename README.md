@@ -2,7 +2,8 @@
 
 # PyCellID
 
-[![Build status](https://github.com/pyCellID/pyCellID/actions/workflows/CI.yml/badge.svg)](https://github.com/pyCellID/pyCellID/actions)
+[![Build status](https://github.com/pyCellID/pyCellID/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/pyCellID/pyCellID/actions/workflows/CI.yml)
+[![PyPI](https://img.shields.io/pypi/v/pycellid)](https://pypi.org/project/pycellid/)
 [![codecov](https://codecov.io/gh/pyCellID/pyCellID/branch/main/graph/badge.svg?token=SXFRA6KCLV)](https://codecov.io/gh/pyCellID/pyCellID)
 [![Documentation Status](https://readthedocs.org/projects/pycellid/badge/?version=latest)](https://pycellid.readthedocs.io/en/latest/?badge=latest)
 [![issues](https://img.shields.io/github/issues/pyCellID/pyCellID)](https://img.shields.io/github/issues/pyCellID/pyCellID)

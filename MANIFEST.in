@@ -1,12 +1,5 @@
 include LICENSE
 include README.md
 include CHANGELOG.rst
+include pyproject.toml
 recursive-include pycellid *.py
-
-exclude tox.ini
-exclude pyproject.toml
-exclude .readthedocs.yaml
-recursive-exclude tests *
-recursive-exclude requirements *
-recursive-exclude docs *
-recursive-exclude samples_cellid *

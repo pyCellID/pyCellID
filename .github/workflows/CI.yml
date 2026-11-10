@@ -1,39 +1,86 @@
-# ==============================================================
-# CI with GitHub Actions
-# ==============================================================
-
+# =============================================================================
+# CI con GitHub Actions
+# =============================================================================
+# "name" es el texto que aparece en el badge del README.
 name: PyCellID
 
+# -----------------------------------------------------------------------------
+# CUÁNDO corre
+# -----------------------------------------------------------------------------
 on:
-  - push
-  - pull_request
+  push:
+    branches: [main]        # cada cambio que llega a main
+  pull_request:             # cada PR (y cada push a una rama con PR abierto)
+  schedule:
+    - cron: "0 6 * * 1"     # todos los lunes 06:00 UTC, aunque nadie toque el código
+  workflow_dispatch:        # botón "Run workflow" en la pestaña Actions
 
+# Permisos mínimos: este workflow solo necesita leer el repositorio.
+permissions:
+  contents: read
+
+# Si llega un push nuevo a la misma rama, cancela la ejecución anterior.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# -----------------------------------------------------------------------------
+# QUÉ corre
+# -----------------------------------------------------------------------------
 jobs:
-  build:
 
+  # Tests en cada versión de Python soportada (un job por versión).
+  tests:
+    name: Tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false      # si una versión falla, las demás igual terminan
       matrix:
-        python-version: [3.8, 3.9]
+        python-version: ["3.11", "3.12", "3.13", "3.14", "3.15"]
 
     steps:
-      - uses: actions/checkout@master
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+      - name: Descargar el código
+        uses: actions/checkout@v7
+
+      - name: Instalar Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v7
         with:
-          python-version: ${{ matrix.python-version}}
-      - name: Install pandoc
-        run: sudo apt-get install pandoc
-      - name: Install tox
-        run: pip install tox tox-gh-actions
-      - name: Test with tox
-        run: tox -r
-      - name: "Upload coverage to Codecov"
-        uses: codecov/codecov-action@v2
+          python-version: ${{ matrix.python-version }}
+
+      - name: Instalar tox
+        run: python -m pip install --upgrade pip tox
+
+      - name: Correr los tests
+        # "py" = el entorno de tox para el Python que está activo
+        run: tox -e py
+
+  # Calidad de código, empaquetado, cobertura y documentación
+  # (una sola vez, en Python 3.12).
+  quality:
+    name: Estilo, manifest, cobertura y docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v7
+
+      - name: Instalar Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Instalar pandoc (para la documentación)
+        run: sudo apt-get update && sudo apt-get install -y pandoc
+
+      - name: Instalar tox
+        run: python -m pip install --upgrade pip tox
+
+      - name: Estilo, docstrings, manifest, cobertura y docs
+        run: tox -e style,docstyle,check-manifest,coverage,docs
+
+      - name: Subir la cobertura a Codecov
+        uses: codecov/codecov-action@v7
         with:
           files: ./coverage.xml
-          directory: ./coverage/reports/
-          env_vars: OS,PYTHON
-          name: codecov-umbrella
-          fail_ci_if_error: false
-          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false   # si Codecov falla, el CI no se pone en rojo

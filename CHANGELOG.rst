@@ -14,6 +14,8 @@ Unreleased (0.2.0)
   scheduled run and manual trigger; style, manifest, coverage and docs
   checked in a separate job. Read the Docs moved to Ubuntu 24.04 and
   Python 3.12 with unpinned documentation dependencies.
+- Releases are published to PyPI by GitHub Actions with Trusted
+  Publishing (no API tokens); manual runs publish to TestPyPI.
 - ``make_df``: avoid ``inplace=True`` in ``set_index`` (deprecated in
   pandas 3.1, to be removed in pandas 4).
 

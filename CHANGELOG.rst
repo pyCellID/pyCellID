@@ -2,7 +2,7 @@ PyCellID Changelog
 ===================
 
 
-Unreleased (0.2.0)
+Version (0.2.0)
 ------------------
 
 - Packaging configuration moved to ``pyproject.toml`` (PEP 621);

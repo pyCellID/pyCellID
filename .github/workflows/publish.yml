@@ -1,0 +1,103 @@
+# =============================================================================
+# Publicación en PyPI con Trusted Publishing (sin tokens)
+# =============================================================================
+# - Al publicar un Release en GitHub  -> sube el paquete a PyPI.
+# - Botón "Run workflow" (manual)     -> sube el paquete a TestPyPI (ensayo).
+#
+# PyPI y TestPyPI confían en ESTE archivo (publish.yml) y en el environment
+# indicado en cada job. Si cambia el nombre del archivo o del environment,
+# hay que actualizar la configuración en pypi.org y test.pypi.org.
+name: Publicar
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+
+  # 1) Construir el sdist y la wheel UNA sola vez.
+  build:
+    name: Construir el paquete
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v7
+
+      - name: Instalar Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Construir y verificar
+        run: |
+          python -m pip install --upgrade pip build twine
+          python -m build
+          twine check --strict dist/*
+          ls -l dist
+
+      - name: Verificar que el tag coincide con la versión del paquete
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="${TAG#v}"
+          if [ ! -f "dist/pycellid-${VERSION}.tar.gz" ]; then
+            echo "El tag ${TAG} no coincide con la versión construida:"
+            ls dist
+            exit 1
+          fi
+          echo "Tag ${TAG} y versión ${VERSION} coinciden."
+
+      - name: Guardar los archivos construidos
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+  # 2a) Ensayo: publicar en TestPyPI (solo con el botón manual).
+  publish-testpypi:
+    name: Publicar en TestPyPI
+    if: github.event_name == 'workflow_dispatch'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/pycellid
+    permissions:
+      id-token: write          # necesario para Trusted Publishing
+    steps:
+      - name: Recuperar los archivos construidos
+        uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+
+      - name: Subir a TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  # 2b) Publicación real: PyPI (solo al publicar un Release).
+  publish-pypi:
+    name: Publicar en PyPI
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pycellid
+    permissions:
+      id-token: write          # necesario para Trusted Publishing
+    steps:
+      - name: Recuperar los archivos construidos
+        uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+
+      - name: Subir a PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
